@@ -1,60 +1,159 @@
-# CodeIgniter 4 Framework
+# 🏦 Aplikasi Manajemen Koperasi
 
-## What is CodeIgniter?
+Aplikasi web berbasis **CodeIgniter 4** untuk manajemen koperasi simpan pinjam. Cocok untuk koperasi skala kecil hingga menengah.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+---
 
-This repository holds the distributable version of the framework.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+## ✨ Fitur Utama
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+| Modul | Deskripsi |
+|---|---|
+| 👥 Anggota | CRUD data anggota koperasi |
+| 💰 Simpanan | Pencatatan simpanan pokok, wajib, dan sukarela |
+| 📋 Pinjaman | Pengajuan dan pengelolaan pinjaman |
+| 💳 Angsuran | Pencatatan cicilan & pelunasan otomatis |
+| 📊 Laporan | Neraca, SHU, laporan anggota & kas |
+| ⚙️ Pengaturan | Identitas koperasi & parameter keuangan |
+| 🌟 Fitur PRO | Master Kelompok & Input Massal (lisensi premium) |
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+---
 
-## Important Change with index.php
+## 🖥️ Kebutuhan Sistem
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+- **PHP** 8.1 atau lebih tinggi
+- **MySQL** 5.7 / MariaDB 10.4 atau lebih tinggi
+- **Composer** 2.x
+- **Web Server**: Apache (XAMPP/Laragon) atau Nginx
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+---
 
-**Please** read the user guide for a better explanation of how CI4 works!
+## 🚀 Cara Instalasi
 
-## Repository Management
+### Metode 1 — Via Git (Direkomendasikan)
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+```bash
+# 1. Clone repository
+git clone https://github.com/USERNAME/koperasi.git
+cd koperasi
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+# 2. Install dependencies PHP
+composer install
 
-## Contributing
+# 3. Salin & konfigurasi file environment
+cp .env.example .env
+```
 
-We welcome contributions from the community.
+Edit file `.env` sesuai konfigurasi server kamu:
 
-Please read the [*Contributing to CodeIgniter*](https://github.com/codeigniter4/CodeIgniter4/blob/develop/CONTRIBUTING.md) section in the development repository.
+```ini
+CI_ENVIRONMENT = development
+app.baseURL    = 'http://localhost/koperasi/public/'
 
-## Server Requirements
+database.default.hostname = localhost
+database.default.database = koperasi_db   # ← nama database kamu
+database.default.username = root           # ← username MySQL
+database.default.password = ''             # ← password MySQL
+database.default.port     = 3306
+```
 
-PHP version 7.4 or higher is required, with the following extensions installed:
+```bash
+# 4. Buat database di MySQL (nama sesuai .env)
+# Contoh: CREATE DATABASE koperasi_db;
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+# 5. Jalankan migrasi via browser
+# Buka: http://localhost/koperasi/public/migrate.php
 
-> [!WARNING]
-> The end of life date for PHP 7.4 was November 28, 2022.
-> The end of life date for PHP 8.0 was November 26, 2023.
-> If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> The end of life date for PHP 8.1 will be November 25, 2024.
+# 6. Buka aplikasi
+# http://localhost/koperasi/public/
+```
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+### Metode 2 — Download ZIP
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+1. Download ZIP dari halaman GitHub → **Code → Download ZIP**
+2. Ekstrak ke folder web server (misal: `htdocs/koperasi/`)
+3. Rename `.env.example` → `.env`, lalu isi konfigurasi database
+4. Buka `http://localhost/koperasi/public/migrate.php`
+5. Aplikasi siap digunakan
+
+---
+
+## 🔐 Login Default
+
+Setelah migrasi, gunakan akun berikut:
+
+| Field | Nilai |
+|---|---|
+| Username | `admin` |
+| Password | `admin123` |
+
+> ⚠️ **Segera ganti password** setelah login pertama kali.
+
+---
+
+## 🌟 Lisensi Premium
+
+Aplikasi ini tersedia dalam dua versi:
+
+### Versi Gratis
+- ✅ Semua fitur dasar (Anggota, Simpanan, Pinjaman, Angsuran, Laporan)
+- ✅ Tidak perlu konfigurasi lisensi apapun
+- ✅ Langsung bisa digunakan setelah instalasi
+
+### Versi Premium
+- 🌟 Semua fitur gratis +
+- 🌟 **Master Kelompok** — pengelompokan anggota
+- 🌟 **Input Massal** — input transaksi banyak anggota sekaligus
+
+Untuk mendapatkan lisensi premium, hubungi developer dan masukkan kode lisensi di menu **Pengaturan → Kode Lisensi**.
+
+---
+
+## 📁 Struktur Folder
+
+```
+koperasi/
+├── app/
+│   ├── Config/          → Konfigurasi aplikasi
+│   ├── Controllers/     → Controller (logika bisnis)
+│   ├── Models/          → Model database
+│   ├── Views/           → Tampilan (HTML/PHP)
+│   ├── Database/
+│   │   ├── Migrations/  → Skema tabel database
+│   │   └── Seeds/       → Data awal
+│   └── Helpers/         → Fungsi bantu global
+├── public/              → Entry point (document root)
+├── .env.example         → Template konfigurasi
+├── composer.json        → Daftar dependencies
+└── README.md
+```
+
+---
+
+## 🛠️ Perintah Berguna
+
+```bash
+# Menjalankan server development
+php spark serve
+
+# Menjalankan migrasi database
+php spark migrate
+
+# Reset database (hati-hati!)
+php spark migrate:rollback
+```
+
+---
+
+## 📞 Kontak & Dukungan
+
+Untuk pertanyaan, bug report, atau pembelian lisensi premium:
+
+- 📧 Email: developer@koperasi.app
+- 💬 WhatsApp: +62 xxx-xxxx-xxxx
+
+---
+
+## 📄 Lisensi
+
+Aplikasi ini dirilis sebagai **freeware** — bebas digunakan untuk keperluan non-komersial.
+Dilarang menjual ulang tanpa izin dari developer.
