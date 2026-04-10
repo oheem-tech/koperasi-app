@@ -60,11 +60,33 @@ database.default.port     = 3306
 # 4. Buat database di MySQL (nama sesuai .env)
 # Contoh: CREATE DATABASE koperasi_db;
 
-# 5. Jalankan migrasi via browser
-# Buka: http://localhost/koperasi/public/migrate.php
+# 5. Jalankan migrasi via command line (terminal)
+php spark migrate
+```
 
-# 6. Buka aplikasi
-# http://localhost/koperasi/public/
+### ⚙️ Pilihan Database (Pilih Salah Satu)
+
+Setelah migrasi selesai, Anda harus memasukkan data awal. Pilih salah satu dari dua opsi berikut:
+
+**Opsi A: Database Murni (Direkomendasikan untuk Production)**
+Hanya membuat akun `admin` (password: `admin123`) tanpa data transaksi dummy.
+```bash
+php spark db:seed AdminSeeder
+```
+
+**Opsi B: Database Demo (Direkomendasikan untuk Coba-Coba)**
+Memasukkan data sampel: 2 akun anggota lengkap dengan transaksi kas awal, simpanan, pengajuan pinjaman, dan angsuran berjalan.
+```bash
+php spark db:seed AdminSeeder
+php spark db:seed DemoSeeder
+```
+
+---
+
+Setelah itu, jalankan server dan buka aplikasi:
+```bash
+php spark serve
+# Buka di browser: http://localhost:8080/
 ```
 
 ### Metode 2 — Download ZIP
