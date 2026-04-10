@@ -19,12 +19,6 @@ composer.phar
 composer-setup.php
 
 #--------------------------------------------
-# FRAMEWORK CORE (CodeIgniter system files)
-# Sudah termasuk dalam paket CI4, tidak perlu di-commit
-#--------------------------------------------
-system/
-
-#--------------------------------------------
 # WRITABLE — Log, Cache, Session (generated otomatis)
 #--------------------------------------------
 writable/
