@@ -21,13 +21,16 @@ composer-setup.php
 #--------------------------------------------
 # WRITABLE — Log, Cache, Session (generated otomatis)
 #--------------------------------------------
-writable/
-!writable/.htaccess
-!writable/debugbar/.gitkeep
+writable/logs/*
 !writable/logs/.gitkeep
+writable/cache/*
 !writable/cache/.gitkeep
+writable/session/*
 !writable/session/.gitkeep
+writable/uploads/*
 !writable/uploads/.gitkeep
+writable/debugbar/*
+!writable/debugbar/.gitkeep
 
 #--------------------------------------------
 # FILE DEBUG / TEMP / SENSITIF
