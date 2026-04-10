@@ -1,0 +1,102 @@
+<?= $this->extend('layout/default') ?>
+
+<?= $this->section('content') ?>
+<div class="row justify-content-center mt-3">
+    <div class="col-lg-10">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-gradient bg-primary text-white p-4 pb-5 position-relative" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);">
+                <div class="text-center position-relative z-1">
+                    <div class="mb-3">
+                        <span class="bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 2rem; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+                            <i class="fas fa-handshake"></i>
+                        </span>
+                    </div>
+                    <h2 class="fw-bold mb-2 text-white">Layanan Kustomisasi & Dukungan Teknis</h2>
+                    <p class="text-white-50 mb-0" style="font-size: 1rem;">Perlu fitur tambahan atau modifikasi khusus untuk Koperasi Anda?</p>
+                </div>
+                <!-- Dekoratif awan/gelombang bawah header -->
+                <svg class="position-absolute bottom-0 start-0 w-100" style="height: 40px; color: #fff;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                  <path fill="currentColor" fill-opacity="1" d="M0,224L60,213.3C120,203,240,181,360,186.7C480,192,600,224,720,240C840,256,960,256,1080,240C1200,224,1320,192,1380,176L1440,160L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+                </svg>
+            </div>
+            
+            <div class="card-body p-5 pt-4">
+                <div class="text-center mb-5">
+                    <p class="lead text-muted" style="max-width: 600px; margin: 0 auto; font-size: 0.95rem; line-height: 1.7;">
+                        Terima kasih telah menggunakan <strong>Aplikasi Koperasi CirebonTech</strong> versi Standar secara gratis. Kami menyadari bahwa setiap Koperasi memiliki Standar Operasional (SOP) dan algoritma perhitungan yang unik.
+                    </p>
+                </div>
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="p-4 bg-light rounded-4 h-100 border border-light-subtle shadow-sm transition-hover">
+                            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                                <i class="fas fa-code text-primary me-2"></i> Kustomisasi Fitur
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                Ingin mengubah rumus bagi hasil SHU? Membutuhkan jenis/potongan simpanan khusus? Atau perlu format Nota Print yang berbeda? Kami siap memodifikasi source-code aplikasi sesuai kebutuhan spesifik Anda.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-4 bg-light rounded-4 h-100 border border-light-subtle shadow-sm transition-hover">
+                            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                                <i class="fas fa-crown text-warning me-2"></i> Lisensi PRO (White-label)
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                Ubah aplikasi menjadi milik Anda sepenuhnya. Hapus watermark "CirebonTech" di seluruh halaman dan nota print, buka fitur eksklusif <strong>Input Massal</strong>, dan aktifkan fitur <strong>Kebijakan Pelunasan Tambahan</strong>.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-4 bg-light rounded-4 h-100 border border-light-subtle shadow-sm transition-hover">
+                            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                                <i class="fas fa-database text-success me-2"></i> Impor Data Lama & Migrasi
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                Jika Anda memiliki ribuan data anggota, saldo, atau cicilan lama di Excel/Buku Besar, kami siap membantu melakukan migrasi <em>database</em> secara utuh ke aplikasi baru Anda dengan rapi dan akurat.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-4 bg-light rounded-4 h-100 border border-light-subtle shadow-sm transition-hover">
+                            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                                <i class="fas fa-server text-danger me-2"></i> Setup Server & Online Hosting
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                Ingin aplikasi ini bisa diakses dari smartphone oleh semua anggota di mana saja? Kami menyediakan jasa penyewaan hosting dan setup domain (misal: <em>koperasi-anda.com</em>).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center bg-primary bg-opacity-10 rounded-4 p-4 mb-4 border border-primary border-opacity-25">
+                    <h5 class="fw-bold text-dark mb-3">Tertarik Meningkatkan Performa Koperasi Anda?</h5>
+                    <p class="text-muted mb-4 small">
+                        Konsultasikan segala kebutuhan IT Koperasi Anda bersama kami secara langsung. Kami siap membantu dengan biaya yang sangat fleksibel dan kompetitif.
+                    </p>
+                    <?php 
+                        $waText = urlencode("Halo Tim CirebonTech,\n\nSaya pengguna Aplikasi Koperasi versi Gratis. Saya tertarik untuk menanyakan mengenai Lisensi PRO / Jasa Kustomisasi untuk koperasi saya...\n\nMohon informasi lebih lanjut.");
+                    ?>
+                    <a href="https://wa.me/6282240629862?text=<?= $waText ?>" target="_blank" class="btn btn-success btn-lg rounded-pill px-4 py-2 fw-bold shadow-sm" style="font-size: 0.95rem;">
+                        <i class="fab fa-whatsapp me-2" style="font-size: 1.2rem;"></i> Hubungi via WhatsApp
+                    </a>
+                    <div class="mt-3 text-muted" style="font-size: 0.8rem;">
+                        0822-4062-9862 (CirebonTech)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.transition-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.transition-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+}
+</style>
+<?= $this->endSection() ?>

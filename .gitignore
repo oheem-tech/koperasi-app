@@ -1,0 +1,81 @@
+##############################################
+# .gitignore — Aplikasi Koperasi (CodeIgniter 4)
+##############################################
+
+#--------------------------------------------
+# KONFIGURASI LOKAL (berisi password & path spesifik)
+# User membuat sendiri dari .env.example
+#--------------------------------------------
+.env
+.env.*
+!.env.example
+
+#--------------------------------------------
+# DEPENDENCIES PHP
+# Di-generate ulang dengan: composer install
+#--------------------------------------------
+vendor/
+composer.phar
+composer-setup.php
+
+#--------------------------------------------
+# FRAMEWORK CORE (CodeIgniter system files)
+# Sudah termasuk dalam paket CI4, tidak perlu di-commit
+#--------------------------------------------
+system/
+
+#--------------------------------------------
+# WRITABLE — Log, Cache, Session (generated otomatis)
+#--------------------------------------------
+writable/
+!writable/.htaccess
+!writable/debugbar/.gitkeep
+!writable/logs/.gitkeep
+!writable/cache/.gitkeep
+!writable/session/.gitkeep
+!writable/uploads/.gitkeep
+
+#--------------------------------------------
+# FILE DEBUG / TEMP / SENSITIF
+#--------------------------------------------
+debug.php
+gen_hash.php
+patch.ps1
+
+#--------------------------------------------
+# OUTPUT MIGRASI (file sementara)
+#--------------------------------------------
+*.html
+!app/Views/**/*.html
+
+#--------------------------------------------
+# OS & EDITOR
+#--------------------------------------------
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains (PHPStorm, dll)
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+#--------------------------------------------
+# UPLOAD ASSETS (tidak perlu di-commit)
+#--------------------------------------------
+public/uploads/
+# Kecuali folder kosong (agar folder tetap ada)
+!public/uploads/.gitkeep
