@@ -170,8 +170,8 @@ php spark migrate:rollback
 
 Untuk pertanyaan, bug report, atau pembelian lisensi premium:
 
-- 📧 Email: developer@koperasi.app
-- 💬 WhatsApp: +62 xxx-xxxx-xxxx
+- 📧 Email: cirebontech@gmail.com
+- 💬 WhatsApp: +62 822-4062-9862
 
 ---
 
