@@ -87,15 +87,14 @@ Setelah itu, jalankan server dan buka aplikasi:
 ```bash
 php spark serve
 # Buka di browser: http://localhost:8080/
-```
+### Metode 2 — Instalasi Cepat Web Installer (Untuk End User/Non-Programmer)
 
-### Metode 2 — Download ZIP
-
-1. Download ZIP dari halaman GitHub → **Code → Download ZIP**
-2. Ekstrak ke folder web server (misal: `htdocs/koperasi/`)
-3. Rename `.env.example` → `.env`, lalu isi konfigurasi database
-4. Buka `http://localhost/koperasi/public/migrate.php`
-5. Aplikasi siap digunakan
+1. Download ZIP dari rilis aplikasi atau minta paket ZIP dari developer
+2. Ekstrak isi ZIP ke folder web server (misal: `htdocs/koperasi/` di XAMPP)
+3. Buat database kosong di phpMyAdmin (misal: `koperasi_db`)
+4. Buka **`http://localhost/koperasi/public/index.php/install`** di browser Anda
+5. Isi form konfigurasi koneksi database yang diminta, lalu klik `Simpan Konfigurasi & Install Database`
+6. Sistem akan otomatis menyambungkan database, membuat tabel, dan menyuntikkan akun Admin. Aplikasi siap digunakan!
 
 ---
 
