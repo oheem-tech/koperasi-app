@@ -12,7 +12,7 @@ class Install extends Controller
         $envExamplePath = ROOTPATH . '.env.example';
 
         // Jika form setup .env di-submit
-        if ($this->request->getMethod() === 'POST' && $this->request->getPost('setup_env')) {
+        if ($this->request->getPost('setup_env')) {
             $dbHost = $this->request->getPost('db_host');
             $dbUser = $this->request->getPost('db_user');
             $dbPass = $this->request->getPost('db_pass');

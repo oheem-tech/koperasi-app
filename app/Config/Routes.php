@@ -10,7 +10,7 @@ $routes->get('/auth', 'Auth::index');
 $routes->post('/auth/process', 'Auth::process');
 $routes->get('/auth/logout', 'Auth::logout');
 $routes->get('/dashboard', 'Dashboard::index', ['filter' => 'auth']);
-$routes->get('/install', 'Install::index');
+$routes->match(['get', 'post'], '/install', 'Install::index');
 
 $routes->group('anggota', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Anggota::index');
