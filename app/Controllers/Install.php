@@ -14,6 +14,7 @@ class Install extends Controller
         // Jika form setup .env di-submit
         if ($this->request->getPost('setup_env')) {
             $dbHost = $this->request->getPost('db_host');
+            $dbPort = $this->request->getPost('db_port');
             $dbUser = $this->request->getPost('db_user');
             $dbPass = $this->request->getPost('db_pass');
             $dbName = $this->request->getPost('db_name');
@@ -24,6 +25,7 @@ class Install extends Controller
                 
                 // Replace configurasi database dan baseURL
                 $envContent = preg_replace('/^database\.default\.hostname\s*=\s*.*/m', "database.default.hostname = $dbHost", $envContent);
+                $envContent = preg_replace('/^database\.default\.port\s*=\s*.*/m', "database.default.port = $dbPort", $envContent);
                 $envContent = preg_replace('/^database\.default\.database\s*=\s*.*/m', "database.default.database = $dbName", $envContent);
                 $envContent = preg_replace('/^database\.default\.username\s*=\s*.*/m', "database.default.username = $dbUser", $envContent);
                 $envContent = preg_replace('/^database\.default\.password\s*=\s*.*/m', "database.default.password = '$dbPass'", $envContent);
@@ -59,7 +61,10 @@ class Install extends Controller
             echo csrf_field();
             echo "<input type='hidden' name='setup_env' value='1'>";
             echo "<div><label style='font-weight:bold; font-size:14px;'>Base URL Aplikasi:</label><br><input type='text' name='base_url' value='{$guessedBaseUrl}' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
-            echo "<div><label style='font-weight:bold; font-size:14px;'>Database Host:</label><br><input type='text' name='db_host' value='localhost' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
+            echo "<div style='display:flex; gap:10px;'>";
+            echo "<div style='flex:3;'><label style='font-weight:bold; font-size:14px;'>Database Host:</label><br><input type='text' name='db_host' value='localhost' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
+            echo "<div style='flex:1;'><label style='font-weight:bold; font-size:14px;'>Port:</label><br><input type='number' name='db_port' value='3306' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
+            echo "</div>";
             echo "<div><label style='font-weight:bold; font-size:14px;'>Nama Database:</label><br><input type='text' name='db_name' placeholder='Misal: koperasi_db' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
             echo "<div><label style='font-weight:bold; font-size:14px;'>Username Database:</label><br><input type='text' name='db_user' value='root' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
             echo "<div><label style='font-weight:bold; font-size:14px;'>Password Database:</label><br><input type='text' name='db_pass' placeholder='(Kosongkan jika di XAMPP default)' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;'></div>";
