@@ -32,6 +32,7 @@ class RoleModel extends Model
             'manage_kas'        => 'Buku Kas Umum (Manajemen Uang Masuk/Keluar)',
             'view_laporan'      => 'Akses & Cetak Laporan Keuangan (SHU, Neraca, Arus Kas)',
             'manage_pengaturan' => 'Pengaturan Global (Bunga, Tenor, Koperasi)',
+            'manage_backup'     => 'Backup & Restore Database',
             'manage_roles'      => 'Hak Akses & Role Management (Super Admin)'
         ];
     }

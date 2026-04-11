@@ -273,7 +273,7 @@
                 <i class="nav-icon fas fa-th-large"></i> Dashboard
             </a>
 
-            <?php if(has_permission('manage_anggota') || has_permission('manage_pengaturan') || has_permission('manage_roles')): ?>
+            <?php if(has_permission('manage_anggota') || has_permission('manage_pengaturan') || has_permission('manage_roles') || has_permission('manage_backup')): ?>
             <div class="nav-section-label">Master Data</div>
             
             <?php if(has_permission('manage_anggota')): ?>
@@ -297,6 +297,12 @@
             </a>
             <a href="<?= base_url('pengaturan') ?>" class="<?= current_url(true)->getSegment(1) == 'pengaturan' ? 'active' : '' ?>">
                 <i class="nav-icon fas fa-sliders-h"></i> Pengaturan Master
+            </a>
+            <?php endif; ?>
+
+            <?php if(has_permission('manage_backup')): ?>
+            <a href="<?= base_url('backup') ?>" class="<?= current_url(true)->getSegment(1) == 'backup' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-database"></i> Backup & Restore
             </a>
             <?php endif; ?>
 

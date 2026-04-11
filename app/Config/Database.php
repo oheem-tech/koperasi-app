@@ -47,31 +47,7 @@ class Database extends Config
         'numberNative' => false,
     ];
 
-    /**
-     * Database connection for data migration (legacy DB).
-     *
-     * @var array<string, mixed>
-     */
-    public array $legacy = [
-        'DSN'          => '',
-        'hostname'     => 'localhost',
-        'username'     => 'root',
-        'password'     => '',
-        'database'     => 'koperasi_lama',
-        'DBDriver'     => 'MySQLi',
-        'DBPrefix'     => '',
-        'pConnect'     => false,
-        'DBDebug'      => true,
-        'charset'      => 'utf8',
-        'DBCollat'     => 'utf8_general_ci',
-        'swapPre'      => '',
-        'encrypt'      => false,
-        'compress'     => false,
-        'strictOn'     => false,
-        'failover'     => [],
-        'port'         => 3306,
-        'numberNative' => false,
-    ];
+
 
     /**
      * This database connection is used when

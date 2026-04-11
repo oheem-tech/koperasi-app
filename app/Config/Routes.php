@@ -10,6 +10,7 @@ $routes->get('/auth', 'Auth::index');
 $routes->post('/auth/process', 'Auth::process');
 $routes->get('/auth/logout', 'Auth::logout');
 $routes->get('/dashboard', 'Dashboard::index', ['filter' => 'auth']);
+$routes->get('/install', 'Install::index');
 
 $routes->group('anggota', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Anggota::index');
@@ -128,10 +129,10 @@ $routes->group('informasi', ['filter' => 'auth'], static function ($routes) {
     $routes->get('support', 'Informasi::support');
 });
 
-$routes->get('migrasikas/run', 'MigrasiKas::run');
-$routes->post('migrasikas/destroy', 'MigrasiKas::destroy');
+$routes->group('backup', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('/', 'Backup::index');
+    $routes->get('download', 'Backup::download');
+    $routes->post('restore', 'Backup::restore');
+});
 
-// Data Migration Tool (Hanya untuk digunakan sekali saat migrasi, hapus setelah selesai)
-$routes->get('migrator', 'Migrator::index');
-$routes->get('migrator/reset', 'Migrator::reset');
-$routes->get('migrator/eksekusi', 'Migrator::eksekusi');
+// Routes end here.

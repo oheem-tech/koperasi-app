@@ -88,6 +88,10 @@ class Role extends BaseController
             'permissions' => json_encode($permissions) // Update the json permissions
         ]);
 
+        if (session()->get('role') === $role['name']) {
+            session()->set('permissions', $permissions);
+        }
+
         return redirect()->to('/role')->with('success', 'Berhasil memperbarui hak akses role ' . $role['name']);
     }
 
