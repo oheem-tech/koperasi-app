@@ -238,9 +238,16 @@
         <a href="<?= base_url('massal') ?>" class="btn btn-secondary px-4">
             <i class="fas fa-times me-1"></i> Batal
         </a>
+        <?php if(is_premium()): ?>
         <button type="submit" class="btn btn-success btn-lg px-5">
             <i class="fas fa-paper-plane me-2"></i> Proses Pembayaran Massal
         </button>
+        <?php else: ?>
+        <a href="<?= base_url('informasi/support') ?>" class="btn btn-success btn-lg px-5">
+            <i class="fas fa-crown text-warning me-2"></i> Proses Pembayaran Massal
+            <span style="font-size:0.7rem; background:rgba(255,255,255,0.2); border-radius:10px; padding:2px 8px; margin-left:4px;">PRO</span>
+        </a>
+        <?php endif; ?>
     </div>
 </form>
 

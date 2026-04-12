@@ -8,9 +8,15 @@
     </div>
     <div class="d-flex gap-2">
         <a href="<?= base_url('kelompok/bulk') ?>" class="btn btn-warning shadow-sm"><i class="fas fa-users-cog"></i> Pindah Massal Anggota</a>
+        <?php if(is_premium()): ?>
         <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambah">
             <i class="fas fa-plus"></i> Tambah Kelompok
         </button>
+        <?php else: ?>
+        <a href="<?= base_url('informasi/support') ?>" class="btn btn-primary shadow-sm" title="Fitur khusus Versi PRO">
+            <i class="fas fa-crown text-warning me-1"></i> Tambah Kelompok <span style="font-size:0.65rem; background:rgba(255,255,255,0.2); border-radius:10px; padding:1px 6px;">PRO</span>
+        </a>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -55,8 +61,16 @@
                             <?php endif; ?>
                         </td>
                         <td class="text-center">
+                            <?php if(is_premium()): ?>
                             <button class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalEdit<?= $k['id'] ?>"><i class="fas fa-edit"></i> Edit</button>
-                            <a href="<?= base_url('kelompok/delete/'.$k['id']) ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Yakin ingin menghapus kelompok ini? Semua anggota di dalamnya harus dikosongkan terlebih dahulu.')"><i class="fas fa-trash"></i></a>
+                            <?php else: ?>
+                            <a href="<?= base_url('informasi/support') ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3" title="Fitur PRO"><i class="fas fa-edit"></i></a>
+                            <?php endif; ?>
+                            <?php if(is_premium()): ?>
+                            <a href="<?= base_url('kelompok/delete/'.$k['id']) ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Yakin ingin menghapus kelompok ini?')"><i class="fas fa-trash"></i></a>
+                            <?php else: ?>
+                            <a href="<?= base_url('informasi/support') ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Fitur PRO"><i class="fas fa-trash"></i></a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     
@@ -72,7 +86,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <div class="alert alert-warning p-2" style="font-size:0.8rem;">
-                                            <i class="fas fa-info-circle"></i> Jika Anda mengubah nama kelompok di sini, sistem akan **otomatis** merubah label kelompok pada seluruh data (<?= $k['jumlah_anggota'] ?>) anggota yang terhubung!
+                                            <i class="fas fa-info-circle"></i> Jika Anda mengubah nama kelompok di sini, sistem akan <b>otomatis</b> merubah label kelompok pada seluruh data (<?= $k['jumlah_anggota'] ?>) anggota yang terhubung!
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label fw-semibold">Nama Kelompok</label>
@@ -85,7 +99,11 @@
                                     </div>
                                     <div class="modal-footer border-0">
                                         <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                                        <?php if(is_premium()): ?>
                                         <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="fas fa-save me-1"></i> Simpan Perubahan</button>
+                                        <?php else: ?>
+                                        <a href="<?= base_url('informasi/support') ?>" class="btn btn-primary rounded-pill px-4"><i class="fas fa-crown text-warning me-1"></i> Simpan <span style="font-size:0.65rem; background:rgba(255,255,255,0.2); border-radius:10px; padding:1px 6px;">PRO</span></a>
+                                        <?php endif; ?>
                                     </div>
                                 </form>
                             </div>
@@ -129,7 +147,11 @@
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <?php if(is_premium()): ?>
                     <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="fas fa-save me-1"></i> Simpan</button>
+                    <?php else: ?>
+                    <a href="<?= base_url('informasi/support') ?>" class="btn btn-primary rounded-pill px-4"><i class="fas fa-crown text-warning me-1"></i> Simpan <span style="font-size:0.65rem; background:rgba(255,255,255,0.2); border-radius:10px; padding:1px 6px;">PRO</span></a>
+                    <?php endif; ?>
                 </div>
             </form>
         </div>

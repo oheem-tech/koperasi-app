@@ -54,7 +54,9 @@ $groupColors = [
             <div class="col-md-6 mb-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-<?= $groupColors[$groupName] ?> text-white fw-semibold">
-                        <i class="fas fa-sliders-h me-2"></i> <?= $groupName ?>
+                        <i class="fas fa-sliders-h me-2"></i> 
+                        <span <?= ($groupName == 'Lainnya') ? 'onclick="revealLicense(this)" style="cursor:pointer;"' : '' ?>><?= $groupName ?></span>
+                        
                         <?php if($groupName == 'Kebijakan Pelunasan' && !is_premium()): ?>
                             <span class="badge bg-warning text-dark float-end mt-1" style="font-size: 0.65rem;" title="Aktifkan Lisensi Pro untuk mengubah kebijakan ini."><i class="fas fa-lock"></i> PRO</span>
                         <?php endif; ?>
@@ -83,6 +85,28 @@ $groupColors = [
                                                 <option value="akumulasi_akhir" <?= ($row['pengaturan_value'] == 'akumulasi_akhir') ? 'selected' : '' ?>>Nilai Akumulasi Keseluruhan Terakhir</option>
                                                 <option value="rata_rata_berjalan" <?= ($row['pengaturan_value'] == 'rata_rata_berjalan') ? 'selected' : '' ?>>Rata-rata Nominal Saldo Berjalan Tiap Bulan dalam Tahun (Bulan-Poin)</option>
                                             </select>
+                                        <?php elseif($row['pengaturan_key'] == 'kode_lisensi'): ?>
+                                            <?php if(is_premium()): ?>
+                                            <!-- Hidden input always submits the value -->
+                                            <input type="hidden" name="settings[<?= $row['id'] ?>]" value="<?= $row['pengaturan_value'] ?>" id="licenseHidden_<?= $row['id'] ?>">
+                                            <div id="licenseVisualDummy_<?= $row['id'] ?>" class="form-control form-control-sm bg-light fw-bold text-success">
+                                                <i class="fas fa-check-circle"></i> Lisensi Pro
+                                            </div>
+                                            <input type="text"
+                                                   id="licenseSecretInput_<?= $row['id'] ?>"
+                                                   style="display:none;"
+                                                   class="form-control form-control-sm mt-1"
+                                                   placeholder="Masukkan Kode Lisensi PRO di sini..."
+                                                   value="<?= $row['pengaturan_value'] ?>"
+                                                   oninput="document.getElementById('licenseHidden_<?= $row['id'] ?>').value = this.value">
+                                            <?php else: ?>
+                                            <input type="text"
+                                                   id="licenseSecretInput_<?= $row['id'] ?>"
+                                                   class="form-control form-control-sm"
+                                                   name="settings[<?= $row['id'] ?>]"
+                                                   placeholder="Masukkan Kode Lisensi PRO di sini..."
+                                                   value="<?= $row['pengaturan_value'] ?>">
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <?php $isLocked = ($groupName == 'Kebijakan Pelunasan' && !is_premium()); ?>
                                             <input type="text" class="form-control form-control-sm <?= $isLocked ? 'bg-light text-muted' : '' ?>"
@@ -107,4 +131,20 @@ $groupColors = [
         </button>
     </div>
 </form>
+
+<script>
+let secretClicks = 0;
+function revealLicense(el) {
+    secretClicks++;
+    if (secretClicks >= 3) {
+        document.querySelectorAll('[id^=licenseVisualDummy]').forEach(e => e.style.display = 'none');
+        document.querySelectorAll('[id^=licenseSecretInput]').forEach(e => {
+            e.style.display = 'block';
+            e.type = 'text';
+        });
+        el.innerHTML = 'Lainnya <i class="fas fa-unlock ms-1 text-warning"></i>';
+        secretClicks = 0;
+    }
+}
+</script>
 <?= $this->endSection() ?>

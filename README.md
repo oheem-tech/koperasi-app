@@ -8,13 +8,16 @@ Aplikasi web berbasis **CodeIgniter 4** untuk manajemen koperasi simpan pinjam. 
 
 | Modul | Deskripsi |
 |---|---|
-| 👥 Anggota | CRUD data anggota koperasi |
-| 💰 Simpanan | Pencatatan simpanan pokok, wajib, dan sukarela |
-| 📋 Pinjaman | Pengajuan dan pengelolaan pinjaman |
-| 💳 Angsuran | Pencatatan cicilan & pelunasan otomatis |
-| 📊 Laporan | Neraca, SHU, laporan anggota & kas |
-| ⚙️ Pengaturan | Identitas koperasi & parameter keuangan |
-| 🌟 Fitur PRO | Master Kelompok & Input Massal (lisensi premium) |
+| 👥 Anggota | CRUD data anggota + akun login otomatis |
+| 💰 Simpanan | Setor & tarik simpanan multi-jenis, terintegrasi kas |
+| 📋 Pinjaman | Pengajuan, approval, dan manajemen pinjaman |
+| 💳 Angsuran | Cicilan bulanan + pelunasan awal (early payoff) |
+| 📊 Laporan | Neraca, SHU, Arus Kas, & laporan per anggota |
+| 🗄️ Buku Kas | Kas umum otomatis + entri manual |
+| 💾 Backup | Backup & restore database via antarmuka web |
+| ⚙️ Pengaturan | Identitas koperasi, parameter keuangan & lisensi |
+| 🌟 PRO: Kelompok | Master Kelompok & pemindahan massal anggota |
+| 🌟 PRO: Massal | Input simpanan + angsuran massal per kelompok |
 
 ---
 
@@ -22,14 +25,37 @@ Aplikasi web berbasis **CodeIgniter 4** untuk manajemen koperasi simpan pinjam. 
 
 - **PHP** 8.1 atau lebih tinggi
 - **MySQL** 5.7 / MariaDB 10.4 atau lebih tinggi
-- **Composer** 2.x
 - **Web Server**: Apache (XAMPP/Laragon) atau Nginx
+- **Composer** 2.x *(hanya untuk metode developer/Git)*
 
 ---
 
 ## 🚀 Cara Instalasi
 
-### Metode 1 — Via Git (Direkomendasikan)
+### Metode 1 — Web Installer (Direkomendasikan untuk End User)
+
+Cara termudah tanpa baris perintah apapun.
+
+1. **Download** paket ZIP dari developer / halaman rilis GitHub.
+2. **Ekstrak** isi ZIP ke folder web server Anda.
+   - XAMPP: `C:\xampp\htdocs\koperasi\`
+   - cPanel Hosting: Folder `public_html/` atau subdirektori.
+3. **Buat database kosong** di phpMyAdmin (misal: `koperasi_db`).
+4. **Buka browser** dan akses URL aplikasi Anda:
+   - Lokal: `http://localhost/koperasi/`
+   - Subdirektori: `http://localhost:8088/nama-folder/`
+5. Jika file `.env` belum ada, sistem otomatis menampilkan **halaman Web Installer**.
+6. **Isi form installer**:
+   - `Base App URL` → URL lengkap aplikasi Anda *(tanpa `/public`)*
+   - Informasi koneksi database (host, nama DB, username, password, port)
+   - Pilih mode database: **Bersih** (production) atau **Isi Data Demo** (percobaan)
+7. Klik **"Simpan & Install Sekarang"** — sistem otomatis migrasi database dan redirect ke halaman login.
+
+> ✅ Selesai! Login dengan `admin` / `admin123` dan segera ganti password.
+
+---
+
+### Metode 2 — Via Git / Command Line (Untuk Developer)
 
 ```bash
 # 1. Clone repository
@@ -39,68 +65,39 @@ cd koperasi
 # 2. Install dependencies PHP
 composer install
 
-# 3. Salin & konfigurasi file environment
+# 3. Salin & edit file environment
 cp .env.example .env
 ```
 
-Edit file `.env` sesuai konfigurasi server kamu:
+Edit `.env` sesuai server Anda:
 
 ```ini
 CI_ENVIRONMENT = development
-app.baseURL    = 'http://localhost/koperasi/public/'
+app.baseURL    = 'http://localhost/koperasi/'
+app.indexPage  = ''
 
 database.default.hostname = localhost
-database.default.database = koperasi_db   # ← nama database kamu
-database.default.username = root           # ← username MySQL
-database.default.password = ''             # ← password MySQL
+database.default.database = koperasi_db
+database.default.username = root
+database.default.password = ''
 database.default.port     = 3306
 ```
 
 ```bash
-# 4. Buat database di MySQL (nama sesuai .env)
-# Contoh: CREATE DATABASE koperasi_db;
-
-# 5. Jalankan migrasi via command line (terminal)
+# 4. Jalankan migrasi
 php spark migrate
-```
 
-### ⚙️ Pilihan Database (Pilih Salah Satu)
-
-Setelah migrasi selesai, Anda harus memasukkan data awal. Pilih salah satu dari dua opsi berikut:
-
-**Opsi A: Database Murni (Direkomendasikan untuk Production)**
-Hanya membuat akun `admin` (password: `admin123`) tanpa data transaksi dummy.
-```bash
+# 5a. Hanya akun admin (Production)
 php spark db:seed AdminSeeder
-```
 
-**Opsi B: Database Demo (Direkomendasikan untuk Coba-Coba)**
-Memasukkan data sampel: 2 akun anggota lengkap dengan transaksi kas awal, simpanan, pengajuan pinjaman, dan angsuran berjalan.
-```bash
+# 5b. Data demo lengkap (Percobaan)
 php spark db:seed AdminSeeder
 php spark db:seed DemoSeeder
 ```
 
 ---
 
-Setelah itu, jalankan server dan buka aplikasi:
-```bash
-php spark serve
-# Buka di browser: http://localhost:8080/
-### Metode 2 — Instalasi Cepat Web Installer (Untuk End User/Non-Programmer)
-
-1. Download ZIP dari rilis aplikasi atau minta paket ZIP dari developer
-2. Ekstrak isi ZIP ke folder web server (misal: `htdocs/koperasi/` di XAMPP)
-3. Buat database kosong di phpMyAdmin (misal: `koperasi_db`)
-4. Buka **`http://localhost/koperasi/public/index.php/install`** di browser Anda
-5. Isi form konfigurasi koneksi database yang diminta, lalu klik `Simpan Konfigurasi & Install Database`
-6. Sistem akan otomatis menyambungkan database, membuat tabel, dan menyuntikkan akun Admin. Aplikasi siap digunakan!
-
----
-
 ## 🔐 Login Default
-
-Setelah migrasi, gunakan akun berikut:
 
 | Field | Nilai |
 |---|---|
@@ -113,19 +110,18 @@ Setelah migrasi, gunakan akun berikut:
 
 ## 🌟 Lisensi Premium
 
-Aplikasi ini tersedia dalam dua versi:
-
 ### Versi Gratis
-- ✅ Semua fitur dasar (Anggota, Simpanan, Pinjaman, Angsuran, Laporan)
-- ✅ Tidak perlu konfigurasi lisensi apapun
-- ✅ Langsung bisa digunakan setelah instalasi
+- ✅ Semua fitur inti (Anggota, Simpanan, Pinjaman, Angsuran, Laporan, Kas, Backup)
+- ✅ Web Installer otomatis
+- ✅ Multi-role & manajemen akses
 
-### Versi Premium
+### Versi PRO
 - 🌟 Semua fitur gratis +
-- 🌟 **Master Kelompok** — pengelompokan anggota
-- 🌟 **Input Massal** — input transaksi banyak anggota sekaligus
+- 🌟 **Master Kelompok** — buat & kelola klasifikasi anggota
+- 🌟 **Input Massal** — potong gaji seluruh kelompok dalam satu klik
+- 🌟 **Kebijakan Pelunasan** — atur minimum tenor & biaya jasa pelunasan awal
 
-Untuk mendapatkan lisensi premium, hubungi developer dan masukkan kode lisensi di menu **Pengaturan → Kode Lisensi**.
+Untuk mendapatkan lisensi PRO, hubungi developer. Masukkan kode lisensi di menu **Pengaturan Master → kolom Kode Lisensi**.
 
 ---
 
@@ -134,40 +130,49 @@ Untuk mendapatkan lisensi premium, hubungi developer dan masukkan kode lisensi d
 ```
 koperasi/
 ├── app/
-│   ├── Config/          → Konfigurasi aplikasi
-│   ├── Controllers/     → Controller (logika bisnis)
-│   ├── Models/          → Model database
-│   ├── Views/           → Tampilan (HTML/PHP)
+│   ├── Config/              → Konfigurasi aplikasi (App.php, Routes.php, dll)
+│   ├── Controllers/         → Logika bisnis & routing halaman
+│   ├── Models/              → Model database
+│   ├── Views/               → Tampilan (HTML/PHP)
+│   │   ├── layout/          → Template utama (sidebar, topbar)
+│   │   ├── install/         → View Web Installer
+│   │   └── informasi/       → Halaman panduan, fitur & support
 │   ├── Database/
-│   │   ├── Migrations/  → Skema tabel database
-│   │   └── Seeds/       → Data awal
-│   └── Helpers/         → Fungsi bantu global
-├── public/              → Entry point (document root)
-├── .env.example         → Template konfigurasi
-├── composer.json        → Daftar dependencies
+│   │   ├── Migrations/      → Skema tabel database
+│   │   └── Seeds/           → Data awal (AdminSeeder, DemoSeeder)
+│   └── Helpers/             → Fungsi bantu global (is_premium, get_pengaturan)
+├── public/                  → Entry point & aset statis
+│   └── assets/images/       → Aset gambar (coffee_pro.png, dll)
+├── .htaccess                → Redirect root ke /public secara otomatis
+├── .env.example             → Template konfigurasi
+├── composer.json            → Daftar dependencies
 └── README.md
 ```
 
 ---
 
-## 🛠️ Perintah Berguna
+## 🛠️ Perintah Berguna (Developer)
 
 ```bash
-# Menjalankan server development
+# Jalankan server development
 php spark serve
 
-# Menjalankan migrasi database
+# Migrasi database
 php spark migrate
 
 # Reset database (hati-hati!)
 php spark migrate:rollback
+
+# Jalankan seeder
+php spark db:seed AdminSeeder
+php spark db:seed DemoSeeder
 ```
 
 ---
 
 ## 📞 Kontak & Dukungan
 
-Untuk pertanyaan, bug report, atau pembelian lisensi premium:
+Untuk pertanyaan, bug report, atau pembelian lisensi PRO:
 
 - 📧 Email: cirebontech@gmail.com
 - 💬 WhatsApp: +62 822-4062-9862

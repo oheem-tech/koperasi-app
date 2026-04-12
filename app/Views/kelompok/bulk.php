@@ -117,9 +117,16 @@
                             </select>
                         </div>
                         <div class="pt-3">
+                            <?php if(is_premium()): ?>
                             <button type="submit" class="btn btn-primary btn-lg shadow-sm" id="btnProses">
                                 <i class="fas fa-check-double me-2"></i>Proses Pemindahan (<span id="countPilih"><?= count($anggota) ?></span>)
                             </button>
+                            <?php else: ?>
+                            <a href="<?= base_url('informasi/support') ?>" class="btn btn-primary btn-lg shadow-sm">
+                                <i class="fas fa-crown text-warning me-2"></i>Proses Pemindahan
+                                <span style="font-size:0.7rem; background:rgba(255,255,255,0.2); border-radius:10px; padding:2px 8px; margin-left:4px;">PRO</span>
+                            </a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

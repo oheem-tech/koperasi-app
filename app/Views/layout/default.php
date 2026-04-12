@@ -273,6 +273,50 @@
                 <i class="nav-icon fas fa-th-large"></i> Dashboard
             </a>
 
+            <div class="nav-section-label">Transaksi</div>
+            <a href="<?= base_url('simpanan') ?>" class="<?= current_url(true)->getSegment(1) == 'simpanan' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-piggy-bank"></i> Simpanan
+            </a>
+            <a href="<?= base_url('pinjaman') ?>" class="<?= current_url(true)->getSegment(1) == 'pinjaman' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-hand-holding-usd"></i> Pinjaman
+            </a>
+            <a href="<?= base_url('angsuran') ?>" class="<?= current_url(true)->getSegment(1) == 'angsuran' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-money-bill-wave"></i> Angsuran
+            </a>
+            <?php if(has_permission('manage_simpanan')): ?>
+            <?php if(is_premium()): ?>
+            <a href="<?= base_url('massal') ?>" class="<?= current_url(true)->getSegment(1) == 'massal' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-layer-group"></i> Input Massal
+            </a>
+            <?php else: ?>
+            <a href="<?= base_url('massal') ?>" class="<?= current_url(true)->getSegment(1) == 'massal' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-layer-group"></i> Input Massal
+            </a>
+            <?php endif; ?>
+            <?php endif; ?>
+
+            <?php if(has_permission('manage_kas')): ?>
+            <a href="<?= base_url('kas') ?>" class="<?= current_url(true)->getSegment(1) == 'kas' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-book-open"></i> Buku Kas Umum
+            </a>
+            <?php endif; ?>
+
+            <?php if(has_permission('view_laporan')): ?>
+            <div class="nav-section-label">Laporan</div>
+            <a href="<?= base_url('laporan/kas') ?>" class="<?= current_url(true)->getSegment(1) == 'laporan' && current_url(true)->getSegment(2) == 'kas' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-chart-line"></i> Arus Kas
+            </a>
+            <a href="<?= base_url('laporan/shu') ?>" class="<?= current_url(true)->getSegment(1) == 'laporan' && current_url(true)->getSegment(2) == 'shu' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-chart-pie"></i> Laporan SHU
+            </a>
+            <a href="<?= base_url('laporan/neraca') ?>" class="<?= current_url(true)->getSegment(1) == 'laporan' && current_url(true)->getSegment(2) == 'neraca' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-balance-scale"></i> Neraca Saldo
+            </a>
+            <a href="<?= base_url('laporan/anggota') ?>" class="<?= current_url(true)->getSegment(1) == 'laporan' && current_url(true)->getSegment(2) == 'anggota' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-users-viewfinder"></i> Keuangan Anggota
+            </a>
+            <?php endif; ?>
+
             <?php if(has_permission('manage_anggota') || has_permission('manage_pengaturan') || has_permission('manage_roles') || has_permission('manage_backup')): ?>
             <div class="nav-section-label">Master Data</div>
             
@@ -285,8 +329,8 @@
                 <i class="nav-icon fas fa-layer-group"></i> Master Kelompok
             </a>
             <?php else: ?>
-            <a href="<?= base_url('informasi/support') ?>" title="Fitur khusus Versi PRO — Klik untuk upgrade">
-                <i class="nav-icon fas fa-layer-group" style="color:#0d9488;"></i> Master Kelompok <span class="ms-auto" style="font-size:0.6rem; padding:2px 7px; border-radius:20px; font-weight:700; background:linear-gradient(135deg,#059669,#0d9488); color:#fff; letter-spacing:.3px;"><i class="fas fa-crown" style="color:#fbbf24;font-size:0.55rem;"></i> PRO</span>
+            <a href="<?= base_url('kelompok') ?>" class="<?= current_url(true)->getSegment(1) == 'kelompok' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-layer-group"></i> Master Kelompok
             </a>
             <?php endif; ?>
             <?php endif; ?>
@@ -317,50 +361,6 @@
             
             <?php endif; ?>
 
-            <div class="nav-section-label">Transaksi</div>
-            <a href="<?= base_url('simpanan') ?>" class="<?= current_url(true)->getSegment(1) == 'simpanan' ? 'active' : '' ?>">
-                <i class="nav-icon fas fa-piggy-bank"></i> Simpanan
-            </a>
-            <a href="<?= base_url('pinjaman') ?>" class="<?= current_url(true)->getSegment(1) == 'pinjaman' ? 'active' : '' ?>">
-                <i class="nav-icon fas fa-hand-holding-usd"></i> Pinjaman
-            </a>
-            <a href="<?= base_url('angsuran') ?>" class="<?= current_url(true)->getSegment(1) == 'angsuran' ? 'active' : '' ?>">
-                <i class="nav-icon fas fa-money-bill-wave"></i> Angsuran
-            </a>
-            <?php if(has_permission('manage_simpanan')): ?>
-            <?php if(is_premium()): ?>
-            <a href="<?= base_url('massal') ?>" class="<?= current_url(true)->getSegment(1) == 'massal' ? 'active' : '' ?>">
-                <i class="nav-icon fas fa-layer-group"></i> Input Massal
-            </a>
-            <?php else: ?>
-            <a href="<?= base_url('informasi/support') ?>" title="Fitur khusus Versi PRO — Klik untuk upgrade">
-                <i class="nav-icon fas fa-layer-group" style="color:#0d9488;"></i> Input Massal <span class="ms-auto" style="font-size:0.6rem; padding:2px 7px; border-radius:20px; font-weight:700; background:linear-gradient(135deg,#059669,#0d9488); color:#fff; letter-spacing:.3px;"><i class="fas fa-crown" style="color:#fbbf24;font-size:0.55rem;"></i> PRO</span>
-            </a>
-            <?php endif; ?>
-            <?php endif; ?>
-
-            <?php if(has_permission('manage_kas')): ?>
-            <a href="<?= base_url('kas') ?>" class="<?= current_url(true)->getSegment(1) == 'kas' ? 'active' : '' ?>">
-                <i class="nav-icon fas fa-book-open"></i> Buku Kas Umum
-            </a>
-            <?php endif; ?>
-
-            <?php if(has_permission('view_laporan')): ?>
-            <div class="nav-section-label">Laporan</div>
-            <a href="<?= base_url('laporan/kas') ?>" class="<?= current_url(true)->getSegment(1) == 'laporan' && current_url(true)->getSegment(2) == 'kas' ? 'active' : '' ?>">
-                <i class="nav-icon fas fa-chart-line"></i> Arus Kas
-            </a>
-            <a href="<?= base_url('laporan/shu') ?>" class="<?= current_url(true)->getSegment(1) == 'laporan' && current_url(true)->getSegment(2) == 'shu' ? 'active' : '' ?>">
-                <i class="nav-icon fas fa-chart-pie"></i> Laporan SHU
-            </a>
-            <a href="<?= base_url('laporan/neraca') ?>" class="<?= current_url(true)->getSegment(1) == 'laporan' && current_url(true)->getSegment(2) == 'neraca' ? 'active' : '' ?>">
-                <i class="nav-icon fas fa-balance-scale"></i> Neraca Saldo
-            </a>
-            <a href="<?= base_url('laporan/anggota') ?>" class="<?= current_url(true)->getSegment(1) == 'laporan' && current_url(true)->getSegment(2) == 'anggota' ? 'active' : '' ?>">
-                <i class="nav-icon fas fa-users-viewfinder"></i> Keuangan Anggota
-            </a>
-            <?php endif; ?>
-
             <?php if(session()->get('role') !== 'anggota'): ?>
             <div class="nav-section-label">Bantuan & Info</div>
             <a href="<?= base_url('informasi/fitur') ?>" class="<?= current_url(true)->getSegment(1) == 'informasi' && current_url(true)->getSegment(2) == 'fitur' ? 'active' : '' ?>">
@@ -374,6 +374,7 @@
             </a>
             <?php endif; ?>
         </div>
+
 
         <div class="sidebar-footer">
             <a href="<?= base_url('profil') ?>" class="<?= current_url(true)->getSegment(1) == 'profil' ? 'active' : '' ?>" style="color:#94a3b8 !important;">

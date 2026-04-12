@@ -22,9 +22,6 @@ class Kelompok extends BaseController
         if (!has_permission('manage_anggota') && !has_permission('manage_pengaturan')) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
-        if (!is_premium()) {
-            return redirect()->to('/informasi/support')->with('error', 'Fitur Master Kelompok hanya tersedia untuk Versi PRO. Silakan upgrade lisensi.');
-        }
 
         $data = [
             'title'    => 'Master Kelompok',
@@ -147,9 +144,6 @@ class Kelompok extends BaseController
     {
         if (!has_permission('manage_anggota')) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
-        }
-        if (!is_premium()) {
-            return redirect()->to('/informasi/support')->with('error', 'Fitur Master Kelompok hanya tersedia untuk Versi PRO. Silakan upgrade lisensi.');
         }
 
         $filter_kelompok = $this->request->getGet('filter_kelompok');

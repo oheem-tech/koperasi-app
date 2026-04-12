@@ -27,44 +27,62 @@
                     </p>
                 </div>
 
+                <div class="row g-4 mb-4">
+                    <!-- Featured PRO License Banner -->
+                    <div class="col-12">
+                        <div class="p-4 bg-white rounded-4 border shadow-sm position-relative overflow-hidden" style="border-color: #ffd700 !important;">
+                            <div class="position-absolute top-0 end-0 p-3 opacity-25 d-none d-md-block">
+                                <i class="fas fa-crown text-warning" style="font-size: 8rem;"></i>
+                            </div>
+                            <div class="row align-items-center position-relative z-1">
+                                <div class="col-md-3 text-center mb-3 mb-md-0">
+                                    <img src="<?= base_url('assets/images/coffee_pro.png') ?>" alt="Premium Coffee" class="img-fluid rounded-circle" style="max-width: 130px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                                </div>
+                                <div class="col-md-9">
+                                    <span class="badge bg-warning text-dark mb-2 py-1 px-2 fw-bold" style="font-size: 0.8rem;"><i class="fas fa-star text-danger"></i> TERBATAS</span>
+                                    <h4 class="fw-bold d-flex align-items-center mb-2">
+                                        Lisensi PRO (White-label)
+                                    </h4>
+                                    <p class="text-muted small mb-2">
+                                        Ubah aplikasi menjadi milik Anda sepenuhnya. Hapus watermark sistem di seluruh halaman dan nota print, buka fitur eksklusif <strong>Input Massal</strong>, dan aktifkan fitur <strong>Kebijakan Pelunasan</strong>.
+                                    </p>
+                                    <div class="fw-bold text-success mb-0" style="font-size: 1.05rem;">
+                                        <i class="fas fa-coffee"></i> <em>Upgrade sekarang juga!<br>Nikmati fitur premium dengan harga super hemat—bahkan nggak lebih mahal dari secangkir kopi favoritmu</em>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row g-4 mb-5">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="p-4 bg-light rounded-4 h-100 border border-light-subtle shadow-sm transition-hover">
-                            <h5 class="fw-bold mb-3 d-flex align-items-center">
-                                <i class="fas fa-code text-primary me-2"></i> Kustomisasi Fitur
-                            </h5>
+                            <h6 class="fw-bold mb-3 d-flex align-items-center text-primary">
+                                <i class="fas fa-code me-2"></i> Kustomisasi Ekstra
+                            </h6>
                             <p class="text-muted small mb-0">
-                                Ingin mengubah rumus bagi hasil SHU? Membutuhkan jenis/potongan simpanan khusus? Atau perlu format Nota Print yang berbeda? Kami siap memodifikasi source-code aplikasi sesuai kebutuhan spesifik Anda.
+                                Ingin mengubah rumus SHU atau format Nota Print khusus? Kami siap memodifikasi source-code sesuai standar spesifik Anda.
                             </p>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="p-4 bg-light rounded-4 h-100 border border-light-subtle shadow-sm transition-hover">
-                            <h5 class="fw-bold mb-3 d-flex align-items-center">
-                                <i class="fas fa-crown text-warning me-2"></i> Lisensi PRO (White-label)
-                            </h5>
+                            <h6 class="fw-bold mb-3 d-flex align-items-center text-success">
+                                <i class="fas fa-database me-2"></i> Migrasi Data Excel
+                            </h6>
                             <p class="text-muted small mb-0">
-                                Ubah aplikasi menjadi milik Anda sepenuhnya. Hapus watermark "CirebonTech" di seluruh halaman dan nota print, buka fitur eksklusif <strong>Input Massal</strong>, dan aktifkan fitur <strong>Kebijakan Pelunasan Tambahan</strong>.
+                                Punya <em>database</em> anggota/cicilan lama dari mesin kasir atau buku cetak? Kami bantu migrasi semua datanya ke aplikasi baru.
                             </p>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="p-4 bg-light rounded-4 h-100 border border-light-subtle shadow-sm transition-hover">
-                            <h5 class="fw-bold mb-3 d-flex align-items-center">
-                                <i class="fas fa-database text-success me-2"></i> Impor Data Lama & Migrasi
-                            </h5>
+                            <h6 class="fw-bold mb-3 d-flex align-items-center text-danger">
+                                <i class="fas fa-server me-2"></i> Setup Hosting
+                            </h6>
                             <p class="text-muted small mb-0">
-                                Jika Anda memiliki ribuan data anggota, saldo, atau cicilan lama di Excel/Buku Besar, kami siap membantu melakukan migrasi <em>database</em> secara utuh ke aplikasi baru Anda dengan rapi dan akurat.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-4 bg-light rounded-4 h-100 border border-light-subtle shadow-sm transition-hover">
-                            <h5 class="fw-bold mb-3 d-flex align-items-center">
-                                <i class="fas fa-server text-danger me-2"></i> Setup Server & Online Hosting
-                            </h5>
-                            <p class="text-muted small mb-0">
-                                Ingin aplikasi ini bisa diakses dari smartphone oleh semua anggota di mana saja? Kami menyediakan jasa penyewaan hosting dan setup domain (misal: <em>koperasi-anda.com</em>).
+                                Ingin aplikasi online agar bisa diakses anggota via smartphone? Kami siapkan penyewaan server (Hosting) & Domain.
                             </p>
                         </div>
                     </div>

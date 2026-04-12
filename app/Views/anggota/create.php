@@ -35,7 +35,7 @@
                     <?php if(is_premium()): ?>
                     <select class="form-select" name="kelompok">
                         <?php foreach($kelompok as $k): ?>
-                        <option value="<?= esc($k['nama_kelompok']) ?>"><?= esc($k['nama_kelompok']) ?></option>
+                        <option value="<?= esc($k['nama_kelompok']) ?>" <?= esc($k['nama_kelompok']) == 'Umum' ? 'selected' : '' ?>><?= esc($k['nama_kelompok']) ?></option>
                         <?php endforeach; ?>
                         <?php if(empty($kelompok)): ?>
                         <option value="Umum">Umum</option>

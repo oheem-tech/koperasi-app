@@ -52,7 +52,7 @@ class InputMassal extends BaseController
     public function index()
     {
         if (!has_permission('manage_simpanan')) return redirect()->to('/dashboard');
-        if (!is_premium()) return redirect()->to('/informasi/support')->with('error', 'Fitur Input Massal hanya tersedia untuk Versi PRO. Silakan upgrade lisensi Anda.');
+
 
         $data = [
             'title'        => 'Input Massal | Koperasi',
@@ -67,7 +67,7 @@ class InputMassal extends BaseController
     public function form()
     {
         if (!has_permission('manage_simpanan')) return redirect()->to('/dashboard');
-        if (!is_premium()) return redirect()->to('/informasi/support')->with('error', 'Fitur Input Massal hanya tersedia untuk Versi PRO. Silakan upgrade lisensi Anda.');
+
 
         $kelompok = $this->request->getGet('kelompok') ?? (isset($this->kelompokList[0]) ? $this->kelompokList[0] : 'Umum');
         $tanggal  = $this->request->getGet('tanggal')  ?? date('Y-m-d');

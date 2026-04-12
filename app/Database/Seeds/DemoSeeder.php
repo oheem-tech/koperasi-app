@@ -67,7 +67,7 @@ class DemoSeeder extends Seeder
                     'tanggal_bergabung' => date('Y-m-d', strtotime('-6 months')),
                     'status' => 'aktif',
                     'jabatan' => 'anggota',
-                    'kelompok' => '1', // 1 refers to id master_kelompok usually (which is Umum)
+                    'kelompok' => 'Umum', // Umum used directly by name instead of id
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ],
@@ -80,7 +80,7 @@ class DemoSeeder extends Seeder
                     'tanggal_bergabung' => date('Y-m-d', strtotime('-3 months')),
                     'status' => 'aktif',
                     'jabatan' => 'anggota',
-                    'kelompok' => '1',
+                    'kelompok' => 'Umum',
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ],
@@ -93,7 +93,7 @@ class DemoSeeder extends Seeder
                     'tanggal_bergabung' => date('Y-m-d', strtotime('-1 months')),
                     'status' => 'aktif',
                     'jabatan' => 'anggota',
-                    'kelompok' => '2',
+                    'kelompok' => 'Umum',
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]
@@ -294,6 +294,9 @@ class DemoSeeder extends Seeder
                     $this->db->table('master_kelompok')->insert($s);
                 }
             }
+
+            // Set kebijakan pelunasan aktif ke 0 secara khusus untuk data demo (gratis)
+            $this->db->table('pengaturan')->where('pengaturan_key', 'kebijakan_pelunasan_aktif')->update(['pengaturan_value' => '0']);
 
             echo "✅ Data Demo berhasil di-seed (Anggota, Kas, Simpanan, Pinjaman, Angsuran)\n";
         }
