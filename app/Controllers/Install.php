@@ -84,7 +84,7 @@ class Install extends Controller
         }
 
         // Jika file .env sudah ada, lanjutkan ke tampilan migrasi normal
-        $loginUrl = base_url('login');
+        $loginUrl = base_url('auth');
         $isDummy  = $this->request->getGet('dummy') == '1';
 
         echo "<!DOCTYPE html>

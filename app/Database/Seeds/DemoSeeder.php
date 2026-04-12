@@ -136,7 +136,7 @@ class DemoSeeder extends Seeder
                         'jenis_simpanan_id' => $sp_id,
                         'tanggal_transaksi' => date('Y-m-d', strtotime('-6 months')),
                         'jumlah' => 100000,
-                        'jenis_transaksi' => 'setoran',
+                        'jenis_transaksi' => 'setor',
                         'keterangan' => 'Setoran Awal Pokok',
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s')
@@ -146,7 +146,7 @@ class DemoSeeder extends Seeder
                         'jenis_simpanan_id' => $sw_id,
                         'tanggal_transaksi' => date('Y-m-d', strtotime('-6 months')),
                         'jumlah' => 50000,
-                        'jenis_transaksi' => 'setoran',
+                        'jenis_transaksi' => 'setor',
                         'keterangan' => 'Setoran Wajib Bulan 1',
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s')
@@ -183,7 +183,7 @@ class DemoSeeder extends Seeder
                         'jenis_simpanan_id' => $sp_id,
                         'tanggal_transaksi' => date('Y-m-d', strtotime('-3 months')),
                         'jumlah' => 100000,
-                        'jenis_transaksi' => 'setoran',
+                        'jenis_transaksi' => 'setor',
                         'keterangan' => 'Setoran Pokok Citra',
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s')
@@ -193,7 +193,7 @@ class DemoSeeder extends Seeder
                         'jenis_simpanan_id' => $sp_id,
                         'tanggal_transaksi' => date('Y-m-d', strtotime('-1 months')),
                         'jumlah' => 100000,
-                        'jenis_transaksi' => 'setoran',
+                        'jenis_transaksi' => 'setor',
                         'keterangan' => 'Setoran Pokok Dewi',
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s')
