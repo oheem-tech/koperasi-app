@@ -9,15 +9,19 @@ class AddKelompokToAnggota extends Migration
     public function up()
     {
         $db = \Config\Database::connect();
-        if (!$db->fieldExists('kelompok', 'anggota')) {
-            $this->forge->addColumn('anggota', [
-                'kelompok' => [
-                    'type'       => 'VARCHAR',
-                    'constraint' => '100',
-                    'default'    => 'Umum',
-                    'after'      => 'jabatan',
-                ]
-            ]);
+        try {
+            if (!$db->fieldExists('kelompok', 'anggota')) {
+                $this->forge->addColumn('anggota', [
+                    'kelompok' => [
+                        'type'       => 'VARCHAR',
+                        'constraint' => '100',
+                        'default'    => 'Umum',
+                        'after'      => 'jabatan',
+                    ]
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Abaikan jika kolom sudah ada atau duplicate
         }
     }
 

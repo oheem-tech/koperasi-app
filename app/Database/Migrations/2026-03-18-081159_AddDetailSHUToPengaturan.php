@@ -38,7 +38,7 @@ class AddDetailSHUToPengaturan extends Migration
                 'keterangan'       => 'SHU Dana Cadangan (%)'
             ],
         ];
-        $this->db->table('pengaturan')->insertBatch($data);
+        $this->db->table('pengaturan')->ignore(true)->insertBatch($data);
     }
 
     public function down()

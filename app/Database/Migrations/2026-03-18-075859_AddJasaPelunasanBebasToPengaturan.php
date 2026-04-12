@@ -13,7 +13,7 @@ class AddJasaPelunasanBebasToPengaturan extends Migration
             'pengaturan_value' => '100',
             'keterangan'       => 'Persentase Jasa yang Dibebankan Saat Pelunasan Setelah Memenuhi Min. Tenor (0=Gratis, 100=1 Bulan Penuh, 50=Setengah Bulan, dll.)'
         ];
-        $this->db->table('pengaturan')->insert($data);
+        $this->db->table('pengaturan')->ignore(true)->insert($data);
     }
 
     public function down()

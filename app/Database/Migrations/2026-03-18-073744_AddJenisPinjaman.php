@@ -30,7 +30,7 @@ class AddJenisPinjaman extends Migration
                 'keterangan' => 'Batas Maksimal Pinjaman Aktif untuk Jenis yang Sama'
             ]
         ];
-        $this->db->table('pengaturan')->insertBatch($data);
+        $this->db->table('pengaturan')->ignore(true)->insertBatch($data);
     }
 
     public function down()

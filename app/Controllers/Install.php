@@ -52,6 +52,8 @@ class Install extends Controller
             $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
             $host = $_SERVER['HTTP_HOST'];
             $script = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
+            // Hapus '/public/' di akhir jika ada, karena kita pakai .htaccess di root
+            $script = preg_replace('/\/public\/?$/', '/', $script);
             $guessedBaseUrl = rtrim($protocol . "://" . $host . $script, '/') . '/';
 
             echo "<div style='font-family: sans-serif; padding: 20px; max-width: 600px; margin: 40px auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>";

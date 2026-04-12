@@ -20,7 +20,7 @@ class AddKebijakanPelunasanToPengaturan extends Migration
                 'keterangan'       => 'Aktifkan Kebijakan Min. Tenor Pelunasan? (1=Ya, 0=Tidak)'
             ]
         ];
-        $this->db->table('pengaturan')->insertBatch($data);
+        $this->db->table('pengaturan')->ignore(true)->insertBatch($data);
     }
 
     public function down()
