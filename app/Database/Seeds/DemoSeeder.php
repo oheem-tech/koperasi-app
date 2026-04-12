@@ -35,6 +35,13 @@ class DemoSeeder extends Seeder
                 'role' => 'anggota',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'username' => 'dewi789',
+                'password' => password_hash('dewi789', PASSWORD_DEFAULT),
+                'role' => 'anggota',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
             ]
         ];
         
@@ -49,7 +56,7 @@ class DemoSeeder extends Seeder
         }
 
         // 3. Data Anggota
-        if (!empty($userIds) && count($userIds) >= 2) {
+        if (!empty($userIds) && count($userIds) >= 3) {
             $anggotaData = [
                 [
                     'user_id' => $userIds[0],
@@ -74,6 +81,19 @@ class DemoSeeder extends Seeder
                     'status' => 'aktif',
                     'jabatan' => 'anggota',
                     'kelompok' => '1',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'user_id' => $userIds[2],
+                    'no_anggota' => 'A-0003',
+                    'nama_lengkap' => 'Dewi Kirana',
+                    'alamat' => 'Jl. Anggrek No. 8',
+                    'no_telp' => '087766554433',
+                    'tanggal_bergabung' => date('Y-m-d', strtotime('-1 months')),
+                    'status' => 'aktif',
+                    'jabatan' => 'anggota',
+                    'kelompok' => '2',
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]
@@ -151,6 +171,51 @@ class DemoSeeder extends Seeder
                         'nominal' => 50000,
                         'kategori' => 'simpanan_wajib',
                         'saldo_akhir' => $saldoKas + 150000
+                    ]
+                ]);
+            }
+
+            // Simpanan Citra dan Dewi
+            if ($this->db->table('simpanan')->where('anggota_id', $anggotaIds[1])->countAllResults() == 0) {
+                $this->db->table('simpanan')->insertBatch([
+                    [
+                        'anggota_id' => $anggotaIds[1],
+                        'jenis_simpanan_id' => $sp_id,
+                        'tanggal_transaksi' => date('Y-m-d', strtotime('-3 months')),
+                        'jumlah' => 100000,
+                        'jenis_transaksi' => 'setoran',
+                        'keterangan' => 'Setoran Pokok Citra',
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ],
+                    [
+                        'anggota_id' => $anggotaIds[2],
+                        'jenis_simpanan_id' => $sp_id,
+                        'tanggal_transaksi' => date('Y-m-d', strtotime('-1 months')),
+                        'jumlah' => 100000,
+                        'jenis_transaksi' => 'setoran',
+                        'keterangan' => 'Setoran Pokok Dewi',
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]
+                ]);
+                $saldoKas = $this->db->table('kas_koperasi')->orderBy('id', 'DESC')->get()->getRow()->saldo_akhir ?? 50150000;
+                $this->db->table('kas_koperasi')->insertBatch([
+                    [
+                        'tanggal' => date('Y-m-d', strtotime('-3 months')),
+                        'keterangan' => 'Simpanan Pokok Citra Lestari',
+                        'jenis' => 'masuk',
+                        'nominal' => 100000,
+                        'kategori' => 'simpanan_pokok',
+                        'saldo_akhir' => $saldoKas + 100000
+                    ],
+                    [
+                        'tanggal' => date('Y-m-d', strtotime('-1 months')),
+                        'keterangan' => 'Simpanan Pokok Dewi Kirana',
+                        'jenis' => 'masuk',
+                        'nominal' => 100000,
+                        'kategori' => 'simpanan_pokok',
+                        'saldo_akhir' => $saldoKas + 200000
                     ]
                 ]);
             }

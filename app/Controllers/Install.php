@@ -37,9 +37,9 @@ class Install extends Controller
                 $envContent = preg_replace('/^CI_ENVIRONMENT\s*=\s*.*/m', "CI_ENVIRONMENT = production", $envContent);
 
                 file_put_contents($envPath, $envContent);
-                
+                $dummy = $this->request->getPost('install_dummy') == '1' ? '?dummy=1' : '';
                 // Redirect agar CI4 me-restart dan membaca .env terbaru
-                return redirect()->to(current_url());
+                return redirect()->to(current_url() . $dummy);
             } else {
                 echo "<div style='color:red; text-align:center;'>File .env.example tidak ditemukan. Proses dibatalkan.</div>";
                 return;
@@ -70,6 +70,11 @@ class Install extends Controller
             echo "<div><label style='font-weight:bold; font-size:14px;'>Nama Database:</label><br><input type='text' name='db_name' placeholder='Misal: koperasi_db' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
             echo "<div><label style='font-weight:bold; font-size:14px;'>Username Database:</label><br><input type='text' name='db_user' value='root' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
             echo "<div><label style='font-weight:bold; font-size:14px;'>Password Database:</label><br><input type='text' name='db_pass' placeholder='(Kosongkan jika di XAMPP default)' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;'></div>";
+            echo "<div><label style='font-weight:bold; font-size:14px;'>Jenis Instalasi (Opsional):</label><br>
+                 <select name='install_dummy' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;'>
+                    <option value='0'>Database Kosong (Hanya Akun Admin)</option>
+                    <option value='1'>Isi dengan Data Dummy (Demo)</option>
+                 </select></div>";
             echo "<button type='submit' style='margin-top: 10px; padding: 12px 20px; background: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; font-size:16px;'>Simpan Konfigurasi & Install Database</button>";
             echo "</form>";
             echo "</div>";
@@ -77,46 +82,221 @@ class Install extends Controller
         }
 
         // Jika file .env sudah ada, lanjutkan ke tampilan migrasi normal
-        echo "<div style='font-family: sans-serif; padding: 20px; text-align: center; max-width: 600px; margin: 40px auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>";
-        echo "<h2>🚀 Web Installer Koperasi</h2>";
-        
+        $loginUrl = base_url('login');
+        $isDummy  = $this->request->getGet('dummy') == '1';
+
+        echo "<!DOCTYPE html>
+<html lang='id'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Web Installer — Koperasi</title>
+    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap' rel='stylesheet'>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            width: 100%;
+            max-width: 560px;
+            overflow: hidden;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+            padding: 36px 30px 30px;
+            text-align: center;
+            position: relative;
+        }
+        .card-header .badge-icon {
+            width: 64px; height: 64px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 30px;
+        }
+        .card-header h1 {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+        .card-header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+        .card-body { padding: 28px 30px; }
+        .log-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 22px;
+        }
+        .log-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+        .log-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.825rem;
+            color: #374151;
+        }
+        .log-item:last-child { border-bottom: none; }
+        .log-item .dot {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .dot-ok  { background: #d1fae5; color: #059669; }
+        .dot-skip { background: #fef3c7; color: #d97706; }
+        .dot-info { background: #dbeafe; color: #2563eb; }
+        .success-box {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 1px solid #a7f3d0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 22px;
+        }
+        .success-box .emoji { font-size: 2.2rem; margin-bottom: 8px; }
+        .success-box h2 { font-size: 1.15rem; font-weight: 800; color: #065f46; margin-bottom: 4px; }
+        .success-box p  { font-size: 0.82rem; color: #047857; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+        .info-cell {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+        .info-cell .lbl { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #0369a1; margin-bottom: 3px; }
+        .info-cell .val { font-size: 0.85rem; font-weight: 600; color: #0c4a6e; font-family: monospace; }
+        .btn-login {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-align: center;
+            transition: opacity .2s;
+            box-shadow: 0 4px 15px rgba(14,165,233,0.4);
+        }
+        .btn-login:hover { opacity: 0.9; }
+        .note { text-align: center; font-size: 0.75rem; color: #94a3b8; margin-top: 14px; }
+        .note a { color: #64748b; }
+    </style>
+</head>
+<body>
+<div class='card'>
+    <div class='card-header'>
+        <div class='badge-icon'>🚀</div>
+        <h1>Web Installer Koperasi</h1>
+        <p>Proses instalasi sedang berjalan...</p>
+    </div>
+    <div class='card-body'>";
+
+        $logItems = [];
+        $hasError = false;
+
         try {
-            // 1. Eksekusi Migrasi (Membuat semua tabel system)
-            echo "<p style='text-align: left;'>Mengeksekusi tabel database...</p>";
+            // 1. Migrasi
             $migrate = \Config\Services::migrations();
             $migrate->latest();
-            echo "<div style='text-align: left; color: green;'>✓ Tabel berhasil dibuat (Migration Complete)!</div>";
+            $logItems[] = ['ok', 'Struktur tabel database berhasil dibuat'];
 
-            // 2. Eksekusi Seeder (Data Awal)
-            echo "<p style='text-align: left; margin-top: 20px;'>Mengisi Data Master & Akun Admin...</p>";
+            // 2. Seeder
             $seeder = \Config\Database::seeder();
-            
-            // Cek apakah Admin sudah ada jangan dised lagi (cegah dobel seed)
             $db = \Config\Database::connect();
             $user_count = $db->table('users')->countAllResults();
-            
+
             if ($user_count === 0) {
-                $seeder->call('AdminSeeder'); // Pastikan seeder Name sesuai dgn yg Anda miliki
-                echo "<div style='text-align: left; color: green;'>✓ Data Admin berhasil disuntikkan!</div>";
+                $seeder->call('AdminSeeder');
+                $logItems[] = ['ok', 'Akun Admin default berhasil dibuat'];
+
+                if ($isDummy) {
+                    $seeder->call('DemoSeeder');
+                    $logItems[] = ['ok', 'Data demo (3 anggota & transaksi) berhasil disuntikkan'];
+                } else {
+                    $logItems[] = ['info', 'Melewati data demo – database kosong siap digunakan'];
+                }
             } else {
-                echo "<div style='text-align: left; color: orange;'>✓ Melewati Seeder (Data sudah ada).</div>";
+                $logItems[] = ['skip', 'Data admin sudah ada, proses seeder dilewati'];
             }
 
-            echo "<br>";
-            echo "<div style='padding: 15px; background: #e6f7ff; border-radius: 6px;'>";
-            echo "<h3 style='margin:0 0 10px 0;'>🎉 INSTALASI BERHASIL!</h3>";
-            echo "Anda dapat menyuruh End User Anda menggunakan perintah ini.<br><br>";
-            echo "<a href='" . base_url() . "' style='display:inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;'>Masuk ke Aplikasi</a>";
-            echo "</div>";
-
         } catch (\Throwable $e) {
-            echo "<br><br><div style='padding: 15px; background: #ffebee; color: #c62828; border-radius: 6px; text-align: left;'>";
-            echo "<strong>💥 Terjadi Kesalahan Instalasi:</strong><br><br>";
-            echo $e->getMessage();
-            echo "<br><br><small>Hapus file <strong>.env</strong> di root aplikasi jika Anda ingin mengulangi pengisian form koneksi database.</small>";
-            echo "</div>";
+            $hasError = true;
+            $logItems[] = ['err', 'ERROR: ' . $e->getMessage()];
         }
-        
+
+        // Render log box
+        echo "<div class='log-box'>";
+        echo "<div class='log-title'>📋 Log Proses Instalasi</div>";
+        foreach ($logItems as $item) {
+            $dotClass = $item[0] === 'ok' ? 'dot-ok' : ($item[0] === 'skip' ? 'dot-skip' : ($item[0] === 'info' ? 'dot-info' : 'dot-err'));
+            $icon     = $item[0] === 'ok' ? '✓' : ($item[0] === 'skip' ? '~' : ($item[0] === 'info' ? 'i' : '✗'));
+            echo "<div class='log-item'><div class='dot {$dotClass}'>{$icon}</div><span>" . htmlspecialchars($item[1]) . "</span></div>";
+        }
         echo "</div>";
+
+        if (!$hasError) {
+            // Success banner
+            echo "<div class='success-box'>
+                <div class='emoji'>🎉</div>
+                <h2>Instalasi Berhasil!</h2>
+                <p>Aplikasi Koperasi Anda sudah siap digunakan.</p>
+            </div>";
+
+            // Credential info box
+            echo "<div class='info-grid'>
+                <div class='info-cell'>
+                    <div class='lbl'>Username Admin</div>
+                    <div class='val'>admin</div>
+                </div>
+                <div class='info-cell'>
+                    <div class='lbl'>Password Admin</div>
+                    <div class='val'>admin123</div>
+                </div>
+            </div>";
+
+            // Login button — pointing to correct login page
+            echo "<a href='{$loginUrl}' class='btn-login'>🔑 Masuk ke Halaman Login</a>";
+            echo "<p class='note'>Segera ubah password setelah login pertama kali.</p>";
+        } else {
+            echo "<div style='background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;color:#991b1b;font-size:0.85rem;'>
+                <strong>⚠️ Instalasi gagal.</strong> Periksa log di atas.<br><br>
+                <small>Hapus file <code>.env</code> di direktori root aplikasi, lalu akses halaman ini kembali untuk mencoba ulang.</small>
+            </div>";
+        }
+
+        echo "   </div>
+</div>
+</body>
+</html>";
     }
 }
