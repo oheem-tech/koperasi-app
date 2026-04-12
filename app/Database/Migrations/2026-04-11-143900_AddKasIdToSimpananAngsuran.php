@@ -8,38 +8,12 @@ class AddKasIdToSimpananAngsuran extends Migration
 {
     public function up()
     {
-        $db = \Config\Database::connect();
-        
-        // Add kas_id to simpanan
-        if (!$db->fieldExists('kas_id', 'simpanan')) {
-            $this->forge->addColumn('simpanan', [
-                'kas_id' => [
-                    'type'       => 'INT',
-                    'constraint' => 11,
-                    'unsigned'   => true,
-                    'null'       => true,
-                    'after'      => 'keterangan',
-                ],
-            ]);
-        }
-
-        // Add kas_id to angsuran
-        if (!$db->fieldExists('kas_id', 'angsuran')) {
-            $this->forge->addColumn('angsuran', [
-                'kas_id' => [
-                    'type'       => 'INT',
-                    'constraint' => 11,
-                    'unsigned'   => true,
-                    'null'       => true,
-                    'after'      => 'cicilan_ke',
-                ],
-            ]);
-        }
+        // No-op: kas_id sudah masuk ke Simpanan.php dan Angsuran.php (migration awal).
+        // File ini dipertahankan agar urutan batch migration tetap konsisten.
     }
 
     public function down()
     {
-        $this->forge->dropColumn('simpanan', 'kas_id');
-        $this->forge->dropColumn('angsuran', 'kas_id');
+        // No-op
     }
 }

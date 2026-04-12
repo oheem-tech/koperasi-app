@@ -13,8 +13,13 @@ class Angsuran extends Migration
             'pinjaman_id'   => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true],
             'tanggal_bayar' => ['type' => 'DATE'],
             'jumlah_bayar'  => ['type' => 'INT', 'constraint' => 11],
+            // Kolom jumlah_pokok & jumlah_jasa sudah include langsung (mencegah addColumn error di hosting)
+            'jumlah_pokok'  => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
+            'jumlah_jasa'   => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
             'denda'         => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
             'cicilan_ke'    => ['type' => 'INT', 'constraint' => 11],
+            // kas_id untuk referensi ke kas_koperasi
+            'kas_id'        => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'null' => true],
             'created_at'    => ['type' => 'DATETIME', 'null' => true],
             'updated_at'    => ['type' => 'DATETIME', 'null' => true],
         ]);

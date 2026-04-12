@@ -16,6 +16,8 @@ class Simpanan extends Migration
             'jumlah'            => ['type' => 'INT', 'constraint' => 11],
             'jenis_transaksi'   => ['type' => 'ENUM', 'constraint' => ['setor', 'tarik']],
             'keterangan'        => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
+            // kas_id untuk referensi ke kas_koperasi (sudah include langsung)
+            'kas_id'            => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'null' => true],
             'created_at'        => ['type' => 'DATETIME', 'null' => true],
             'updated_at'        => ['type' => 'DATETIME', 'null' => true],
         ]);

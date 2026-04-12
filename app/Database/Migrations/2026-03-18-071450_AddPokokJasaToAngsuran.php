@@ -8,26 +8,12 @@ class AddPokokJasaToAngsuran extends Migration
 {
     public function up()
     {
-        $fields = [
-            'jumlah_pokok' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 0,
-                'after'      => 'jumlah_bayar'
-            ],
-            'jumlah_jasa' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 0,
-                'after'      => 'jumlah_pokok'
-            ]
-        ];
-        
-        $this->forge->addColumn('angsuran', $fields);
+        // No-op: Kolom jumlah_pokok & jumlah_jasa sudah masuk ke Angsuran.php (migration awal).
+        // File ini dipertahankan agar urutan batch migration tetap konsisten.
     }
 
     public function down()
     {
-        $this->forge->dropColumn('angsuran', ['jumlah_pokok', 'jumlah_jasa']);
+        // No-op
     }
 }
