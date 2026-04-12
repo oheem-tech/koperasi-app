@@ -38,8 +38,10 @@ class Install extends Controller
 
                 file_put_contents($envPath, $envContent);
                 $dummy = $this->request->getPost('install_dummy') == '1' ? '?dummy=1' : '';
-                // Redirect agar CI4 me-restart dan membaca .env terbaru
-                return redirect()->to(current_url() . $dummy);
+
+                // Gunakan javascript redirect agar browser yang menentukan absolute URL-nya
+                echo "<script>window.location.href = 'install" . htmlspecialchars($dummy) . "';</script>";
+                exit;
             } else {
                 echo "<div style='color:red; text-align:center;'>File .env.example tidak ditemukan. Proses dibatalkan.</div>";
                 return;
