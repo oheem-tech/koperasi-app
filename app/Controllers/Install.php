@@ -87,6 +87,22 @@ class Install extends Controller
         $loginUrl = base_url('auth');
         $isDummy  = $this->request->getGet('dummy') == '1';
 
+        // ─── Guard: Jika aplikasi sudah terinstall & ada data, redirect langsung ───
+        // Cek apakah tabel 'users' sudah ada dan isinya > 0
+        try {
+            $db = \Config\Database::connect();
+            // Cek apakah tabel users sudah ada (aman di MySQL & MariaDB)
+            $tableExists = $db->tableExists('users');
+            if ($tableExists && $db->table('users')->countAllResults() > 0) {
+                // Aplikasi sudah terinstall, redirect ke login
+                echo "<script>window.location.href = '{$loginUrl}';</script>";
+                exit;
+            }
+        } catch (\Throwable $e) {
+            // Gagal konek DB → lanjutkan proses instalasi normal
+        }
+        // ───────────────────────────────────────────────────────────────────────────
+
         echo "<!DOCTYPE html>
 <html lang='id'>
 <head>
