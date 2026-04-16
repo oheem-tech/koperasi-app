@@ -136,7 +136,7 @@ if ($selected_anggota) {
                     <th>Jatuh Tempo</th>
                     <th>Status</th>
                     <?php if(has_permission('manage_pinjaman')): ?>
-                    <th>Aksi</th>
+                    <th width="140" class="text-center">Aksi</th>
                     <?php endif; ?>
                 </tr>
             </thead>
@@ -161,14 +161,20 @@ if ($selected_anggota) {
                         ?>
                     </td>
                     <?php if(has_permission('manage_pinjaman')): ?>
-                    <td>
+                    <td class="text-center text-nowrap">
+                        <a href="<?= base_url('pinjaman/print/'.$row['id']) ?>" target="_blank" class="btn btn-sm btn-outline-secondary" title="Cetak Pengajuan"><i class="fas fa-print"></i></a>
+                        <a href="<?= base_url('pinjaman/edit/'.$row['id']) ?>" class="btn btn-sm btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></a>
+                        <a href="<?= base_url('pinjaman/delete/'.$row['id']) ?>" class="btn btn-sm btn-outline-danger" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus pinjaman ini?')"><i class="fas fa-trash"></i></a>
+
                         <?php if($row['status'] == 'pending'): ?>
-                        <a href="<?= base_url('pinjaman/approve/'.$row['id']) ?>" class="btn btn-sm btn-success" onclick="return confirm('Persetujuan pinjaman akan menambahkan dana tersebut ke daftar angsuran. Lanjutkan?')"><i class="fas fa-check"></i> Setujui</a>
-                        <a href="<?= base_url('pinjaman/reject/'.$row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Tolak pinjaman ini?')"><i class="fas fa-times"></i> Tolak</a>
+                        <div class="mt-1">
+                            <a href="<?= base_url('pinjaman/approve/'.$row['id']) ?>" class="btn btn-sm btn-outline-success" onclick="return confirm('Persetujuan pinjaman akan menambahkan dana tersebut ke daftar angsuran. Lanjutkan?')" title="Setujui"><i class="fas fa-check"></i></a>
+                            <a href="<?= base_url('pinjaman/reject/'.$row['id']) ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tolak pinjaman ini?')" title="Tolak"><i class="fas fa-times"></i></a>
+                        </div>
                         <?php elseif($row['status'] == 'disetujui'): ?>
-                        <a href="<?= base_url('angsuran/pelunasan/'.$row['id']) ?>" class="btn btn-sm btn-warning"><i class="fas fa-hand-holding-usd"></i> Lunasi</a>
-                        <?php else: ?>
-                        -
+                        <div class="mt-1">
+                            <a href="<?= base_url('angsuran/pelunasan/'.$row['id']) ?>" class="btn btn-sm btn-outline-info" title="Lunasi"><i class="fas fa-hand-holding-usd"></i></a>
+                        </div>
                         <?php endif; ?>
                     </td>
                     <?php endif; ?>

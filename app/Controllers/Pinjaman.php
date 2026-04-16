@@ -97,13 +97,18 @@ class Pinjaman extends BaseController
             return redirect()->back()->with('error', "Anggota sudah memiliki {$existingCount} pinjaman aktif/pending untuk jenis '{$jenis_pinjaman}'. Batas maksimal adalah {$maks}.");
         }
 
+        $tanggal_pengajuan = $this->request->getPost('tanggal_pengajuan');
+        if (empty($tanggal_pengajuan)) {
+            $tanggal_pengajuan = date('Y-m-d');
+        }
+
         $bungaConf = $this->pengaturanModel->where('pengaturan_key', 'bunga_pinjaman')->first();
         $bunga_persen = $bungaConf ? $bungaConf['pengaturan_value'] : 1.5;
 
         $this->pinjamanModel->save([
             'anggota_id'          => $anggota_id,
             'jenis_pinjaman'      => $jenis_pinjaman,
-            'tanggal_pengajuan'   => date('Y-m-d'),
+            'tanggal_pengajuan'   => $tanggal_pengajuan,
             'jumlah_pinjaman'     => $jumlah_pinjaman,
             'lama_tenor'          => $lama_tenor,
             'bunga_persen'        => $bunga_persen,
@@ -158,5 +163,90 @@ class Pinjaman extends BaseController
             ]);
         }
         return redirect()->to('/pinjaman')->with('error', 'Pinjaman telah ditolak.');
+    }
+
+    public function edit($id)
+    {
+        if (!has_permission('manage_pinjaman')) return redirect()->to('/dashboard');
+
+        $pinjaman = $this->pinjamanModel->find($id);
+        if (!$pinjaman) return redirect()->to('/pinjaman')->with('error', 'Data pinjaman tidak ditemukan.');
+
+        $opsiTenor = $this->pengaturanModel->where('pengaturan_key', 'opsi_tenor_pinjaman')->first();
+        $tenorArr = $opsiTenor ? explode(',', $opsiTenor['pengaturan_value']) : [3, 6, 12, 24];
+
+        $opsiJenis = $this->pengaturanModel->where('pengaturan_key', 'opsi_jenis_pinjaman')->first();
+        $jenisArr = $opsiJenis ? explode(',', $opsiJenis['pengaturan_value']) : ['Uang'];
+
+        $data = [
+            'title'      => 'Edit Pinjaman',
+            'pinjaman'   => $pinjaman,
+            'anggota'    => $this->anggotaModel->where('status', 'aktif')->findAll(),
+            'opsi_tenor' => $tenorArr,
+            'opsi_jenis' => $jenisArr
+        ];
+        return view('pinjaman/edit', $data);
+    }
+
+    public function update($id)
+    {
+        if (!has_permission('manage_pinjaman')) return redirect()->to('/dashboard');
+
+        $pinjaman = $this->pinjamanModel->find($id);
+        if (!$pinjaman) return redirect()->to('/pinjaman')->with('error', 'Data pinjaman tidak ditemukan.');
+
+        $jenis_pinjaman = $this->request->getPost('jenis_pinjaman');
+        $jumlah_pinjaman = str_replace('.', '', $this->request->getPost('jumlah_pinjaman'));
+        $lama_tenor = $this->request->getPost('lama_tenor');
+        $tanggal_pengajuan = $this->request->getPost('tanggal_pengajuan');
+        $anggota_id = $this->request->getPost('anggota_id');
+
+        $updateData = [
+            'jenis_pinjaman'      => $jenis_pinjaman,
+            'tanggal_pengajuan'   => $tanggal_pengajuan,
+            'jumlah_pinjaman'     => $jumlah_pinjaman,
+            'lama_tenor'          => $lama_tenor,
+        ];
+
+        if ($anggota_id) {
+            $updateData['anggota_id'] = $anggota_id;
+        }
+
+        $this->pinjamanModel->update($id, $updateData);
+
+        return redirect()->to('/pinjaman')->with('success', 'Data pinjaman berhasil diupdate.');
+    }
+
+    public function delete($id)
+    {
+        if (!has_permission('manage_pinjaman')) return redirect()->to('/dashboard');
+
+        $pinjaman = $this->pinjamanModel->find($id);
+        if (!$pinjaman) return redirect()->to('/pinjaman')->with('error', 'Data pinjaman tidak ditemukan.');
+
+        $this->pinjamanModel->delete($id);
+
+        return redirect()->to('/pinjaman')->with('success', 'Data pinjaman berhasil dihapus.');
+    }
+
+    public function print($id)
+    {
+        $db = \Config\Database::connect();
+        $row = $db->table('pinjaman')
+            ->select('pinjaman.*, anggota.nama_lengkap, anggota.no_anggota')
+            ->join('anggota', 'anggota.id = pinjaman.anggota_id')
+            ->where('pinjaman.id', $id)
+            ->get()->getRowArray();
+
+        if (!$row) return redirect()->to('/pinjaman')->with('error', 'Data tidak ditemukan.');
+
+        if (!has_permission('manage_pinjaman')) {
+            $anggotaSelf = $this->anggotaModel->where('user_id', session()->get('user_id'))->first();
+            if (!$anggotaSelf || $anggotaSelf['id'] != $row['anggota_id']) {
+                return redirect()->to('/pinjaman')->with('error', 'Akses ditolak.');
+            }
+        }
+
+        return view('pinjaman/print', ['data' => $row]);
     }
 }

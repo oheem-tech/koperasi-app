@@ -57,6 +57,10 @@ $routes->group('pinjaman', ['filter' => 'auth'], static function ($routes) {
     $routes->post('store', 'Pinjaman::store');
     $routes->get('approve/(:num)', 'Pinjaman::approve/$1');
     $routes->get('reject/(:num)', 'Pinjaman::reject/$1');
+    $routes->get('edit/(:num)', 'Pinjaman::edit/$1');
+    $routes->post('update/(:num)', 'Pinjaman::update/$1');
+    $routes->get('delete/(:num)', 'Pinjaman::delete/$1');
+    $routes->get('print/(:num)', 'Pinjaman::print/$1');
 });
 
 $routes->group('angsuran', ['filter' => 'auth'], static function ($routes) {
