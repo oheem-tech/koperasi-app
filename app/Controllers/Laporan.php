@@ -187,17 +187,25 @@ class Laporan extends BaseController
         $saldoSimpananMap = array_column($totalSimpananPerAnggota, 'saldo_simpanan', 'anggota_id');
         $totalSimpananGlobal = array_sum($saldoSimpananMap);
 
+        // 2b. Denda dan Pendapatan Lainnya untuk dimasukkan ke Total SHU
+        $totalDendaGlobal = $db->table('angsuran')->where("YEAR(tanggal_bayar)", $tahun)->selectSum('denda')->get()->getRow()->denda ?? 0;
+        $pendapatanMasukGlobal = $db->table('kas_koperasi')->where('kategori', 'pendapatan_biaya')->where('jenis', 'masuk')->where("YEAR(tanggal)", $tahun)->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+        $biayaKeluarGlobal = $db->table('kas_koperasi')->where('kategori', 'pendapatan_biaya')->where('jenis', 'keluar')->where("YEAR(tanggal)", $tahun)->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+        $pendapatanLainnyaGlobal = $pendapatanMasukGlobal - $biayaKeluarGlobal;
+
+        $totalSHU = $totalJasaGlobal + $totalDendaGlobal + $pendapatanLainnyaGlobal;
+
         // 4. Kalkulasi Alokasi SHU Global
         $alokasiSHU = [
-            'total_shu'          => $totalJasaGlobal,
-            'jasa_modal'         => round($totalJasaGlobal * ($settings['shu_jasa_modal']        ?? 20) / 100),
-            'jasa_anggota'       => round($totalJasaGlobal * ($settings['shu_jasa_anggota']      ?? 25) / 100),
-            'pengurus_anggota'   => round($totalJasaGlobal * ($settings['shu_pengurus_anggota']  ?? 10) / 100),
-            'pengawas'           => round($totalJasaGlobal * ($settings['shu_pengawas']          ?? 5)  / 100),
-            'pembina'            => round($totalJasaGlobal * ($settings['shu_pembina']           ?? 5)  / 100),
-            'dana_sosial'        => round($totalJasaGlobal * ($settings['shu_dana_sosial']     ?? 5)  / 100),
-            'dana_pendidikan'    => round($totalJasaGlobal * ($settings['shu_dana_pendidikan'] ?? 5)  / 100),
-            'dana_cadangan'      => round($totalJasaGlobal * ($settings['shu_cadangan']        ?? 20) / 100),
+            'total_shu'          => $totalSHU,
+            'jasa_modal'         => round($totalSHU * ($settings['shu_jasa_modal']        ?? 20) / 100),
+            'jasa_anggota'       => round($totalSHU * ($settings['shu_jasa_anggota']      ?? 25) / 100),
+            'pengurus_anggota'   => round($totalSHU * ($settings['shu_pengurus_anggota']  ?? 10) / 100),
+            'pengawas'           => round($totalSHU * ($settings['shu_pengawas']          ?? 5)  / 100),
+            'pembina'            => round($totalSHU * ($settings['shu_pembina']           ?? 5)  / 100),
+            'dana_sosial'        => round($totalSHU * ($settings['shu_dana_sosial']     ?? 5)  / 100),
+            'dana_pendidikan'    => round($totalSHU * ($settings['shu_dana_pendidikan'] ?? 5)  / 100),
+            'dana_cadangan'      => round($totalSHU * ($settings['shu_cadangan']        ?? 20) / 100),
         ];
         $alokasiSHU['total_dialokasikan'] = array_sum($alokasiSHU) - $alokasiSHU['total_shu'];
 
@@ -219,9 +227,11 @@ class Laporan extends BaseController
             $total_jasa_individu = $jasaMap[$a['anggota_id']] ?? 0;
             $saldo_anggota       = $saldoSimpananMap[$a['anggota_id']] ?? 0;
 
-            $shu_jasa_angsuran = $total_jasa_individu * $persen_jasa_anggota;
+            $shu_jasa_angsuran = ($totalJasaGlobal > 0)
+                ? ($total_jasa_individu / $totalJasaGlobal) * ($totalSHU * $persen_jasa_anggota)
+                : 0;
             $shu_modal = ($totalSimpananGlobal > 0)
-                ? ($saldo_anggota / $totalSimpananGlobal) * ($totalJasaGlobal * $persen_jasa_modal)
+                ? ($saldo_anggota / $totalSimpananGlobal) * ($totalSHU * $persen_jasa_modal)
                 : 0;
 
             // Distribusi Jasa Jabatan
@@ -356,11 +366,14 @@ class Laporan extends BaseController
         $modalAnggota = max(0, $simpananPokokWajib);
 
         // 2. SHU Belum Dibagi: Total jasa + denda angsuran + Kas Pendapatan/Biaya Lainnya
-        $totalJasaDiterima  = $db->table('angsuran')->where('DATE(tanggal_bayar) <=', $cutoff)->selectSum('jumlah_jasa')->get()->getRow()->jumlah_jasa ?? 0;
-        $totalDendaDiterima = $db->table('angsuran')->where('DATE(tanggal_bayar) <=', $cutoff)->selectSum('denda')->get()->getRow()->denda ?? 0;
+        $tahunCutoff = date('Y', strtotime($cutoff));
+        $awalTahun   = $tahunCutoff . '-01-01';
+
+        $totalJasaDiterima  = $db->table('angsuran')->where('tanggal_bayar >=', $awalTahun)->where('DATE(tanggal_bayar) <=', $cutoff)->selectSum('jumlah_jasa')->get()->getRow()->jumlah_jasa ?? 0;
+        $totalDendaDiterima = $db->table('angsuran')->where('tanggal_bayar >=', $awalTahun)->where('DATE(tanggal_bayar) <=', $cutoff)->selectSum('denda')->get()->getRow()->denda ?? 0;
         
-        $pendapatanManualMasuk = $db->table('kas_koperasi')->where('kategori', 'pendapatan_biaya')->where('jenis', 'masuk')->where('DATE(tanggal) <=', $cutoff)->selectSum('nominal')->get()->getRow()->nominal ?? 0;
-        $biayaManualKeluar = $db->table('kas_koperasi')->where('kategori', 'pendapatan_biaya')->where('jenis', 'keluar')->where('DATE(tanggal) <=', $cutoff)->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+        $pendapatanManualMasuk = $db->table('kas_koperasi')->where('kategori', 'pendapatan_biaya')->where('jenis', 'masuk')->where('tanggal >=', $awalTahun)->where('DATE(tanggal) <=', $cutoff)->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+        $biayaManualKeluar = $db->table('kas_koperasi')->where('kategori', 'pendapatan_biaya')->where('jenis', 'keluar')->where('tanggal >=', $awalTahun)->where('DATE(tanggal) <=', $cutoff)->selectSum('nominal')->get()->getRow()->nominal ?? 0;
         $pendapatanLainnya = $pendapatanManualMasuk - $biayaManualKeluar;
 
         $shuBelumDibagi     = $totalJasaDiterima + $totalDendaDiterima + $pendapatanLainnya;

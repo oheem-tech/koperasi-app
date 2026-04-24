@@ -34,24 +34,10 @@
     <div class="col-md-8">
         <div class="card shadow-sm">
             <div class="card-header bg-white fw-600">
-                <?php if($role == 'admin'): ?>
-                <i class="fas fa-unlock text-success me-2" id="secretAreaProfil" style="cursor:pointer;" title="Kunci Area Edit"></i><span id="secretLabel"> Ganti Password (Mode Edit Terbuka)</span>
-                <?php else: ?>
                 <i class="fas fa-lock text-primary me-2"></i> Ganti Password
-                <?php endif; ?>
             </div>
 
-            <?php if($role == 'admin'): ?>
-            <div class="card-body" id="blockedWrapper" style="display:none;">
-                <div class="text-center py-4 text-muted">
-                    <i class="fas fa-shield-alt fa-3x mb-3 text-warning"></i>
-                    <h6 class="mt-3">Keamanan Tingkat Lanjut</h6>
-                    <small>Fitur pergantian password untuk Administrator dikunci otomatis.</small>
-                </div>
-            </div>
-            <?php endif; ?>
-
-            <div class="card-body" id="formWrapper">
+            <div class="card-body">
                 <form action="<?= base_url('profil/update-password') ?>" method="post" id="formGantiPassword">
                     <?= csrf_field() ?>
 
@@ -151,48 +137,6 @@ document.getElementById('formGantiPassword').addEventListener('submit', function
     }
 });
 
-<?php if($role == 'admin'): ?>
-// SECRET CLICK PROFIL ADMIN
-let secretAreaProfil = document.getElementById('secretAreaProfil');
-let secretLabel = document.getElementById('secretLabel');
-let formWrapper = document.getElementById('formWrapper');
-let blockedWrapper = document.getElementById('blockedWrapper');
-let profilClickCount = 0;
-let profilTimer = null;
-let savedState = sessionStorage.getItem('admin_profile_unlocked');
-let isUnlocked = (savedState !== 'false'); // Default terbuka
 
-// Fungsi untuk memperbarui tampilan berdasarkan status buka/tutup
-function updateLockUI() {
-    if (isUnlocked) {
-        blockedWrapper.style.display = 'none';
-        formWrapper.style.display = 'block';
-        secretAreaProfil.className = 'fas fa-unlock text-success me-2';
-        secretLabel.innerText = ' Ganti Password (Mode Edit Terbuka)';
-    } else {
-        blockedWrapper.style.display = 'block';
-        formWrapper.style.display = 'none';
-        secretAreaProfil.className = 'fas fa-lock text-warning me-2';
-        secretLabel.innerText = ' Ganti Password (Terkunci)';
-    }
-}
-
-if (secretAreaProfil) {
-    // Panggil saat halaman pertama dimuat agar tampilan sesuai cache sesi
-    updateLockUI();
-
-    secretAreaProfil.addEventListener('click', function() {
-        profilClickCount++;
-        if (profilClickCount >= 5) {
-            isUnlocked = !isUnlocked;
-            sessionStorage.setItem('admin_profile_unlocked', isUnlocked ? 'true' : 'false');
-            updateLockUI();
-            profilClickCount = 0; // reset
-        }
-        clearTimeout(profilTimer);
-        profilTimer = setTimeout(() => { profilClickCount = 0; }, 2000);
-    });
-}
-<?php endif; ?>
 </script>
 <?= $this->endSection() ?>

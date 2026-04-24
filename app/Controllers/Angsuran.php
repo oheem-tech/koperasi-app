@@ -370,16 +370,25 @@ class Angsuran extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
 
-        // 1. Hapus Kas Lama
+        // 1 & 2. Update Kas Lama atau Insert Baru
         $kasModel = new \App\Models\KasKoperasiModel();
+        
+        $anggotaLama = $this->anggotaModel->find($pinjamanLama['anggota_id']);
+        $namaAnggotaLama = $anggotaLama ? $anggotaLama['nama_lengkap'] : 'Anggota';
+        $kodePinjaman = 'PJ-' . str_pad($pinjamanLama['id'], 4, '0', STR_PAD_LEFT);
+        $keteranganKasBaru = 'Setoran Angsuran ' . $pinjamanLama['jenis_pinjaman'] . ' - ' . $namaAnggotaLama . ' (Cicilan ke-' . $cicilan_ke . ') [' . $kodePinjaman . ']';
+        
         if ($angsuranLama['kas_id']) {
-            $kasModel->delete($angsuranLama['kas_id']);
+            $kasModel->update($angsuranLama['kas_id'], [
+                'tanggal'    => $tanggal_bayarBaru,
+                'keterangan' => $keteranganKasBaru,
+                'nominal'    => $jumlah_bayarBaru,
+                'jenis'      => 'masuk',
+                'kategori'   => 'angsuran'
+            ]);
+            $kas_id_baru = $angsuranLama['kas_id'];
         } else {
             // Fallback backward compatibility
-            $anggotaLama = $this->anggotaModel->find($pinjamanLama['anggota_id']);
-            $namaAnggotaLama = $anggotaLama ? $anggotaLama['nama_lengkap'] : 'Anggota';
-            $kodePinjaman = 'PJ-' . str_pad($pinjamanLama['id'], 4, '0', STR_PAD_LEFT);
-            
             $ketKasLamaBiasa = 'Setoran Angsuran ' . $pinjamanLama['jenis_pinjaman'] . ' - ' . $namaAnggotaLama . ' (Cicilan ke-' . $cicilan_ke . ') [' . $kodePinjaman . ']';
             $ketKasLamaLunas = 'Pelunasan Pinjaman ' . $pinjamanLama['jenis_pinjaman'] . ' - ' . $namaAnggotaLama . ' [' . $kodePinjaman . ']';
 
@@ -390,16 +399,20 @@ class Angsuran extends BaseController
                                         ->orLike('keterangan', $ketKasLamaLunas, 'both')
                                     ->groupEnd()
                                     ->first();
-            if ($kasSekarang) $kasModel->delete($kasSekarang['id']);
+            
+            if ($kasSekarang) {
+                $kasModel->update($kasSekarang['id'], [
+                    'tanggal'    => $tanggal_bayarBaru,
+                    'keterangan' => $keteranganKasBaru,
+                    'nominal'    => $jumlah_bayarBaru,
+                    'jenis'      => 'masuk',
+                    'kategori'   => 'angsuran'
+                ]);
+                $kas_id_baru = $kasSekarang['id'];
+            } else {
+                $kas_id_baru = $kasModel->catatTransaksi($tanggal_bayarBaru, $keteranganKasBaru, 'masuk', $jumlah_bayarBaru, 'angsuran');
+            }
         }
-
-        // 2. Catat Kas Baru untuk dapat ID baru
-        $anggotaLama = $this->anggotaModel->find($pinjamanLama['anggota_id']);
-        $namaAnggotaLama = $anggotaLama ? $anggotaLama['nama_lengkap'] : 'Anggota';
-        $kodePinjaman = 'PJ-' . str_pad($pinjamanLama['id'], 4, '0', STR_PAD_LEFT);
-        $keteranganKasBaru = 'Setoran Angsuran ' . $pinjamanLama['jenis_pinjaman'] . ' - ' . $namaAnggotaLama . ' (Cicilan ke-' . $cicilan_ke . ') [' . $kodePinjaman . ']';
-        
-        $kas_id_baru = $kasModel->catatTransaksi($tanggal_bayarBaru, $keteranganKasBaru, 'masuk', $jumlah_bayarBaru, 'angsuran');
 
         // 3. Update Data Angsuran
         $this->angsuranModel->update($id, [

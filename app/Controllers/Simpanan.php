@@ -165,12 +165,25 @@ class Simpanan extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
 
-        // 1. Hapus catatan Kas lama berdasarkan kas_id yang terikat dengan Simpanan
+        // 1 & 2. Update Kas lama jika ada, jika tidak insert baru
         $kasModel = new KasKoperasiModel();
+        
+        $anggotaBaru = $this->anggotaModel->find($anggotaIdBaru);
+        $namaAnggotaBaru = $anggotaBaru ? $anggotaBaru['nama_lengkap'] : 'Anggota';
+        $keteranganKasBaru = ($jenis_transaksiBaru == 'setor' ? 'Setoran' : 'Penarikan') . ' Simpanan - ' . $namaAnggotaBaru;
+        $jenisKasBaru = ($jenis_transaksiBaru == 'setor') ? 'masuk' : 'keluar';
+        
         if ($simpananLama['kas_id']) {
-            $kasModel->delete($simpananLama['kas_id']);
+            $kasModel->update($simpananLama['kas_id'], [
+                'tanggal'    => $tanggal_transaksiBaru,
+                'keterangan' => $keteranganKasBaru,
+                'jenis'      => $jenisKasBaru,
+                'nominal'    => $jumlahBaru,
+                'kategori'   => 'simpanan'
+            ]);
+            $kas_id_baru = $simpananLama['kas_id'];
         } else {
-            // Fallback (jika data jadul belum termigrasi)
+            // Fallback backward compatibility
             $anggotaLama = $this->anggotaModel->find($simpananLama['anggota_id']);
             $namaAnggotaLama = $anggotaLama ? $anggotaLama['nama_lengkap'] : 'Anggota';
             $ketKasLama = ($simpananLama['jenis_transaksi'] == 'setor' ? 'Setoran' : 'Penarikan') . ' Simpanan - ' . $namaAnggotaLama;
@@ -180,16 +193,19 @@ class Simpanan extends BaseController
                                 ->like('keterangan', $ketKasLama, 'both')
                                 ->first();
 
-            if ($kasLama) $kasModel->delete($kasLama['id']);
+            if ($kasLama) {
+                $kasModel->update($kasLama['id'], [
+                    'tanggal'    => $tanggal_transaksiBaru,
+                    'keterangan' => $keteranganKasBaru,
+                    'jenis'      => $jenisKasBaru,
+                    'nominal'    => $jumlahBaru,
+                    'kategori'   => 'simpanan'
+                ]);
+                $kas_id_baru = $kasLama['id'];
+            } else {
+                $kas_id_baru = $kasModel->catatTransaksi($tanggal_transaksiBaru, $keteranganKasBaru, $jenisKasBaru, $jumlahBaru, 'simpanan');
+            }
         }
-
-        // 2. Catat transaksi Kas baru dan dapatkan ID-nya
-        $anggotaBaru = $this->anggotaModel->find($anggotaIdBaru);
-        $namaAnggotaBaru = $anggotaBaru ? $anggotaBaru['nama_lengkap'] : 'Anggota';
-        $keteranganKasBaru = ($jenis_transaksiBaru == 'setor' ? 'Setoran' : 'Penarikan') . ' Simpanan - ' . $namaAnggotaBaru;
-        $jenisKasBaru = ($jenis_transaksiBaru == 'setor') ? 'masuk' : 'keluar';
-        
-        $kas_id_baru = $kasModel->catatTransaksi($tanggal_transaksiBaru, $keteranganKasBaru, $jenisKasBaru, $jumlahBaru, 'simpanan');
 
         // 3. Update data simpanan
         $this->simpananModel->update($id, [
@@ -199,7 +215,7 @@ class Simpanan extends BaseController
             'jumlah'            => $jumlahBaru,
             'jenis_transaksi'   => $jenis_transaksiBaru,
             'keterangan'        => $this->request->getPost('keterangan'),
-            'kas_id'            => $kas_id_baru, // Simpan kas_id yang baru
+            'kas_id'            => $kas_id_baru, // Simpan kas_id
         ]);
 
         $db->transComplete();
