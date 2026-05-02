@@ -148,6 +148,24 @@ class Pinjaman extends BaseController
             if ($db->transStatus() === false) {
                 return redirect()->to('/pinjaman')->with('error', 'Gagal memproses persetujuan pinjaman.');
             }
+
+            // === WA NOTIFICATION PINJAMAN ===
+            $pengaturanModel = new \App\Models\PengaturanModel();
+            $waAktif = $pengaturanModel->where('pengaturan_key', 'wa_pinjaman_aktif')->first();
+            if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota && !empty($anggota['no_telp'])) {
+                $waTemplate = $pengaturanModel->where('pengaturan_key', 'wa_template_pinjaman')->first();
+                if ($waTemplate) {
+                    $pesan = str_replace(
+                        ['{Nama}', '{Nominal}', '{Tanggal}'],
+                        [$namaAnggota, number_format($pinjaman['jumlah_pinjaman'], 0, ',', '.'), date('d/m/Y')],
+                        $waTemplate['pengaturan_value']
+                    );
+                    
+                    $waService = new \App\Libraries\WaGateway();
+                    $waService->sendMessage($anggota['no_telp'], $pesan);
+                }
+            }
+            // ================================
         }
         return redirect()->to('/pinjaman')->with('success', 'Pinjaman berhasil disetujui dan dana kas dicairkan.');
     }

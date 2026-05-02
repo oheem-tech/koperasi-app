@@ -109,6 +109,27 @@ class Simpanan extends BaseController
             return redirect()->back()->with('error', 'Gagal memproses transaksi.');
         }
 
+        // === WA NOTIFICATION SIMPANAN ===
+        $pengaturanModel = new \App\Models\PengaturanModel();
+        $waAktif = $pengaturanModel->where('pengaturan_key', 'wa_simpanan_aktif')->first();
+        if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota && !empty($anggota['no_telp'])) {
+            $waTemplate = $pengaturanModel->where('pengaturan_key', 'wa_template_simpanan')->first();
+            if ($waTemplate) {
+                $jenisSimpanan = $this->jenisSimpananModel->find($this->request->getPost('jenis_simpanan_id'));
+                $namaJenis = $jenisSimpanan ? $jenisSimpanan['nama_simpanan'] : 'Simpanan';
+                
+                $pesan = str_replace(
+                    ['{Nama}', '{Nominal}', '{Tanggal}', '{Jenis}'],
+                    [$namaAnggota, number_format($jumlah, 0, ',', '.'), date('d/m/Y', strtotime($tanggal_transaksi)), $namaJenis],
+                    $waTemplate['pengaturan_value']
+                );
+                
+                $waService = new \App\Libraries\WaGateway();
+                $waService->sendMessage($anggota['no_telp'], $pesan);
+            }
+        }
+        // ================================
+
         return redirect()->to('/simpanan')->with('success', 'Transaksi simpanan berhasil diproses.');
     }
 

@@ -30,6 +30,15 @@ class Pengaturan extends BaseController
             ['pengaturan_key' => 'koperasi_logo',      'pengaturan_value' => '',                          'keterangan' => 'File Logo (Format Gambar)'],
             ['pengaturan_key' => 'shu_metode_modal',   'pengaturan_value' => 'akumulasi_akhir',           'keterangan' => 'Metode Hitung Jasa Modal SHU'],
             ['pengaturan_key' => 'kode_lisensi',       'pengaturan_value' => '',                          'keterangan' => 'Kode Lisensi White-Label / Premium'],
+            
+            // Pengaturan WhatsApp Gateway (Fonnte)
+            ['pengaturan_key' => 'wa_token',           'pengaturan_value' => '',                          'keterangan' => 'Token API WhatsApp Gateway (Fonnte)'],
+            ['pengaturan_key' => 'wa_simpanan_aktif',  'pengaturan_value' => '0',                         'keterangan' => 'Notifikasi Simpanan (1=Aktif, 0=Nonaktif)'],
+            ['pengaturan_key' => 'wa_template_simpanan', 'pengaturan_value' => 'Halo {Nama}, Setoran Simpanan {Jenis} Anda sebesar Rp {Nominal} pada tanggal {Tanggal} telah berhasil kami terima. Salam, Koperasi.', 'keterangan' => 'Template Pesan Simpanan'],
+            ['pengaturan_key' => 'wa_pinjaman_aktif',  'pengaturan_value' => '0',                         'keterangan' => 'Notifikasi Pencairan Pinjaman (1=Aktif, 0=Nonaktif)'],
+            ['pengaturan_key' => 'wa_template_pinjaman', 'pengaturan_value' => 'Halo {Nama}, Pinjaman Anda sebesar Rp {Nominal} telah dicairkan pada tanggal {Tanggal}.', 'keterangan' => 'Template Pesan Pinjaman'],
+            ['pengaturan_key' => 'wa_angsuran_aktif',  'pengaturan_value' => '0',                         'keterangan' => 'Notifikasi Pembayaran Angsuran (1=Aktif, 0=Nonaktif)'],
+            ['pengaturan_key' => 'wa_template_angsuran', 'pengaturan_value' => 'Halo {Nama}, Pembayaran Angsuran ke-{CicilanKe} sebesar Rp {Nominal} telah berhasil diterima pada tanggal {Tanggal}. Sisa tagihan Anda: Rp {Sisa}.', 'keterangan' => 'Template Pesan Angsuran'],
         ];
 
         foreach ($identitas as $idData) {

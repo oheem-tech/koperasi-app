@@ -134,6 +134,22 @@
                         </div>
                     </div>
 
+                    <!-- WhatsApp Gateway PRO -->
+                    <div class="col-md-6">
+                        <div class="p-3 h-100" style="background:#f0fdf4; border-radius:12px; border-left:4px solid #059669;">
+                            <h5 class="fw-bold fs-6 mb-3">
+                                <i class="fab fa-whatsapp me-2" style="color:#25D366;"></i> WhatsApp Gateway
+                                <span style="font-size:0.6rem; padding:2px 7px; border-radius:20px; font-weight:700; background:linear-gradient(135deg,#059669,#0d9488); color:#fff; letter-spacing:.3px; vertical-align:middle;"><i class="fas fa-crown" style="color:#fbbf24; font-size:0.5rem;"></i> PRO</span>
+                            </h5>
+                            <ul class="text-muted small mb-0 ps-3" style="line-height:1.9;">
+                                <li>Notifikasi real-time via WhatsApp ke anggota koperasi secara otomatis.</li>
+                                <li>Tersedia untuk modul transaksi: <b>Simpanan</b>, <b>Pencairan Pinjaman</b>, dan <b>Angsuran</b>.</li>
+                                <li>Pengaturan status ON/OFF per-modul melalui menu Pengaturan.</li>
+                                <li>Template isi pesan dinamis yang bisa diubah-ubah menggunakan tag (seperti {Nama}, {Nominal}, dll).</li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <!-- Akses & Keamanan -->
                     <div class="col-md-6">
                         <div class="p-3 h-100" style="background:#f8fafc; border-radius:12px; border-left:4px solid var(--accent);">

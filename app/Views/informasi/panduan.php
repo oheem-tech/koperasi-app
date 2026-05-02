@@ -305,11 +305,47 @@
                         </div>
                     </div>
 
+                    <!-- Panduan WhatsApp Gateway (PRO) -->
+                    <div class="accordion-item mb-3 border-0 bg-transparent">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded shadow-sm fw-bold" style="background:#f8fafc; color:#0f172a;" type="button" data-bs-toggle="collapse" data-bs-target="#panduanWaGateway">
+                                <i class="fab fa-whatsapp me-2" style="color:#25D366;"></i> 8. Konfigurasi WhatsApp Gateway
+                                <span class="badge-pro ms-2"><i class="fas fa-crown" style="color:#fbbf24; font-size:0.5rem;"></i> PRO</span>
+                            </button>
+                        </h2>
+                        <div id="panduanWaGateway" class="accordion-collapse collapse" data-bs-parent="#accordionPanduan">
+                            <div class="accordion-body px-4 pt-4 pb-2">
+                                <div class="alert alert-warning py-2 px-3" style="font-size:0.82rem;"><i class="fas fa-crown me-1 text-warning"></i> Fitur ini memerlukan <b>Lisensi PRO</b>.</div>
+                                <div class="guide-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h6>Dapatkan Token API Fonnte</h6>
+                                        <p>Daftar atau login ke <a href="https://fonnte.com" target="_blank" class="text-decoration-none">fonnte.com</a>. Hubungkan nomor WhatsApp koperasi (scan QR code), lalu salin <b>Token API</b> dari menu Device.</p>
+                                    </div>
+                                </div>
+                                <div class="guide-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h6>Masukkan Token di Pengaturan Aplikasi</h6>
+                                        <p>Buka menu <b>"Pengaturan Master"</b> di aplikasi. Pada blok <b>WhatsApp Gateway</b>, tempelkan token yang disalin ke kolom <code>wa_token</code>.</p>
+                                    </div>
+                                </div>
+                                <div class="guide-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h6>Aktifkan & Sesuaikan Template</h6>
+                                        <p>Ubah status notifikasi menjadi <b>Aktif</b> pada modul yang diinginkan (Simpanan, Pinjaman, Angsuran). Anda bisa memodifikasi kalimat template sesuai kebutuhan. Jangan lupa klik <b>Simpan Semua Perubahan</b>. Sistem kini akan mengirimkan notifikasi WA otomatis saat transaksi dilakukan.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Panduan Pengaturan Lisensi -->
                     <div class="accordion-item mb-3 border-0 bg-transparent">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed rounded shadow-sm fw-bold" style="background:#f8fafc; color:#0f172a;" type="button" data-bs-toggle="collapse" data-bs-target="#panduanLisensi">
-                                <i class="fas fa-key me-2 text-warning"></i> 8. Aktivasi Lisensi PRO
+                                <i class="fas fa-key me-2 text-warning"></i> 9. Aktivasi Lisensi PRO
                             </button>
                         </h2>
                         <div id="panduanLisensi" class="accordion-collapse collapse" data-bs-parent="#accordionPanduan">

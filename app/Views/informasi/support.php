@@ -44,7 +44,7 @@
                                         Lisensi PRO (White-label)
                                     </h4>
                                     <p class="text-muted small mb-2">
-                                        Ubah aplikasi menjadi milik Anda sepenuhnya. Hapus watermark sistem di seluruh halaman dan nota print, buka fitur eksklusif <strong>Input Massal</strong>, dan aktifkan fitur <strong>Kebijakan Pelunasan</strong>.
+                                        Ubah aplikasi menjadi milik Anda sepenuhnya. Hapus watermark sistem di seluruh halaman dan nota print, buka fitur eksklusif <strong>Input Massal</strong>, aktifkan fitur <strong>Kebijakan Pelunasan</strong>, serta nikmati pengiriman notifikasi otomatis via <strong>WhatsApp Gateway</strong>.
                                     </p>
                                     <div class="fw-bold text-success mb-0" style="font-size: 1.05rem;">
                                         <i class="fas fa-coffee"></i> <em>Upgrade sekarang juga!<br>Nikmati fitur premium dengan harga super hemat—bahkan nggak lebih mahal dari secangkir kopi favoritmu</em>

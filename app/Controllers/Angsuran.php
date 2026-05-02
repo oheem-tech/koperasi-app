@@ -184,6 +184,27 @@ class Angsuran extends BaseController
             return redirect()->back()->with('error', 'Gagal memproses pembayaran angsuran.');
         }
 
+        // === WA NOTIFICATION ANGSURAN ===
+        $waAktif = $this->pengaturanModel->where('pengaturan_key', 'wa_angsuran_aktif')->first();
+        if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota && !empty($anggota['no_telp'])) {
+            $waTemplate = $this->pengaturanModel->where('pengaturan_key', 'wa_template_angsuran')->first();
+            if ($waTemplate) {
+                // Hitung sisa tagihan jika belum lunas, anggap sisa pokok
+                $sisaTagihan = ($pinjaman && !$is_pelunasan && $cicilan_ke < $pinjaman['lama_tenor']) ? 
+                               ($pinjaman['jumlah_pinjaman'] - ($pinjaman['jumlah_pinjaman'] / $pinjaman['lama_tenor'] * $cicilan_ke)) : 0;
+
+                $pesan = str_replace(
+                    ['{Nama}', '{Nominal}', '{Tanggal}', '{CicilanKe}', '{Sisa}'],
+                    [$namaAnggota, number_format($jumlah_bayar, 0, ',', '.'), date('d/m/Y', strtotime($this->request->getPost('tanggal_bayar'))), $cicilan_ke, number_format($sisaTagihan, 0, ',', '.')],
+                    $waTemplate['pengaturan_value']
+                );
+                
+                $waService = new \App\Libraries\WaGateway();
+                $waService->sendMessage($anggota['no_telp'], $pesan);
+            }
+        }
+        // ================================
+
         return redirect()->to('/angsuran')->with('success', 'Pembayaran angsuran berhasil diproses.');
     }
 
@@ -304,6 +325,23 @@ class Angsuran extends BaseController
         if ($db->transStatus() === false) {
             return redirect()->back()->with('error', 'Gagal proses pelunasan.');
         }
+
+        // === WA NOTIFICATION PELUNASAN (ANGSURAN) ===
+        $waAktif = $this->pengaturanModel->where('pengaturan_key', 'wa_angsuran_aktif')->first();
+        if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota && !empty($anggota['no_telp'])) {
+            $waTemplate = $this->pengaturanModel->where('pengaturan_key', 'wa_template_angsuran')->first();
+            if ($waTemplate) {
+                $pesan = str_replace(
+                    ['{Nama}', '{Nominal}', '{Tanggal}', '{CicilanKe}', '{Sisa}'],
+                    [$namaAnggota, number_format($total_pelunasan, 0, ',', '.'), date('d/m/Y'), 'Lunas', '0'],
+                    $waTemplate['pengaturan_value']
+                );
+                
+                $waService = new \App\Libraries\WaGateway();
+                $waService->sendMessage($anggota['no_telp'], $pesan);
+            }
+        }
+        // ================================
 
         return redirect()->to('/angsuran')->with('success', 'Pinjaman berhasil dilunasi!');
     }

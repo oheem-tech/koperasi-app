@@ -18,6 +18,7 @@ $groups = [
     'Tenor & Jenis Pinjaman' => [],
     'Kebijakan Pelunasan' => [],
     'Distribusi SHU' => [],
+    'WhatsApp Gateway' => [],
     'Lainnya' => [],
 ];
 foreach ($pengaturan as $row) {
@@ -26,6 +27,8 @@ foreach ($pengaturan as $row) {
         $groups['Identitas Koperasi'][] = $row;
     } elseif (strpos($key, 'shu_') === 0) {
         $groups['Distribusi SHU'][] = $row;
+    } elseif (strpos($key, 'wa_') === 0) {
+        $groups['WhatsApp Gateway'][] = $row;
     } elseif (strpos($key, 'pelunasan_') === 0 || strpos($key, 'kebijakan_') === 0) {
         $groups['Kebijakan Pelunasan'][] = $row;
     } elseif (strpos($key, 'tenor') !== false || strpos($key, 'jenis') !== false || strpos($key, 'maks_') !== false) {
@@ -42,6 +45,7 @@ $groupColors = [
     'Tenor & Jenis Pinjaman' => 'info',
     'Kebijakan Pelunasan' => 'warning',
     'Distribusi SHU' => 'success',
+    'WhatsApp Gateway' => 'success',
     'Lainnya' => 'secondary',
 ];
 ?>
@@ -57,7 +61,7 @@ $groupColors = [
                         <i class="fas fa-sliders-h me-2"></i> 
                         <span <?= ($groupName == 'Lainnya') ? 'onclick="revealLicense(this)" style="cursor:pointer;"' : '' ?>><?= $groupName ?></span>
                         
-                        <?php if($groupName == 'Kebijakan Pelunasan' && !is_premium()): ?>
+                        <?php if(($groupName == 'Kebijakan Pelunasan' || $groupName == 'WhatsApp Gateway') && !is_premium()): ?>
                             <span class="badge bg-warning text-dark float-end mt-1" style="font-size: 0.65rem;" title="Aktifkan Lisensi Pro untuk mengubah kebijakan ini."><i class="fas fa-lock"></i> PRO</span>
                         <?php endif; ?>
                     </div>
@@ -107,12 +111,28 @@ $groupColors = [
                                                    placeholder="Masukkan Kode Lisensi PRO di sini..."
                                                    value="<?= $row['pengaturan_value'] ?>">
                                             <?php endif; ?>
+                                        <?php elseif(strpos($row['pengaturan_key'], '_aktif') !== false && strpos($row['pengaturan_key'], 'wa_') === 0): ?>
+                                            <?php $isLocked = (($groupName == 'Kebijakan Pelunasan' || $groupName == 'WhatsApp Gateway') && !is_premium()); ?>
+                                            <select class="form-select form-select-sm <?= $isLocked ? 'bg-light text-muted' : '' ?>" name="settings[<?= $row['id'] ?>]" <?= $isLocked ? 'disabled title="Fitur khusus Lisensi Pro"' : 'required' ?>>
+                                                <option value="1" <?= ($row['pengaturan_value'] == '1') ? 'selected' : '' ?>>Aktif</option>
+                                                <option value="0" <?= ($row['pengaturan_value'] == '0') ? 'selected' : '' ?>>Nonaktif</option>
+                                            </select>
+                                            <?php if($isLocked): ?>
+                                                <input type="hidden" name="settings[<?= $row['id'] ?>]" value="<?= $row['pengaturan_value'] ?>">
+                                            <?php endif; ?>
+                                        <?php elseif(strpos($row['pengaturan_key'], 'wa_template_') === 0): ?>
+                                            <?php $isLocked = (($groupName == 'Kebijakan Pelunasan' || $groupName == 'WhatsApp Gateway') && !is_premium()); ?>
+                                            <textarea class="form-control form-control-sm <?= $isLocked ? 'bg-light text-muted' : '' ?>" name="settings[<?= $row['id'] ?>]" rows="3" <?= $isLocked ? 'readonly title="Fitur khusus Lisensi Pro"' : 'required' ?>><?= htmlspecialchars($row['pengaturan_value']) ?></textarea>
+                                            <small class="text-muted d-block mt-1">Gunakan tag dinamis seperti {Nama}, {Nominal}, {Tanggal}, dll sesuai keterangan modul.</small>
                                         <?php else: ?>
-                                            <?php $isLocked = ($groupName == 'Kebijakan Pelunasan' && !is_premium()); ?>
+                                            <?php 
+                                            $isLocked = (($groupName == 'Kebijakan Pelunasan' || $groupName == 'WhatsApp Gateway') && !is_premium());
+                                            $isRequired = !in_array($row['pengaturan_key'], ['wa_token', 'kode_lisensi']);
+                                            ?>
                                             <input type="text" class="form-control form-control-sm <?= $isLocked ? 'bg-light text-muted' : '' ?>"
                                                    name="settings[<?= $row['id'] ?>]"
                                                    value="<?= $row['pengaturan_value'] ?>"
-                                                   <?= $isLocked ? 'readonly title="Fitur khusus Lisensi Pro"' : 'required' ?>>
+                                                   <?= $isLocked ? 'readonly title="Fitur khusus Lisensi Pro"' : ($isRequired ? 'required' : '') ?>>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
