@@ -18,6 +18,8 @@ Aplikasi web berbasis **CodeIgniter 4** untuk manajemen koperasi simpan pinjam. 
 | ⚙️ Pengaturan | Identitas koperasi, parameter keuangan & lisensi |
 | 🌟 PRO: Kelompok | Master Kelompok & pemindahan massal anggota |
 | 🌟 PRO: Massal | Input simpanan + angsuran massal per kelompok |
+| 🌟 PRO: WA Gateway | Notifikasi WA otomatis (Simpanan, Pinjaman, Angsuran) |
+| 🌟 PRO: WA Chatbot | Anggota bisa cek saldo & sisa pinjaman via Chat WA |
 
 ---
 
@@ -120,6 +122,8 @@ php spark db:seed DemoSeeder
 - 🌟 **Master Kelompok** — buat & kelola klasifikasi anggota
 - 🌟 **Input Massal** — potong gaji seluruh kelompok dalam satu klik
 - 🌟 **Kebijakan Pelunasan** — atur minimum tenor & biaya jasa pelunasan awal
+- 🌟 **WhatsApp Gateway (Fonnte)** — notifikasi otomatis untuk transaksi simpanan, pinjaman, dan angsuran
+- 🌟 **WA Chatbot Inbound** — anggota bisa mengecek saldo dan pinjaman hanya dengan membalas pesan (SALDO, PINJAMAN, ANGSURAN, INFO)
 
 Untuk mendapatkan lisensi PRO, hubungi developer. Masukkan kode lisensi di menu **Pengaturan Master → kolom Kode Lisensi**.
 
