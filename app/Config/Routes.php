@@ -139,4 +139,8 @@ $routes->group('backup', ['filter' => 'auth'], static function ($routes) {
     $routes->post('restore', 'Backup::restore');
 });
 
+
+// WhatsApp Inbound Webhook (TANPA auth — dipanggil server Fonnte)
+$routes->match(['get', 'post'], 'webhook/whatsapp', 'WhatsappWebhook::receive');
+
 // Routes end here.

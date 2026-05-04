@@ -341,11 +341,101 @@
                         </div>
                     </div>
 
+                    <!-- Panduan WA Chatbot Inbound (PRO) -->
+                    <div class="accordion-item mb-3 border-0 bg-transparent">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded shadow-sm fw-bold" style="background:#f8fafc; color:#0f172a;" type="button" data-bs-toggle="collapse" data-bs-target="#panduanWaChatbot">
+                                <i class="fab fa-whatsapp me-2" style="color:#25D366;"></i> 9. WA Chatbot — Anggota Cek Saldo via WhatsApp
+                                <span class="badge-pro ms-2"><i class="fas fa-crown" style="color:#fbbf24; font-size:0.5rem;"></i> PRO</span>
+                            </button>
+                        </h2>
+                        <div id="panduanWaChatbot" class="accordion-collapse collapse" data-bs-parent="#accordionPanduan">
+                            <div class="accordion-body px-4 pt-4 pb-2">
+                                <div class="alert alert-warning py-2 px-3" style="font-size:0.82rem;"><i class="fas fa-crown me-1 text-warning"></i> Fitur ini memerlukan <b>Lisensi PRO</b> dan konfigurasi WhatsApp Gateway (Fonnte) yang aktif.</div>
+                                <p class="text-muted mb-3" style="font-size:0.9rem;">
+                                    Fitur ini memungkinkan anggota koperasi mengirim pesan WhatsApp ke nomor gateway koperasi
+                                    untuk mengecek informasi akun mereka secara <b>otomatis dan real-time</b>, tanpa perlu login ke aplikasi.
+                                </p>
+                                <!-- Tabel perintah -->
+                                <div class="card bg-light border-0 mb-4 p-3">
+                                    <h6 class="fw-bold mb-2"><i class="fas fa-list-ul me-2 text-success"></i>Perintah yang Bisa Dikirim Anggota</h6>
+                                    <div class="row g-2">
+                                        <div class="col-sm-6">
+                                            <div class="d-flex align-items-start gap-2 mb-1">
+                                                <code class="bg-white px-2 py-1 rounded border fw-bold" style="min-width:90px;text-align:center;">SALDO</code>
+                                                <small class="text-muted">Cek total saldo simpanan per jenis</small>
+                                            </div>
+                                            <div class="d-flex align-items-start gap-2 mb-1">
+                                                <code class="bg-white px-2 py-1 rounded border fw-bold" style="min-width:90px;text-align:center;">PINJAMAN</code>
+                                                <small class="text-muted">Lihat sisa hutang pinjaman aktif</small>
+                                            </div>
+                                            <div class="d-flex align-items-start gap-2 mb-1">
+                                                <code class="bg-white px-2 py-1 rounded border fw-bold" style="min-width:90px;text-align:center;">ANGSURAN</code>
+                                                <small class="text-muted">Detail cicilan dan sisa tenor</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="d-flex align-items-start gap-2 mb-1">
+                                                <code class="bg-white px-2 py-1 rounded border fw-bold" style="min-width:90px;text-align:center;">INFO</code>
+                                                <small class="text-muted">Ringkasan lengkap saldo + pinjaman</small>
+                                            </div>
+                                            <div class="d-flex align-items-start gap-2 mb-1">
+                                                <code class="bg-white px-2 py-1 rounded border fw-bold" style="min-width:90px;text-align:center;">BANTUAN</code>
+                                                <small class="text-muted">Tampilkan daftar perintah ini</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block"><i class="fas fa-info-circle"></i> Perintah bisa ditulis huruf besar maupun kecil.</small>
+                                </div>
+                                <!-- Langkah setup -->
+                                <div class="guide-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h6>Pastikan WA Gateway Sudah Aktif</h6>
+                                        <p>Fitur chatbot membutuhkan Token Fonnte yang sudah terpasang di <b>Pengaturan → wa_token</b>. Jika belum, ikuti panduan <b>"8. Konfigurasi WhatsApp Gateway"</b> terlebih dahulu.</p>
+                                    </div>
+                                </div>
+                                <div class="guide-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h6>Aktifkan Toggle Chatbot</h6>
+                                        <p>Buka <b>Pengaturan Master</b> → blok <b>WhatsApp Gateway</b> → ubah <code>wa_chatbot_aktif</code> menjadi <b>Aktif</b> → klik <b>Simpan Semua Perubahan</b>.</p>
+                                    </div>
+                                </div>
+                                <div class="guide-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h6>Salin URL Webhook dari Halaman Pengaturan</h6>
+                                        <p>Scroll ke bawah halaman Pengaturan — akan muncul panel hijau <b>"Panduan Setup WA Chatbot Inbound"</b>. Klik tombol <b>Salin</b> untuk menyalin URL webhook.</p>
+                                    </div>
+                                </div>
+                                <div class="guide-step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h6>Daftarkan URL Webhook ke Fonnte</h6>
+                                        <p>Login ke <a href="https://fonnte.com" target="_blank" class="text-decoration-none">fonnte.com</a> → pilih <b>Device</b> → klik <b>Edit/Detail</b> pada nomor WA koperasi. Tempel URL webhook di kolom <b>Webhook</b>. Pastikan toggle <b>autoread</b> diset menjadi <b>On</b>, lalu klik <b>Update</b>.</p>
+                                    </div>
+                                </div>
+                                <div class="guide-step">
+                                    <div class="step-number">5</div>
+                                    <div class="step-content">
+                                        <h6>Test: Kirim Pesan dari Nomor Anggota</h6>
+                                        <p>Kirim WA ke nomor koperasi dengan teks <code>BANTUAN</code>. Jika berhasil, sistem membalas otomatis. <b>Penting:</b> Gunakan nomor pribadi untuk mengetes (jangan mengirim pesan dari nomor Koperasi ke nomor Koperasi itu sendiri), dan pastikan nomor penguji sudah tercatat di Data Anggota.</p>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info py-2 px-3 mt-2" style="font-size:0.82rem;">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    <b>Keamanan:</b> Sistem hanya merespons nomor WhatsApp yang <b>terdaftar di data anggota</b>. Nomor tidak dikenal akan mendapat pesan informasi bahwa nomornya tidak terdaftar.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Panduan Pengaturan Lisensi -->
                     <div class="accordion-item mb-3 border-0 bg-transparent">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed rounded shadow-sm fw-bold" style="background:#f8fafc; color:#0f172a;" type="button" data-bs-toggle="collapse" data-bs-target="#panduanLisensi">
-                                <i class="fas fa-key me-2 text-warning"></i> 9. Aktivasi Lisensi PRO
+                                <i class="fas fa-key me-2 text-warning"></i> 10. Aktivasi Lisensi PRO
                             </button>
                         </h2>
                         <div id="panduanLisensi" class="accordion-collapse collapse" data-bs-parent="#accordionPanduan">
@@ -354,7 +444,7 @@
                                     <div class="step-number">1</div>
                                     <div class="step-content">
                                         <h6>Hubungi Developer untuk Dapatkan Kode</h6>
-                                        <p>Kunjungi menu <b>"Kustomisasi & Support"</b> dan hubungi developer via WhatsApp untuk mendapatkan kode lisensi PRO.</p>
+                                        <p>Kunjungi menu <b>"Kustomisasi &amp; Support"</b> dan hubungi developer via WhatsApp untuk mendapatkan kode lisensi PRO.</p>
                                     </div>
                                 </div>
                                 <div class="guide-step">

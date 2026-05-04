@@ -19,9 +19,14 @@ class WaGateway
     /**
      * Parse phone number to international format (62...)
      */
-    private function formatPhoneNumber($phone)
+    public function formatPhoneNumber($phone)
     {
         $phone = preg_replace('/[^0-9]/', '', $phone);
+        
+        if (empty($phone)) {
+            return '';
+        }
+
         if (substr($phone, 0, 1) === '0') {
             $phone = '62' . substr($phone, 1);
         } elseif (substr($phone, 0, 2) === '62') {
@@ -56,6 +61,12 @@ class WaGateway
         }
 
         $formattedPhone = $this->formatPhoneNumber($phone);
+        
+        // Validasi panjang nomor HP minimal (misal: 628...)
+        if (empty($formattedPhone) || strlen($formattedPhone) < 9) {
+            log_message('error', 'WA Gateway dibatalkan: Nomor HP tidak valid (' . $phone . ')');
+            return false;
+        }
 
         $curl = curl_init();
 

@@ -152,6 +152,57 @@ $groupColors = [
     </div>
 </form>
 
+<?php if(is_premium()): ?>
+<!-- Info Box: URL Webhook Fonnte -->
+<div class="card border-success shadow-sm mb-4">
+    <div class="card-header bg-success text-white fw-semibold">
+        <i class="fab fa-whatsapp me-2"></i> Panduan Setup WA Chatbot Inbound (Anggota Tanya via WA)
+    </div>
+    <div class="card-body">
+        <p class="mb-2">Agar anggota bisa mengirim pesan WA untuk cek saldo/pinjaman, daftarkan URL berikut ke <strong>Fonnte Dashboard → Device → Webhook</strong>:</p>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control font-monospace" id="webhookUrl" 
+                   value="<?= base_url('webhook/whatsapp') ?>" readonly>
+            <button class="btn btn-outline-success" type="button" onclick="copyWebhook()" title="Salin URL">
+                <i class="fas fa-copy"></i> Salin
+            </button>
+        </div>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="alert alert-info py-2 mb-0">
+                    <strong><i class="fas fa-info-circle"></i> Cara Setup di Fonnte:</strong>
+                    <ol class="mb-0 mt-1 ps-3 small">
+                        <li>Login ke <a href="https://fonnte.com" target="_blank">fonnte.com</a></li>
+                        <li>Pilih Device → klik <strong>Edit / Detail</strong></li>
+                        <li>Tempel URL di atas ke kolom <strong>Webhook</strong></li>
+                        <li>Aktifkan toggle <strong>autoread</strong> menjadi <strong>On</strong></li>
+                        <li>Klik <strong>Update / Simpan</strong></li>
+                    </ol>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-warning py-2 mb-0">
+                    <strong><i class="fas fa-comments"></i> Perintah Anggota:</strong>
+                    <ul class="mb-0 mt-1 ps-3 small">
+                        <li><code>SALDO</code> — cek saldo simpanan</li>
+                        <li><code>PINJAMAN</code> — sisa hutang pinjaman</li>
+                        <li><code>ANGSURAN</code> — detail cicilan</li>
+                        <li><code>INFO</code> — ringkasan akun</li>
+                        <li><code>BANTUAN</code> — daftar perintah</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <p class="text-muted small mt-2 mb-0">
+            <i class="fas fa-shield-alt"></i> 
+            Hanya anggota dengan nomor HP terdaftar di database yang bisa menggunakan layanan ini.
+            Aktifkan toggle <strong>wa_chatbot_aktif</strong> di atas untuk mengaktifkan fitur ini.<br>
+            <strong>Penting:</strong> Gunakan nomor pribadi Anda saat menguji coba (jangan mengirim pesan dari nomor Koperasi ke nomor Koperasi itu sendiri).
+        </p>
+    </div>
+</div>
+<?php endif; ?>
+
 <script>
 let secretClicks = 0;
 function revealLicense(el) {
@@ -165,6 +216,18 @@ function revealLicense(el) {
         el.innerHTML = 'Lainnya <i class="fas fa-unlock ms-1 text-warning"></i>';
         secretClicks = 0;
     }
+}
+function copyWebhook() {
+    const el = document.getElementById('webhookUrl');
+    el.select();
+    document.execCommand('copy');
+    const btn = el.nextElementSibling;
+    btn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+    btn.classList.replace('btn-outline-success', 'btn-success');
+    setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-copy"></i> Salin';
+        btn.classList.replace('btn-success', 'btn-outline-success');
+    }, 2000);
 }
 </script>
 <?= $this->endSection() ?>

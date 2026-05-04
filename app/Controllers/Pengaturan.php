@@ -39,6 +39,9 @@ class Pengaturan extends BaseController
             ['pengaturan_key' => 'wa_template_pinjaman', 'pengaturan_value' => 'Halo {Nama}, Pinjaman Anda sebesar Rp {Nominal} telah dicairkan pada tanggal {Tanggal}.', 'keterangan' => 'Template Pesan Pinjaman'],
             ['pengaturan_key' => 'wa_angsuran_aktif',  'pengaturan_value' => '0',                         'keterangan' => 'Notifikasi Pembayaran Angsuran (1=Aktif, 0=Nonaktif)'],
             ['pengaturan_key' => 'wa_template_angsuran', 'pengaturan_value' => 'Halo {Nama}, Pembayaran Angsuran ke-{CicilanKe} sebesar Rp {Nominal} telah berhasil diterima pada tanggal {Tanggal}. Sisa tagihan Anda: Rp {Sisa}.', 'keterangan' => 'Template Pesan Angsuran'],
+            
+            // Pengaturan WA Chatbot Inbound (Anggota tanya via WA)
+            ['pengaturan_key' => 'wa_chatbot_aktif',  'pengaturan_value' => '0', 'keterangan' => 'Fitur WA Chatbot Inbound (Anggota cek saldo/pinjaman via WA) (1=Aktif, 0=Nonaktif)'],
         ];
 
         foreach ($identitas as $idData) {
