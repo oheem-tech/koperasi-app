@@ -34,6 +34,45 @@ Aplikasi web berbasis **CodeIgniter 4** untuk manajemen koperasi simpan pinjam. 
 
 ## 🚀 Cara Instalasi
 
+### Metode 0 — Docker (Direkomendasikan untuk Developer) 🐳
+
+Cara tercepat & paling konsisten — **sekali jalan langsung siap di browser** (otomatis: build, buat `.env`, migrasi DB, seed data demo).
+
+**Prasyarat:** Docker Desktop sudah terpasang & berjalan.
+
+```bash
+# Linux / macOS / Git Bash
+./run.sh
+
+# Windows (double-click atau via cmd)
+run.bat
+```
+
+Setelah selesai, buka **http://localhost:8088/** lalu gunakan **Quick Login** di halaman login.
+
+| Perintah | Fungsi |
+|---|---|
+| `./run.sh` / `run.bat` | Setup penuh + start + buka browser |
+| `./run.sh status` | Lihat status container |
+| `./run.sh logs` | Lihat log realtime |
+| `./run.sh restart` | Restart container |
+| `./run.sh down` | Hentikan semua container |
+| `./run.sh reset` | Hapus total data (volume) lalu setup ulang |
+| `./run.sh doctor` | Cek prasyarat & port |
+
+> Ubah port: `APP_PORT=8090 ./run.sh`. Tanpa data demo: `SEED_DEMO=0 ./run.sh`.
+
+#### 🔑 Akun Demo (Quick Login)
+
+| Role | Username | Password |
+|---|---|---|
+| Admin | `admin` | `admin123` |
+| Anggota | `budi123` | `budi123` |
+| Anggota | `citra456` | `citra456` |
+| Anggota | `dewi789` | `dewi789` |
+
+---
+
 ### Metode 1 — Web Installer (Direkomendasikan untuk End User)
 
 Cara termudah tanpa baris perintah apapun.

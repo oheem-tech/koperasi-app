@@ -1,0 +1,18 @@
+# Normalisasi line ending agar konsisten lintas-OS
+* text=auto
+
+# Skrip shell & file yang dieksekusi di container Linux WAJIB pakai LF
+*.sh            text eol=lf
+docker/entrypoint.sh text eol=lf
+spark           text eol=lf
+Dockerfile      text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+
+# Skrip Windows pakai CRLF
+*.bat           text eol=crlf
+
+# File biner — jangan diutak-atik
+*.png           binary
+*.jpg           binary
+*.zip           binary

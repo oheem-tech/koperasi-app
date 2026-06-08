@@ -1,0 +1,51 @@
+# =====================================================================
+#  Aplikasi Koperasi (CodeIgniter 4) — Docker Compose
+# =====================================================================
+services:
+  db:
+    image: mariadb:10.11
+    container_name: koperasi-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-koperasi_db}
+      MARIADB_USER: ${DB_USER:-koperasi}
+      MARIADB_PASSWORD: ${DB_PASS:-koperasi}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASS:-rootkoperasi}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "${DB_EXPOSE_PORT:-33061}:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: koperasi-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      CI_ENVIRONMENT: ${CI_ENVIRONMENT:-production}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8088/}
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-koperasi_db}
+      DB_USER: ${DB_USER:-koperasi}
+      DB_PASS: ${DB_PASS:-koperasi}
+      SEED_DEMO: ${SEED_DEMO:-1}
+    ports:
+      - "${APP_PORT:-8088}:80"
+    volumes:
+      - writable_data:/var/www/html/writable
+      - uploads_data:/var/www/html/public/uploads
+
+volumes:
+  db_data:
+  writable_data:
+  uploads_data:

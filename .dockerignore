@@ -1,0 +1,16 @@
+.git
+.idea
+.vscode
+vendor
+node_modules
+writable/logs/*
+writable/cache/*
+writable/session/*
+writable/debugbar/*
+writable/uploads/*
+public/uploads/*
+.env
+.env.*
+!.env.example
+app3.zip
+*.code-workspace

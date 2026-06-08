@@ -110,6 +110,46 @@
     /* Edge/IE native password reveal */
     input::-ms-reveal, input::-ms-clear { display: none; }
 
+    /* ===== QUICK LOGIN (Demo) ===== */
+    .ql-divider {
+        display: flex; align-items: center; gap: 12px;
+        margin: 22px 0 16px; color: #94a3b8;
+        font-size: .72rem; font-weight: 600; letter-spacing: .4px;
+        text-transform: uppercase;
+    }
+    .ql-divider::before, .ql-divider::after {
+        content: ''; flex: 1; height: 1px; background: #e2e8f0;
+    }
+    .ql-admin {
+        width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 11px; margin-bottom: 10px;
+        background: #0f172a; color: #fff;
+        border: none; border-radius: 10px;
+        font-family: 'Inter', sans-serif; font-weight: 600; font-size: .85rem;
+        cursor: pointer; transition: background .2s, transform .15s;
+    }
+    .ql-admin:hover { background: #1e293b; transform: translateY(-1px); }
+    .ql-admin:active { transform: translateY(0); }
+    .ql-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .ql-chip {
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        padding: 10px 6px;
+        background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px;
+        font-family: 'Inter', sans-serif; cursor: pointer;
+        transition: border-color .2s, background .2s, transform .15s;
+    }
+    .ql-chip:hover { border-color: #3b82f6; background: #eff6ff; transform: translateY(-1px); }
+    .ql-chip:active { transform: translateY(0); }
+    .ql-chip .ql-ava {
+        width: 30px; height: 30px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, #3b82f6, #06b6d4);
+        color: #fff; font-size: .78rem; font-weight: 700;
+    }
+    .ql-chip .ql-name { font-size: .72rem; font-weight: 600; color: #334155; }
+    .ql-chip .ql-role { font-size: .62rem; color: #94a3b8; }
+    .ql-hint { text-align: center; font-size: .68rem; color: #cbd5e1; margin-top: 10px; }
+
     /* ===== MOBILE ===== */
     .login-mobile-header { display: none; }
 
@@ -304,7 +344,7 @@
             </div>
             <?php endif; ?>
 
-            <form action="<?= base_url('auth/process') ?>" method="post">
+            <form id="loginForm" action="<?= base_url('auth/process') ?>" method="post">
                 <?= csrf_field() ?>
                 <div class="mb-3">
                     <label class="form-label" for="username">Username</label>
@@ -328,6 +368,32 @@
                 </button>
             </form>
 
+            <!-- ===== QUICK LOGIN (akun demo untuk pengujian) ===== -->
+            <div class="ql-divider">Quick Login &middot; Demo</div>
+
+            <button type="button" class="ql-admin" onclick="quickLogin('admin','admin123')">
+                <i class="fas fa-user-shield"></i> Masuk sebagai Admin
+            </button>
+
+            <div class="ql-grid">
+                <div class="ql-chip" role="button" tabindex="0" onclick="quickLogin('budi123','budi123')">
+                    <span class="ql-ava">B</span>
+                    <span class="ql-name">Budi</span>
+                    <span class="ql-role">Anggota</span>
+                </div>
+                <div class="ql-chip" role="button" tabindex="0" onclick="quickLogin('citra456','citra456')">
+                    <span class="ql-ava">C</span>
+                    <span class="ql-name">Citra</span>
+                    <span class="ql-role">Anggota</span>
+                </div>
+                <div class="ql-chip" role="button" tabindex="0" onclick="quickLogin('dewi789','dewi789')">
+                    <span class="ql-ava">D</span>
+                    <span class="ql-name">Dewi</span>
+                    <span class="ql-role">Anggota</span>
+                </div>
+            </div>
+            <p class="ql-hint">Klik untuk masuk otomatis tanpa mengetik kredensial</p>
+
             <p class="mt-4 text-center" style="font-size:.75rem;color:#94a3b8;">
                 &copy; <?= date('Y') ?> <?= esc(get_pengaturan('koperasi_nama', 'Koperasi Simpan Pinjam')) ?> &middot; Semua hak dilindungi
             </p>
@@ -336,6 +402,19 @@
 </div>
 
 <script>
+    // Quick Login: isi kredensial demo lalu submit form login
+    function quickLogin(username, password) {
+        document.getElementById('username').value = username;
+        document.getElementById('loginPassword').value = password;
+        document.getElementById('loginForm').submit();
+    }
+    // Aksesibilitas: Enter/Space pada chip anggota
+    document.querySelectorAll('.ql-chip').forEach(function (el) {
+        el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+        });
+    });
+
     document.getElementById('togglePassword').addEventListener('click', function () {
         const input = document.getElementById('loginPassword');
         const isPassword = input.getAttribute('type') === 'password';
