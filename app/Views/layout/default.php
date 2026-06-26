@@ -8,7 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+    <!-- SEO & Open Graph (WhatsApp / Social Media Preview) -->
+    <meta name="description" content="Aplikasi Koperasi Simpan Pinjam - Kelola anggota, simpanan, dan pinjaman dengan mudah.">
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="<?= base_url() ?>">
+    <meta property="og:title"       content="<?= $title ?? esc(get_pengaturan('koperasi_nama', 'Koperasi App')) ?>">
+    <meta property="og:description" content="Aplikasi Koperasi Simpan Pinjam - Kelola anggota, simpanan, dan pinjaman dengan mudah.">
     <style>
+
         :root {
             --sidebar-bg: #0f172a;
             --sidebar-width: 250px;
