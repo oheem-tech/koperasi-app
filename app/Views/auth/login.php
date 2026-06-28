@@ -26,7 +26,7 @@
         background: linear-gradient(145deg, #0f172a 0%, #1e3a5f 50%, #0f4c8c 100%);
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
-        padding: 48px;
+        padding: 48px 40px;
         position: relative; overflow: hidden;
     }
     .login-left::before {
@@ -41,21 +41,41 @@
         background: radial-gradient(circle, rgba(6,182,212,.2) 0%, transparent 70%);
         border-radius: 50%; bottom: -60px; left: -60px;
     }
-    .login-left-content { position: relative; z-index: 2; text-align: center; color: #fff; }
+    .login-left-content { position: relative; z-index: 2; text-align: center; color: #fff; max-width: 360px; width: 100%; }
     .login-logo {
-        height: 72px;
-        display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;
+        width: 68px; height: 68px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 16px;
+        background: rgba(255,255,255,.1);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1.5px solid rgba(255,255,255,.18);
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(0,0,0,.25);
     }
-    .login-logo i { font-size: 32px; width: 72px; height: 72px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 18px; box-shadow: 0 8px 32px rgba(59,130,246,.5); color: #fff;}
-    .login-left h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
-    .login-left p  { opacity: .65; font-size: .9rem; max-width: 280px; line-height: 1.6; }
-    .login-features { margin-top: 36px; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+    .login-logo img { max-height: 44px; border-radius: 10px; }
+    .login-logo i { font-size: 28px; color: #fff; }
+    .login-left h2 {
+        font-size: 1.2rem; font-weight: 800;
+        margin: 0 0 8px; line-height: 1.4;
+        letter-spacing: -.2px;
+    }
+    .login-left > .login-left-content > p {
+        opacity: .60; font-size: .82rem;
+        max-width: 270px; line-height: 1.65;
+        margin: 0 auto 28px;
+    }
+    .login-features { display: flex; flex-direction: column; gap: 9px; text-align: left; }
     .login-feature {
-        display: flex; align-items: center; gap: 12px;
-        background: rgba(255,255,255,.07); border-radius: 10px;
-        padding: 12px 16px; font-size: .83rem;
+        display: flex; align-items: center; gap: 11px;
+        background: rgba(255,255,255,.07);
+        border: 1px solid rgba(255,255,255,.09);
+        border-radius: 10px;
+        padding: 9px 14px; font-size: .80rem;
+        transition: background .2s;
     }
-    .login-feature i { color: #60a5fa; font-size: 1rem; width: 18px; text-align: center; }
+    .login-feature:hover { background: rgba(255,255,255,.12); }
+    .login-feature i { color: #60a5fa; font-size: .88rem; width: 16px; text-align: center; flex-shrink: 0; }
 
     /* ===== DESKTOP: RIGHT PANEL ===== */
     .login-right {
@@ -239,24 +259,32 @@
     <!-- ===== DESKTOP: LEFT PANEL ===== -->
     <div class="login-left">
         <div class="login-left-content">
+
+            <!-- Logo -->
             <div class="login-logo">
                 <?php if(get_koperasi_logo()): ?>
-                    <img src="<?= get_koperasi_logo() ?>" alt="Logo Koperasi" style="max-height: 72px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.3);">
+                    <img src="<?= get_koperasi_logo() ?>" alt="Logo Koperasi">
                 <?php else: ?>
                     <i class="fas fa-landmark"></i>
                 <?php endif; ?>
             </div>
+
+            <!-- Nama & Tagline -->
             <h2><?= esc(get_pengaturan('koperasi_nama', 'Koperasi Simpan Pinjam')) ?></h2>
             <p>Sistem manajemen keuangan koperasi yang terintegrasi dan mudah digunakan.</p>
 
+            <!-- Divider -->
+            <div style="width:40px;height:2px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 20px;"></div>
+
+            <!-- Fitur -->
             <div class="login-features">
                 <div class="login-feature">
                     <i class="fas fa-piggy-bank"></i>
-                    <span>Kelola simpanan & pinjaman anggota</span>
+                    <span>Kelola simpanan &amp; pinjaman anggota</span>
                 </div>
                 <div class="login-feature">
                     <i class="fas fa-chart-pie"></i>
-                    <span>Laporan SHU otomatis & akurat</span>
+                    <span>Laporan SHU otomatis &amp; akurat</span>
                 </div>
                 <div class="login-feature">
                     <i class="fas fa-balance-scale"></i>
@@ -267,6 +295,7 @@
                     <span>Data aman dengan kontrol akses</span>
                 </div>
             </div>
+
         </div>
     </div>
 

@@ -84,6 +84,10 @@ class Pengaturan extends BaseController
                 $this->pengaturanModel->update($id, ['pengaturan_value' => $val]);
             }
         }
+        if (function_exists('catat_log')) {
+            catat_log('Edit Pengaturan', 'Mengubah konfigurasi / pengaturan sistem');
+        }
+
         return redirect()->to('/pengaturan')->with('success', 'Pengaturan berhasil diperbarui.');
 
         return redirect()->to('/pengaturan')->with('error', 'Tidak ada data yang diperbarui.');

@@ -87,18 +87,18 @@
     <p>Selamat datang kembali, <strong><?= session()->get('username') ?></strong>. Berikut ringkasan keuangan koperasi hari ini.</p>
 </div>
 
-<!-- Stat Cards -->
+<!-- Stat Cards Baris 1 -->
 <div class="row g-3 mb-4">
-    <div class="col-12 col-sm-6 col-lg-3">
-        <div class="stat-card stat-blue">
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="stat-card stat-blue h-100">
             <div class="stat-icon"><i class="fas fa-users"></i></div>
             <div class="stat-label">Total Anggota Aktif</div>
             <div class="stat-value"><?= $total_anggota ?></div>
             <div class="stat-sub">Anggota terdaftar</div>
         </div>
     </div>
-    <div class="col-12 col-sm-6 col-lg-3">
-        <div class="stat-card stat-green">
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="stat-card stat-green h-100">
             <div class="stat-icon"><i class="fas fa-piggy-bank"></i></div>
             <div class="stat-label">Total Saldo Simpanan</div>
             <div class="stat-value" style="font-size:1.25rem;">Rp <?= number_format($saldo_simpanan, 0, ',', '.') ?></div>
@@ -106,15 +106,15 @@
             <div style="border-top:1px solid rgba(255,255,255,0.2); margin-top:8px; padding-top:8px;">
                 <?php foreach($rincian_simpanan as $rs): ?>
                     <div class="d-flex justify-content-between mb-1" style="font-size:0.78rem;">
-                        <span><?= $rs['nama_simpanan'] ?></span>
+                        <span class="text-truncate" style="max-width: 150px;" title="<?= $rs['nama_simpanan'] ?>"><?= $rs['nama_simpanan'] ?></span>
                         <span class="fw-semibold">Rp <?= number_format($rs['total'], 0, ',', '.') ?></span>
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
     </div>
-    <div class="col-12 col-sm-6 col-lg-3">
-        <div class="stat-card stat-cyan">
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="stat-card stat-cyan h-100">
             <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
             <div class="stat-label">Total Dana Dipinjam</div>
             <div class="stat-value" style="font-size:1.25rem;">Rp <?= number_format($total_pinjaman, 0, ',', '.') ?></div>
@@ -131,8 +131,36 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-sm-6 col-lg-3">
-        <div class="stat-card <?= $pinjaman_pending > 0 ? 'stat-amber' : 'stat-purple' ?>">
+</div>
+
+<!-- Stat Cards Baris 2 -->
+<div class="row g-3 mb-4">
+    <!-- Arus Kas Bulan Ini -->
+    <div class="col-12 col-lg-6">
+        <div class="stat-card stat-purple h-100">
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="stat-label">Arus Kas (<?= date('F Y') ?>)</div>
+            <div class="stat-value" style="font-size:1.25rem;">Rp <?= number_format($arus_kas_akhir, 0, ',', '.') ?></div>
+            <div class="stat-sub mb-2">Saldo Kas Akhir</div>
+            <div style="border-top:1px solid rgba(255,255,255,0.2); margin-top:8px; padding-top:8px;">
+                <div class="d-flex justify-content-between mb-1" style="font-size:0.78rem;">
+                    <span>Saldo Sebelumnya</span>
+                    <span class="fw-semibold">Rp <?= number_format($arus_kas_sebelumnya, 0, ',', '.') ?></span>
+                </div>
+                <div class="d-flex justify-content-between mb-1" style="font-size:0.78rem;">
+                    <span>Pemasukan Bulan Ini</span>
+                    <span class="fw-semibold text-success">Rp <?= number_format($arus_kas_masuk, 0, ',', '.') ?></span>
+                </div>
+                <div class="d-flex justify-content-between mb-1" style="font-size:0.78rem;">
+                    <span>Pengeluaran Bulan Ini</span>
+                    <span class="fw-semibold text-warning">Rp <?= number_format($arus_kas_keluar, 0, ',', '.') ?></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+        <div class="stat-card <?= $pinjaman_pending > 0 ? 'stat-amber' : 'stat-indigo' ?> h-100" style="<?= $pinjaman_pending == 0 ? 'background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff;' : '' ?>">
             <div class="stat-icon"><i class="fas fa-clock"></i></div>
             <div class="stat-label">Menunggu Persetujuan</div>
             <div class="stat-value"><?= $pinjaman_pending ?></div>
@@ -140,6 +168,31 @@
         </div>
     </div>
 </div>
+
+<!-- Grafik -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="section-title"><i class="fas fa-chart-area"></i> Tren Arus Kas (6 Bulan Terakhir)</div>
+                <div style="position: relative; height: 130px; width: 100%;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="section-title"><i class="fas fa-chart-pie"></i> Komposisi Simpanan</div>
+                <div style="position: relative; height: 130px; width: 100%;">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Quick Links -->
 <div class="row g-3 mb-4">
@@ -292,6 +345,87 @@
     </div>
 </div>
 
+<?php endif; ?>
+
+<?php if(isset($chart_trend_labels)): ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const trendCtx = document.getElementById('trendChart');
+    if (trendCtx) {
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: <?= $chart_trend_labels ?>,
+                datasets: [
+                    {
+                        label: 'Uang Masuk',
+                        data: <?= $chart_trend_masuk ?>,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Uang Keluar',
+                        data: <?= $chart_trend_keluar ?>,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 1000000) {
+                                    return 'Rp ' + (value / 1000000) + ' Jt';
+                                }
+                                return 'Rp ' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    const pieCtx = document.getElementById('pieChart');
+    if (pieCtx) {
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: <?= $chart_pie_labels ?>,
+                datasets: [{
+                    data: <?= $chart_pie_data ?>,
+                    backgroundColor: [
+                        '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                },
+                cutout: '65%'
+            }
+        });
+    }
+});
+</script>
 <?php endif; ?>
 
 <?= $this->endSection() ?>

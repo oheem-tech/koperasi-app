@@ -364,6 +364,11 @@
             <a href="<?= base_url('role') ?>" class="<?= current_url(true)->getSegment(1) == 'role' ? 'active' : '' ?>">
                 <i class="nav-icon fas fa-user-shield"></i> Hak Akses & Role
             </a>
+            <?php if(has_permission('view_log')): ?>
+            <a href="<?= base_url('logaktivitas') ?>" class="<?= current_url(true)->getSegment(1) == 'logaktivitas' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-history"></i> Log Aktivitas
+            </a>
+            <?php endif; ?>
             <?php endif; ?>
             
             <?php endif; ?>

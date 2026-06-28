@@ -116,6 +116,10 @@ class Pinjaman extends BaseController
             'status'              => 'pending'
         ]);
 
+        if (function_exists('catat_log')) {
+            catat_log('Pengajuan Pinjaman', 'Mengajukan pinjaman ' . $jenis_pinjaman . ' sebesar Rp ' . number_format($jumlah_pinjaman, 0, ',', '.'));
+        }
+
         return redirect()->to('/pinjaman')->with('success', 'Pengajuan pinjaman berhasil dikirim.');
     }
 
@@ -166,6 +170,10 @@ class Pinjaman extends BaseController
                 }
             }
             // ================================
+            
+            if (function_exists('catat_log')) {
+                catat_log('Setuju Pinjaman', 'Menyetujui pinjaman ID: ' . $id . ' untuk ' . $namaAnggota);
+            }
         }
         return redirect()->to('/pinjaman')->with('success', 'Pinjaman berhasil disetujui dan dana kas dicairkan.');
     }
@@ -179,6 +187,10 @@ class Pinjaman extends BaseController
             $this->pinjamanModel->update($id, [
                 'status' => 'ditolak'
             ]);
+            
+            if (function_exists('catat_log')) {
+                catat_log('Tolak Pinjaman', 'Menolak pinjaman ID: ' . $id);
+            }
         }
         return redirect()->to('/pinjaman')->with('error', 'Pinjaman telah ditolak.');
     }
@@ -232,6 +244,10 @@ class Pinjaman extends BaseController
 
         $this->pinjamanModel->update($id, $updateData);
 
+        if (function_exists('catat_log')) {
+            catat_log('Edit Pinjaman', 'Memperbarui data pinjaman ID: ' . $id);
+        }
+
         return redirect()->to('/pinjaman')->with('success', 'Data pinjaman berhasil diupdate.');
     }
 
@@ -243,6 +259,10 @@ class Pinjaman extends BaseController
         if (!$pinjaman) return redirect()->to('/pinjaman')->with('error', 'Data pinjaman tidak ditemukan.');
 
         $this->pinjamanModel->delete($id);
+
+        if (function_exists('catat_log')) {
+            catat_log('Hapus Pinjaman', 'Menghapus data pinjaman ID: ' . $id);
+        }
 
         return redirect()->to('/pinjaman')->with('success', 'Data pinjaman berhasil dihapus.');
     }

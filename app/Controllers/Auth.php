@@ -53,6 +53,12 @@ class Auth extends BaseController
                     'isLoggedIn' => true,
                 ];
                 session()->set($sessionData);
+                
+                // Record login activity
+                if (function_exists('catat_log')) {
+                    catat_log('Login', 'User berhasil login ke sistem');
+                }
+
                 return redirect()->to('/dashboard');
             } else {
                 session()->setFlashdata('error', 'Password salah.');
@@ -66,6 +72,10 @@ class Auth extends BaseController
 
     public function logout()
     {
+        if (function_exists('catat_log') && session()->get('isLoggedIn')) {
+            catat_log('Logout', 'User keluar dari sistem');
+        }
+        
         session()->destroy();
         return redirect()->to('/auth');
     }

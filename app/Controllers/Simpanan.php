@@ -130,6 +130,10 @@ class Simpanan extends BaseController
         }
         // ================================
 
+        if (function_exists('catat_log')) {
+            catat_log('Tambah Simpanan', ucfirst($jenis_transaksi) . ' Rp ' . number_format($jumlah, 0, ',', '.') . ' untuk ' . $namaAnggota);
+        }
+
         return redirect()->to('/simpanan')->with('success', 'Transaksi simpanan berhasil diproses.');
     }
 
@@ -245,6 +249,10 @@ class Simpanan extends BaseController
             return redirect()->back()->with('error', 'Gagal memproses pembaruan transaksi.');
         }
 
+        if (function_exists('catat_log')) {
+            catat_log('Edit Simpanan', 'Memperbarui transaksi simpanan ID: ' . $id);
+        }
+
         return redirect()->to('/simpanan')->with('success', 'Transaksi simpanan berhasil diperbarui.');
     }
 
@@ -283,6 +291,10 @@ class Simpanan extends BaseController
 
         if ($db->transStatus() === false) {
             return redirect()->to('/simpanan')->with('error', 'Gagal menghapus transaksi simpanan.');
+        }
+
+        if (function_exists('catat_log')) {
+            catat_log('Hapus Simpanan', 'Menghapus transaksi simpanan ID: ' . $id);
         }
 
         return redirect()->to('/simpanan')->with('success', 'Data simpanan berhasil dihapus beserta catatan kas terkait.');

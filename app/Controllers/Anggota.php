@@ -88,6 +88,10 @@ class Anggota extends BaseController
             return redirect()->back()->with('error', 'Gagal menambahkan anggota.');
         }
 
+        if (function_exists('catat_log')) {
+            catat_log('Tambah Anggota', 'Menambahkan anggota baru: ' . $this->request->getPost('nama_lengkap'));
+        }
+
         return redirect()->to('/anggota')->with('success', 'Anggota berhasil ditambahkan.');
     }
 
@@ -129,6 +133,10 @@ class Anggota extends BaseController
             ]);
         }
 
+        if (function_exists('catat_log')) {
+            catat_log('Edit Anggota', 'Memperbarui data anggota: ' . $this->request->getPost('nama_lengkap'));
+        }
+
         return redirect()->to('/anggota')->with('success', 'Anggota berhasil diupdate.');
     }
 
@@ -139,6 +147,9 @@ class Anggota extends BaseController
         $anggota = $this->anggotaModel->find($id);
         if ($anggota) {
             $this->userModel->delete($anggota['user_id']);
+            if (function_exists('catat_log')) {
+                catat_log('Hapus Anggota', 'Menghapus anggota: ' . $anggota['nama_lengkap']);
+            }
         }
         return redirect()->to('/anggota')->with('success', 'Anggota berhasil dihapus.');
     }

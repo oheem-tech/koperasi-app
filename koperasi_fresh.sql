@@ -41,7 +41,8 @@ INSERT INTO `migrations` (`version`, `class`, `group`, `namespace`, `time`, `bat
 ('2026-04-10-104500', 'App\\Database\\Migrations\\CreateMasterKelompok',            'default', 'App', UNIX_TIMESTAMP(), 1),
 ('2026-04-11-141923', 'App\\Database\\Migrations\\AddKelompokToAnggota',            'default', 'App', UNIX_TIMESTAMP(), 1),
 ('2026-04-11-143900', 'App\\Database\\Migrations\\AddKasIdToSimpananAngsuran',      'default', 'App', UNIX_TIMESTAMP(), 1),
-('2026-04-12-111000', 'App\\Database\\Migrations\\AddKategoriToKasKoperasi',        'default', 'App', UNIX_TIMESTAMP(), 1);
+('2026-04-12-111000', 'App\\Database\\Migrations\\AddKategoriToKasKoperasi',        'default', 'App', UNIX_TIMESTAMP(), 1),
+('2026-06-28-131400', 'App\\Database\\Migrations\\LogAktivitas',                    'default', 'App', UNIX_TIMESTAMP(), 1);
 
 -- ============================================================
 -- Tabel: users
@@ -236,4 +237,42 @@ INSERT INTO `jenis_simpanan` (`nama_simpanan`, `minimal_setoran`) VALUES
 INSERT INTO `users` (`username`, `password`, `role`, `created_at`, `updated_at`) VALUES
 ('admin', '$2y$10$vrMMPlgbA8TIdqRiE//HCOzvlwN1KdZlLO71lg9rrjQ1BJOR1S8XS', 'admin', NOW(), NOW());
 
+-- ============================================================
+-- Tabel: roles (Hak Akses & Permission)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS `roles` (
+  `id`          int(11) NOT NULL AUTO_INCREMENT,
+  `name`        varchar(50) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `permissions` text DEFAULT NULL,
+  `created_at`  datetime DEFAULT NULL,
+  `updated_at`  datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- Data Default: roles
+-- ============================================================
+INSERT INTO `roles` (`name`, `description`, `permissions`, `created_at`, `updated_at`) VALUES
+('admin',      'Super Administrator dengan hak akses penuh',            '["manage_anggota","manage_simpanan","manage_pinjaman","manage_angsuran","manage_kas","view_laporan","manage_pengaturan","manage_backup","manage_roles","view_log"]', NOW(), NOW()),
+('anggota',    'Anggota Koperasi Biasa (Akses Terbatas)',                '["view_simpanan","view_pinjaman"]',                                                                                                                                   NOW(), NOW()),
+('bendahara',  'Bendahara (Penyelaras Kas dan Pembukuan)',               '["manage_anggota","manage_simpanan","manage_pinjaman","manage_angsuran","manage_kas","view_laporan"]',                                                                NOW(), NOW()),
+('ketua',      'Ketua Koperasi',                                         '["manage_anggota","manage_simpanan","manage_kas","view_laporan","manage_pengaturan","manage_backup"]',                                                                NOW(), NOW());
+
+-- ============================================================
+-- Tabel: log_aktivitas (Riwayat Aktivitas Pengguna)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS `log_aktivitas` (
+  `id`          int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id`     int(11) UNSIGNED NOT NULL,
+  `aktivitas`   varchar(100) NOT NULL,
+  `keterangan`  text DEFAULT NULL,
+  `ip_address`  varchar(45) DEFAULT NULL,
+  `created_at`  datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;
+

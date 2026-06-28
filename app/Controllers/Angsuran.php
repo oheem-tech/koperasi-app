@@ -205,6 +205,10 @@ class Angsuran extends BaseController
         }
         // ================================
 
+        if (function_exists('catat_log')) {
+            catat_log('Tambah Angsuran', $keteranganKas);
+        }
+
         return redirect()->to('/angsuran')->with('success', 'Pembayaran angsuran berhasil diproses.');
     }
 
@@ -343,6 +347,10 @@ class Angsuran extends BaseController
         }
         // ================================
 
+        if (function_exists('catat_log')) {
+            catat_log('Pelunasan Pinjaman', $keteranganKas);
+        }
+
         return redirect()->to('/angsuran')->with('success', 'Pinjaman berhasil dilunasi!');
     }
 
@@ -468,6 +476,10 @@ class Angsuran extends BaseController
             return redirect()->back()->with('error', 'Gagal memproses pembaruan angsuran.');
         }
 
+        if (function_exists('catat_log')) {
+            catat_log('Edit Angsuran', 'Memperbarui angsuran ID: ' . $id);
+        }
+
         return redirect()->to('/angsuran')->with('success', 'Transaksi angsuran berhasil diperbarui.');
     }
 
@@ -521,6 +533,10 @@ class Angsuran extends BaseController
 
         if ($db->transStatus() === false) {
             return redirect()->to('/angsuran')->with('error', 'Gagal menghapus transaksi angsuran.');
+        }
+
+        if (function_exists('catat_log')) {
+            catat_log('Hapus Angsuran', 'Menghapus angsuran ID: ' . $id);
         }
 
         return redirect()->to('/angsuran')->with('success', 'Data angsuran berhasil dihapus, catatan kas dicabut, dan status pinjaman disesuaikan.');
