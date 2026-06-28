@@ -42,6 +42,7 @@ INSERT INTO `migrations` (`version`, `class`, `group`, `namespace`, `time`, `bat
 ('2026-04-11-141923', 'App\\Database\\Migrations\\AddKelompokToAnggota',            'default', 'App', UNIX_TIMESTAMP(), 1),
 ('2026-04-11-143900', 'App\\Database\\Migrations\\AddKasIdToSimpananAngsuran',      'default', 'App', UNIX_TIMESTAMP(), 1),
 ('2026-04-12-111000', 'App\\Database\\Migrations\\AddKategoriToKasKoperasi',        'default', 'App', UNIX_TIMESTAMP(), 1),
+('2026-04-12-120000', 'App\\Database\\Migrations\\CreateRoles',                       'default', 'App', UNIX_TIMESTAMP(), 1),
 ('2026-06-28-131400', 'App\\Database\\Migrations\\LogAktivitas',                    'default', 'App', UNIX_TIMESTAMP(), 1);
 
 -- ============================================================
