@@ -8,6 +8,11 @@ class Auth extends BaseController
 {
     public function index()
     {
+        // Jika .env belum ada, redirect ke halaman installer
+        if (!file_exists(ROOTPATH . '.env')) {
+            return redirect()->to('/install');
+        }
+
         // If already logged in, redirect to dashboard
         if (session()->get('isLoggedIn')) {
             return redirect()->to('/dashboard');

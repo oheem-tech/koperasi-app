@@ -43,6 +43,24 @@ require rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'bootstra
 require_once SYSTEMPATH . 'Config/DotEnv.php';
 (new CodeIgniter\Config\DotEnv(ROOTPATH))->load();
 
+// ── Installer Guard ──────────────────────────────────────────────────────────
+// Jika file .env belum ada, redirect ke halaman installer sebelum framework
+// mencoba koneksi database (yang akan menyebabkan crash "Whoops!").
+if (!file_exists(ROOTPATH . '.env')) {
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+    // Normalisasi: ambil path tanpa query string
+    $requestPath = strtok($requestUri, '?');
+    // Izinkan akses ke /install saja, blokir semua path lain
+    if (!preg_match('#/install#i', $requestPath)) {
+        // Deteksi base path otomatis (misal: /kopercob atau /demo-koperasi)
+        $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
+        $installUrl = $scriptDir . '/install';
+        header('Location: ' . $installUrl, true, 302);
+        exit;
+    }
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 // Define ENVIRONMENT
 if (! defined('ENVIRONMENT')) {
     define('ENVIRONMENT', env('CI_ENVIRONMENT', 'production'));
