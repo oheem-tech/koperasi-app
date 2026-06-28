@@ -17,7 +17,6 @@ class CreateRoles extends Migration
             'name' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 50,
-                'unique'     => true,
             ],
             'description' => [
                 'type'       => 'VARCHAR',
