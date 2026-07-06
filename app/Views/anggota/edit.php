@@ -78,7 +78,7 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Username</label>
-                    <input type="text" class="form-control" value="<?= $user['username'] ?>" disabled>
+                    <input type="text" class="form-control" value="<?= $user['username'] ?? '(Tidak ada akun login)' ?>" disabled>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Password Baru (Opsional)</label>

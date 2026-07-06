@@ -272,6 +272,7 @@
                 <span style="display: inline-flex !important; align-items: center; gap: 5px; font-size: 0.7rem; padding: 3px 12px; border-radius: 20px; font-weight: 700; width: max-content; margin: 0 auto; background: linear-gradient(135deg,#059669,#0d9488); color:#fff; letter-spacing:.4px;"><i class="fas fa-crown" style="margin:0;width:auto;color:#fbbf24;"></i> VERSI PRO</span>
             </div>
             <?php endif; ?>
+            <div style="margin-top: 10px; font-size: 0.7rem; color: #64748b; font-weight: 600; letter-spacing: 0.3px;">sherka v1.0.0</div>
         </div>
 
         <div class="sidebar-nav">

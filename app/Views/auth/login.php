@@ -357,7 +357,8 @@
                 </button>
             </form>
 
-            <p class="mt-4 text-center" style="font-size:.75rem;color:#94a3b8;">
+            <div class="mt-4 text-center" style="font-size:.75rem; color:#94a3b8; font-weight:400; margin-bottom:4px;">sherka v1.0.0</div>
+            <p class="text-center" style="font-size:.75rem; color:#64748b; font-weight:600;">
                 &copy; <?= date('Y') ?> <?= esc(get_pengaturan('koperasi_nama', 'Koperasi Simpan Pinjam')) ?> &middot; Semua hak dilindungi
             </p>
         </div>

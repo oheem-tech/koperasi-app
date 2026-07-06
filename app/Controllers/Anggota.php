@@ -127,7 +127,7 @@ class Anggota extends BaseController
         ]);
 
         $password = $this->request->getPost('password');
-        if (!empty($password)) {
+        if (!empty($password) && !empty($anggota['user_id'])) {
             $this->userModel->update($anggota['user_id'], [
                 'password' => password_hash($password, PASSWORD_DEFAULT)
             ]);
