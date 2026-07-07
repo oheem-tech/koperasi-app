@@ -13,24 +13,36 @@
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <form action="<?= base_url('kas') ?>" method="get" class="row gx-2 gy-2 align-items-center">
-            <div class="col-auto">
-                <label>Bulan Transaksi:</label>
-            </div>
             <?php
                 // Tentukan default select dari filter saat ini
-                $selBulan = $bulan !== 'all' ? date('m', strtotime($bulan . '-01')) : date('m');
-                $selTahun = $bulan !== 'all' ? date('Y', strtotime($bulan . '-01')) : date('Y');
+                $selType = is_array($periode) ? $periode['type'] : 'bulan';
+                $selBulan = is_array($periode) ? $periode['bulan'] : date('m');
+                $selSemester = (is_array($periode) && isset($periode['semester'])) ? $periode['semester'] : '1';
+                $selTahun = is_array($periode) ? $periode['tahun'] : date('Y');
                 $namaBulan = ['01'=>'Januari','02'=>'Februari','03'=>'Maret','04'=>'April','05'=>'Mei','06'=>'Juni','07'=>'Juli','08'=>'Agustus','09'=>'September','10'=>'Oktober','11'=>'November','12'=>'Desember'];
             ?>
             <div class="col-auto">
-                <select name="filter_bulan" class="form-select">
+                <select name="filter_type" id="filter_type" class="form-select" onchange="toggleFilterType()">
+                    <option value="bulan" <?= $selType == 'bulan' ? 'selected' : '' ?>>Bulan</option>
+                    <option value="semester" <?= $selType == 'semester' ? 'selected' : '' ?>>Semester</option>
+                    <option value="tahun" <?= $selType == 'tahun' ? 'selected' : '' ?>>Tahun</option>
+                </select>
+            </div>
+            <div class="col-auto" id="col_filter_bulan" style="<?= $selType !== 'bulan' ? 'display:none;' : '' ?>">
+                <select name="filter_bulan" id="filter_bulan" class="form-select">
                     <?php foreach($namaBulan as $num => $name): ?>
                         <option value="<?= $num ?>" <?= $selBulan == $num ? 'selected' : '' ?>><?= $name ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-auto">
-                <select name="filter_tahun" class="form-select">
+            <div class="col-auto" id="col_filter_semester" style="<?= $selType !== 'semester' ? 'display:none;' : '' ?>">
+                <select name="filter_semester" id="filter_semester" class="form-select">
+                    <option value="1" <?= $selSemester == '1' ? 'selected' : '' ?>>Semester 1 (Jan-Jun)</option>
+                    <option value="2" <?= $selSemester == '2' ? 'selected' : '' ?>>Semester 2 (Jul-Des)</option>
+                </select>
+            </div>
+            <div class="col-auto" id="col_filter_tahun">
+                <select name="filter_tahun" id="filter_tahun" class="form-select">
                     <?php for($y = date('Y') + 2; $y >= 2010; $y--): ?>
                         <option value="<?= $y ?>" <?= $selTahun == $y ? 'selected' : '' ?>><?= $y ?></option>
                     <?php endfor; ?>
@@ -40,7 +52,7 @@
                 <button type="submit" class="btn btn-secondary">Filter</button>
                 <a href="<?= base_url('kas?bulan=all') ?>" class="btn btn-outline-secondary">Semua Waktu</a>
             </div>
-            <?php if ($bulan !== 'all'): ?>
+            <?php if ($periode !== 'all'): ?>
             <div class="col-auto ms-auto">
                 <div class="bg-light border border-info rounded px-3 py-1">
                     <span class="text-muted small d-block mb-n1" style="font-size: 0.8rem;">Saldo Periode Sebelumnya</span>
@@ -72,9 +84,9 @@
                 $totalMasuk = 0;
                 $totalKeluar = 0;
                 ?>
-                <?php if ($bulan !== 'all'): ?>
+                <?php if ($periode !== 'all'): ?>
                 <tr class="table-info">
-                    <td colspan="5" class="text-end fw-bold">SALDO PERIODE SEBELUMNYA:</td>
+                    <td colspan="5" class="text-end fw-bold">SALDO PERIODE SEBELUMNYA (<?= esc($prevPeriodeDesc) ?>):</td>
                     <td class="text-end fw-bold">Rp <?= number_format($awalSaldo ?? 0, 0, ',', '.') ?></td>
                     <td></td>
                 </tr>
@@ -133,4 +145,13 @@
         </table>
     </div>
 </div>
+
+<script>
+function toggleFilterType() {
+    const type = document.getElementById('filter_type').value;
+    document.getElementById('col_filter_bulan').style.display = type === 'bulan' ? 'block' : 'none';
+    document.getElementById('col_filter_semester').style.display = type === 'semester' ? 'block' : 'none';
+    // filter_tahun selalu muncul
+}
+</script>
 <?= $this->endSection() ?>

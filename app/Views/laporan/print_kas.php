@@ -1,7 +1,7 @@
 <?= $this->extend('layout/print') ?>
 <?= $this->section('content') ?>
 
-<div class="laporan-title">LAPORAN ARUS KAS<br>Periode: <?= $bulan === 'all' ? 'Semua Waktu' : date('F Y', strtotime($bulan . '-01')) ?></div>
+<div class="laporan-title">LAPORAN ARUS KAS<br>Periode: <?= esc($periodeDesc ?? 'Semua Waktu') ?></div>
 
 <table class="table">
     <thead>
@@ -41,7 +41,15 @@
     <tfoot>
         <tr>
             <td style="text-align:right; font-weight:bold;">KENAIKAN / (PENURUNAN) KAS BERSIH</td>
-            <td colspan="2" style="text-align:center; font-weight:bold; font-size:14px;">Rp <?= number_format($saldoBersih, 0, ',', '.') ?></td>
+            <td colspan="2" style="text-align:center; font-weight:bold;">Rp <?= number_format($saldoBersih, 0, ',', '.') ?></td>
+        </tr>
+        <tr>
+            <td style="text-align:right; font-weight:bold;">SALDO KAS AWAL PERIODE</td>
+            <td colspan="2" style="text-align:center; font-weight:bold;">Rp <?= number_format($awalSaldo ?? 0, 0, ',', '.') ?></td>
+        </tr>
+        <tr style="background:#e2e8f0;">
+            <td style="text-align:right; font-weight:bold; font-size:14px;">SALDO KAS AKHIR PERIODE</td>
+            <td colspan="2" style="text-align:center; font-weight:bold; font-size:14px;">Rp <?= number_format($saldoAkhir ?? 0, 0, ',', '.') ?></td>
         </tr>
     </tfoot>
 </table>

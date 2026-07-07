@@ -21,16 +21,73 @@ class Laporan extends BaseController
         if (!has_permission('view_laporan')) return redirect()->to('/dashboard');
         
         $db = \Config\Database::connect();
-        $bulan = $this->request->getGet('bulan') ?? date('Y-m');
+        $bulanParam = $this->request->getGet('bulan');
+        $filterType = $this->request->getGet('filter_type');
+        $filterBulan = $this->request->getGet('filter_bulan');
+        $filterTahun = $this->request->getGet('filter_tahun');
+        $filterSemester = $this->request->getGet('filter_semester');
+
+        if ($bulanParam === 'all') {
+            $periode = 'all';
+            $periodeDesc = 'Semua Waktu';
+        } else if ($filterType) {
+            $periode = [
+                'type' => $filterType,
+                'tahun' => $filterTahun,
+                'bulan' => $filterBulan,
+                'semester' => $filterSemester
+            ];
+            
+            if ($filterType === 'bulan') {
+                $namaBulan = ['01'=>'Januari','02'=>'Februari','03'=>'Maret','04'=>'April','05'=>'Mei','06'=>'Juni','07'=>'Juli','08'=>'Agustus','09'=>'September','10'=>'Oktober','11'=>'November','12'=>'Desember'];
+                $periodeDesc = $namaBulan[str_pad($filterBulan, 2, '0', STR_PAD_LEFT)] . ' ' . $filterTahun;
+            } else if ($filterType === 'semester') {
+                $periodeDesc = 'Semester ' . $filterSemester . ' Tahun ' . $filterTahun;
+            } else {
+                $periodeDesc = 'Tahun ' . $filterTahun;
+            }
+        } else {
+            // Default to current month if no filter submitted
+            if ($bulanParam && preg_match('/^\d{4}-\d{2}$/', $bulanParam)) {
+                $periode = [
+                    'type' => 'bulan',
+                    'tahun' => substr($bulanParam, 0, 4),
+                    'bulan' => substr($bulanParam, 5, 2)
+                ];
+            } else {
+                $periode = [
+                    'type' => 'bulan',
+                    'tahun' => date('Y'),
+                    'bulan' => date('m')
+                ];
+            }
+            $namaBulan = ['01'=>'Januari','02'=>'Februari','03'=>'Maret','04'=>'April','05'=>'Mei','06'=>'Juni','07'=>'Juli','08'=>'Agustus','09'=>'September','10'=>'Oktober','11'=>'November','12'=>'Desember'];
+            $periodeDesc = $namaBulan[str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT)] . ' ' . $periode['tahun'];
+        }
+
+        $applyFilter = function($builder, $colTanggal) use ($periode) {
+            if ($periode === 'all') return;
+            if ($periode['type'] === 'bulan') {
+                $bulanStr = $periode['tahun'] . '-' . str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT);
+                $builder->where("DATE_FORMAT($colTanggal, '%Y-%m')", $bulanStr);
+            } else if ($periode['type'] === 'semester') {
+                $builder->where("YEAR($colTanggal)", $periode['tahun']);
+                if ($periode['semester'] == '1') {
+                    $builder->where("MONTH($colTanggal) <=", 6);
+                } else {
+                    $builder->where("MONTH($colTanggal) >", 6);
+                }
+            } else if ($periode['type'] === 'tahun') {
+                $builder->where("YEAR($colTanggal)", $periode['tahun']);
+            }
+        };
 
         $simpananMasuk = $db->table('simpanan')
             ->select('simpanan.*, anggota.nama_lengkap, jenis_simpanan.nama_simpanan')
             ->join('anggota', 'anggota.id = simpanan.anggota_id')
             ->join('jenis_simpanan', 'jenis_simpanan.id = simpanan.jenis_simpanan_id')
             ->where('jenis_transaksi', 'setor');
-        if ($bulan !== 'all') {
-            $simpananMasuk->where("DATE_FORMAT(tanggal_transaksi, '%Y-%m')", $bulan);
-        }
+        $applyFilter($simpananMasuk, 'tanggal_transaksi');
         $simpananMasuk = $simpananMasuk->get()->getResultArray();
 
         // Simpanan keluar (tarik)
@@ -39,21 +96,28 @@ class Laporan extends BaseController
             ->join('anggota', 'anggota.id = simpanan.anggota_id')
             ->join('jenis_simpanan', 'jenis_simpanan.id = simpanan.jenis_simpanan_id')
             ->where('jenis_transaksi', 'tarik');
-        if ($bulan !== 'all') {
-            $simpananKeluar->where("DATE_FORMAT(tanggal_transaksi, '%Y-%m')", $bulan);
-        }
+        $applyFilter($simpananKeluar, 'tanggal_transaksi');
         $simpananKeluar = $simpananKeluar->get()->getResultArray();
 
         // Pinjaman cair (disetujui atau lunas)
         $pinjamanCair = $db->table('pinjaman')
-            ->select('pinjaman.*, anggota.nama_lengkap, anggota.no_anggota')
+            ->select('pinjaman.*, anggota.nama_lengkap, anggota.no_anggota, kas_koperasi.tanggal as tanggal_cair')
             ->join('anggota', 'anggota.id = pinjaman.anggota_id')
+            ->join('kas_koperasi', "kas_koperasi.kategori = 'pinjaman' AND kas_koperasi.jenis = 'keluar' AND kas_koperasi.nominal = pinjaman.jumlah_pinjaman AND kas_koperasi.keterangan LIKE CONCAT('%', anggota.nama_lengkap, '%')", 'left')
             ->whereIn('pinjaman.status', ['disetujui', 'lunas']);
-        if ($bulan !== 'all') {
-            $pinjamanCair->groupStart()
-                ->where("DATE_FORMAT(tanggal_jatuh_tempo - INTERVAL lama_tenor MONTH, '%Y-%m')", $bulan)
-                ->orWhere("DATE_FORMAT(tanggal_pengajuan, '%Y-%m')", $bulan)
-            ->groupEnd();
+        if ($periode !== 'all') {
+            $pinjamanCair->groupStart();
+            if ($periode['type'] === 'bulan') {
+                $b = $periode['tahun'] . '-' . str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT);
+                $pinjamanCair->where("DATE_FORMAT(COALESCE(kas_koperasi.tanggal, tanggal_jatuh_tempo - INTERVAL lama_tenor MONTH), '%Y-%m')", $b);
+            } else if ($periode['type'] === 'semester') {
+                $y = $periode['tahun'];
+                $mOp = $periode['semester'] == '1' ? '<=' : '>';
+                $pinjamanCair->where("YEAR(COALESCE(kas_koperasi.tanggal, tanggal_jatuh_tempo - INTERVAL lama_tenor MONTH)) = $y AND MONTH(COALESCE(kas_koperasi.tanggal, tanggal_jatuh_tempo - INTERVAL lama_tenor MONTH)) $mOp 6");
+            } else if ($periode['type'] === 'tahun') {
+                $pinjamanCair->where("YEAR(COALESCE(kas_koperasi.tanggal, tanggal_jatuh_tempo - INTERVAL lama_tenor MONTH))", $periode['tahun']);
+            }
+            $pinjamanCair->groupEnd();
         }
         $pinjamanCair = $pinjamanCair->get()->getResultArray();
 
@@ -62,42 +126,89 @@ class Laporan extends BaseController
             ->select('angsuran.*, anggota.nama_lengkap, anggota.no_anggota, pinjaman.jenis_pinjaman')
             ->join('pinjaman', 'pinjaman.id = angsuran.pinjaman_id')
             ->join('anggota', 'anggota.id = pinjaman.anggota_id');
-        if ($bulan !== 'all') {
-            $angsuranMasuk->where("DATE_FORMAT(tanggal_bayar, '%Y-%m')", $bulan);
-        }
+        $applyFilter($angsuranMasuk, 'tanggal_bayar');
         $angsuranMasuk = $angsuranMasuk->get()->getResultArray();
 
         // Kas Operasional / Manual Masuk
-        // Gunakan kategori='operasional' — lebih andal daripada string matching keterangan.
-        // Ini memastikan "Setoran SHR", "Pelunasan Angsuran", dll. tidak masuk ke kelompok ini.
         $manualMasuk = $db->table('kas_koperasi')
             ->where('jenis', 'masuk')
-            ->where('kategori', 'operasional');
-        if ($bulan !== 'all') {
-            $manualMasuk->where("DATE_FORMAT(tanggal, '%Y-%m')", $bulan);
-        }
+            ->whereNotIn('kategori', ['simpanan', 'angsuran', 'pinjaman']);
+        $applyFilter($manualMasuk, 'tanggal');
         $manualMasuk = $manualMasuk->get()->getResultArray();
 
         // Kas Operasional / Manual Keluar
         $manualKeluar = $db->table('kas_koperasi')
             ->where('jenis', 'keluar')
-            ->where('kategori', 'operasional');
-        if ($bulan !== 'all') {
-            $manualKeluar->where("DATE_FORMAT(tanggal, '%Y-%m')", $bulan);
-        }
+            ->whereNotIn('kategori', ['simpanan', 'angsuran', 'pinjaman']);
+        $applyFilter($manualKeluar, 'tanggal');
         $manualKeluar = $manualKeluar->get()->getResultArray();
 
-        $totalMasuk = array_sum(array_column($simpananMasuk, 'jumlah'))
-                    + array_sum(array_column($angsuranMasuk, 'jumlah_bayar'))
-                    + array_sum(array_column($manualMasuk, 'nominal'));
+        // Real Kas dari Buku Kas Umum untuk garansi sinkronisasi 100%
+        $semuaKasMasuk = $db->table('kas_koperasi')->where('jenis', 'masuk');
+        $applyFilter($semuaKasMasuk, 'tanggal');
+        $totalMasukReal = $semuaKasMasuk->selectSum('nominal')->get()->getRow()->nominal ?? 0;
 
-        $totalKeluar = array_sum(array_column($simpananKeluar, 'jumlah'))
-                     + array_sum(array_column($pinjamanCair, 'jumlah_pinjaman'))
-                     + array_sum(array_column($manualKeluar, 'nominal'));
+        $semuaKasKeluar = $db->table('kas_koperasi')->where('jenis', 'keluar');
+        $applyFilter($semuaKasKeluar, 'tanggal');
+        $totalKeluarReal = $semuaKasKeluar->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+
+        $totalMasukKomponen = array_sum(array_column($simpananMasuk, 'jumlah'))
+                            + array_sum(array_column($angsuranMasuk, 'jumlah_bayar'))
+                            + array_sum(array_column($manualMasuk, 'nominal'));
+
+        $totalKeluarKomponen = array_sum(array_column($simpananKeluar, 'jumlah'))
+                             + array_sum(array_column($pinjamanCair, 'jumlah_pinjaman'))
+                             + array_sum(array_column($manualKeluar, 'nominal'));
+
+        // Inject selisih (data yatim/terhapus sebagian) agar match dengan Buku Kas
+        $selisihMasuk = $totalMasukReal - $totalMasukKomponen;
+        if (abs($selisihMasuk) > 0) {
+            $manualMasuk[] = [
+                'tanggal' => date('Y-m-d'),
+                'keterangan' => 'Penyesuaian Sistem (Data yatim/tidak sinkron)',
+                'nominal' => $selisihMasuk
+            ];
+        }
+
+        $selisihKeluar = $totalKeluarReal - $totalKeluarKomponen;
+        if (abs($selisihKeluar) > 0) {
+            $manualKeluar[] = [
+                'tanggal' => date('Y-m-d'),
+                'keterangan' => 'Penyesuaian Sistem (Data yatim/tidak sinkron)',
+                'nominal' => $selisihKeluar
+            ];
+        }
+
+        $totalMasuk = $totalMasukReal;
+        $totalKeluar = $totalKeluarReal;
+
+        // Hitung Saldo Awal
+        $awalSaldo = 0;
+        if ($periode !== 'all') {
+            if ($periode['type'] === 'bulan') {
+                $tanggalAwal = $periode['tahun'] . '-' . str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT) . '-01';
+            } else if ($periode['type'] === 'semester') {
+                if ($periode['semester'] == '1') {
+                    $tanggalAwal = $periode['tahun'] . '-01-01';
+                } else {
+                    $tanggalAwal = $periode['tahun'] . '-07-01';
+                }
+            } else if ($periode['type'] === 'tahun') {
+                $tanggalAwal = $periode['tahun'] . '-01-01';
+            }
+            
+            $masukSebelum = $db->table('kas_koperasi')->where("DATE(tanggal) <", $tanggalAwal)->where('jenis', 'masuk')->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+            $keluarSebelum = $db->table('kas_koperasi')->where("DATE(tanggal) <", $tanggalAwal)->where('jenis', 'keluar')->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+            $awalSaldo = $masukSebelum - $keluarSebelum;
+        }
+
+        $saldoBersih = $totalMasuk - $totalKeluar;
+        $saldoAkhir = $awalSaldo + $saldoBersih;
 
         $data = [
             'title'          => 'Laporan Arus Kas',
-            'bulan'          => $bulan,
+            'periode'        => $periode,
+            'periodeDesc'    => $periodeDesc,
             'simpananMasuk'  => $simpananMasuk,
             'simpananKeluar' => $simpananKeluar,
             'pinjamanCair'   => $pinjamanCair,
@@ -106,12 +217,14 @@ class Laporan extends BaseController
             'manualKeluar'   => $manualKeluar,
             'totalMasuk'     => $totalMasuk,
             'totalKeluar'    => $totalKeluar,
-            'saldoBersih'    => $totalMasuk - $totalKeluar,
+            'saldoBersih'    => $saldoBersih,
+            'awalSaldo'      => $awalSaldo,
+            'saldoAkhir'     => $saldoAkhir,
         ];
         $action = $this->request->getGet('action');
         if ($action == 'excel') {
             header("Content-type: application/vnd-ms-excel");
-            $filenameBulan = $bulan === 'all' ? 'Semua_Waktu' : $bulan;
+            $filenameBulan = str_replace(' ', '_', $periodeDesc);
             header("Content-Disposition: attachment; filename=Laporan_Arus_Kas_{$filenameBulan}.xls");
             return view('laporan/print_kas', $data);
         } elseif ($action == 'print') {

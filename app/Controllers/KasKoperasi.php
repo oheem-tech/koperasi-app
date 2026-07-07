@@ -46,28 +46,104 @@ class KasKoperasi extends BaseController
         if (!has_permission('manage_kas')) return redirect()->to('/dashboard');
 
         $bulanParam = $this->request->getGet('bulan');
+        $filterType = $this->request->getGet('filter_type');
         $filterBulan = $this->request->getGet('filter_bulan');
         $filterTahun = $this->request->getGet('filter_tahun');
+        $filterSemester = $this->request->getGet('filter_semester');
 
-        if ($filterBulan && $filterTahun) {
-            $bulan = $filterTahun . '-' . str_pad($filterBulan, 2, '0', STR_PAD_LEFT);
+        $prevPeriodeDesc = '';
+        if ($bulanParam === 'all') {
+            $periode = 'all';
+            $periodeDesc = 'Semua Waktu';
+        } else if ($filterType) {
+            $periode = [
+                'type' => $filterType,
+                'tahun' => $filterTahun,
+                'bulan' => $filterBulan,
+                'semester' => $filterSemester
+            ];
+            
+            $namaBulan = ['01'=>'Januari','02'=>'Februari','03'=>'Maret','04'=>'April','05'=>'Mei','06'=>'Juni','07'=>'Juli','08'=>'Agustus','09'=>'September','10'=>'Oktober','11'=>'November','12'=>'Desember'];
+            
+            if ($filterType === 'bulan') {
+                $periodeDesc = $namaBulan[str_pad($filterBulan, 2, '0', STR_PAD_LEFT)] . ' ' . $filterTahun;
+                
+                $prevM = $filterBulan - 1;
+                $prevY = $filterTahun;
+                if ($prevM < 1) {
+                    $prevM = 12;
+                    $prevY--;
+                }
+                $prevPeriodeDesc = 'Bulan ' . $namaBulan[str_pad($prevM, 2, '0', STR_PAD_LEFT)] . ' ' . $prevY;
+                
+            } else if ($filterType === 'semester') {
+                $periodeDesc = 'Semester ' . $filterSemester . ' Tahun ' . $filterTahun;
+                
+                $prevS = $filterSemester == '1' ? '2' : '1';
+                $prevY = $filterSemester == '1' ? $filterTahun - 1 : $filterTahun;
+                $prevPeriodeDesc = 'Semester ' . $prevS . ' Tahun ' . $prevY;
+                
+            } else {
+                $periodeDesc = 'Tahun ' . $filterTahun;
+                $prevPeriodeDesc = 'Tahun ' . ($filterTahun - 1);
+            }
         } else {
-            $bulan = $bulanParam ?? date('Y-m');
+            // Default to current month if no filter submitted
+            if ($bulanParam && preg_match('/^\d{4}-\d{2}$/', $bulanParam)) {
+                $periode = [
+                    'type' => 'bulan',
+                    'tahun' => substr($bulanParam, 0, 4),
+                    'bulan' => substr($bulanParam, 5, 2)
+                ];
+            } else {
+                $periode = [
+                    'type' => 'bulan',
+                    'tahun' => date('Y'),
+                    'bulan' => date('m')
+                ];
+            }
+            $namaBulan = ['01'=>'Januari','02'=>'Februari','03'=>'Maret','04'=>'April','05'=>'Mei','06'=>'Juni','07'=>'Juli','08'=>'Agustus','09'=>'September','10'=>'Oktober','11'=>'November','12'=>'Desember'];
+            $periodeDesc = $namaBulan[str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT)] . ' ' . $periode['tahun'];
+            
+            $prevM = $periode['bulan'] - 1;
+            $prevY = $periode['tahun'];
+            if ($prevM < 1) {
+                $prevM = 12;
+                $prevY--;
+            }
+            $prevPeriodeDesc = 'Bulan ' . $namaBulan[str_pad($prevM, 2, '0', STR_PAD_LEFT)] . ' ' . $prevY;
         }
 
-        if ($bulan === 'all') {
+        if ($periode === 'all') {
             $kas = $this->kasModel->orderBy('tanggal', 'ASC')->orderBy('id', 'ASC')->findAll();
             $awalSaldo = 0;
         } else {
+            if ($periode['type'] === 'bulan') {
+                $bulanStr = $periode['tahun'] . '-' . str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT);
+                $this->kasModel->where("DATE_FORMAT(tanggal, '%Y-%m')", $bulanStr);
+                $tanggalAwal = $bulanStr . '-01';
+            } else if ($periode['type'] === 'semester') {
+                $this->kasModel->where("YEAR(tanggal)", $periode['tahun']);
+                if ($periode['semester'] == '1') {
+                    $this->kasModel->where("MONTH(tanggal) <=", 6);
+                    $tanggalAwal = $periode['tahun'] . '-01-01';
+                } else {
+                    $this->kasModel->where("MONTH(tanggal) >", 6);
+                    $tanggalAwal = $periode['tahun'] . '-07-01';
+                }
+            } else if ($periode['type'] === 'tahun') {
+                $this->kasModel->where("YEAR(tanggal)", $periode['tahun']);
+                $tanggalAwal = $periode['tahun'] . '-01-01';
+            }
+            
             $kas = $this->kasModel
-                ->where("DATE_FORMAT(tanggal, '%Y-%m')", $bulan)
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('id', 'ASC')
                 ->findAll();
             
-            // Hitung total saldo masuk & keluar SEBELUM bulan ini
-            $masukSebelum = $this->kasModel->where("DATE_FORMAT(tanggal, '%Y-%m') <", $bulan)->where('jenis', 'masuk')->selectSum('nominal')->get()->getRow()->nominal ?? 0;
-            $keluarSebelum = $this->kasModel->where("DATE_FORMAT(tanggal, '%Y-%m') <", $bulan)->where('jenis', 'keluar')->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+            // Hitung total saldo masuk & keluar SEBELUM tanggal awal periode
+            $masukSebelum = $this->kasModel->where("DATE(tanggal) <", $tanggalAwal)->where('jenis', 'masuk')->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+            $keluarSebelum = $this->kasModel->where("DATE(tanggal) <", $tanggalAwal)->where('jenis', 'keluar')->selectSum('nominal')->get()->getRow()->nominal ?? 0;
             $awalSaldo = $masukSebelum - $keluarSebelum;
         }
 
@@ -90,7 +166,9 @@ class KasKoperasi extends BaseController
         $data = [
             'title' => 'Buku Kas Umum | Koperasi',
             'kas'   => $kas,
-            'bulan' => $bulan,
+            'periode' => $periode,
+            'periodeDesc' => $periodeDesc,
+            'prevPeriodeDesc' => $prevPeriodeDesc,
             'awalSaldo' => $awalSaldo
         ];
         return view('kas/index', $data);
