@@ -275,7 +275,7 @@ class WhatsappWebhook extends BaseController
             $tenorSisa = max(0, (int)$p['lama_tenor'] - $jumlahAngsuranDibayar);
 
             // Estimasi angsuran per bulan (flat)
-            $bungaTotal = (float)$p['jumlah_pinjaman'] * ((float)$p['bunga_persen'] / 100) * ((int)$p['lama_tenor'] / 12);
+            $bungaTotal = (float)$p['jumlah_pinjaman'] * ((float)$p['bunga_persen'] / 100) * (int)$p['lama_tenor'];
             $totalBayar = (float)$p['jumlah_pinjaman'] + $bungaTotal;
             $angsuranPerBulan = $p['lama_tenor'] > 0 ? $totalBayar / (int)$p['lama_tenor'] : 0;
 

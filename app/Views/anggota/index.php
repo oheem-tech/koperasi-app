@@ -15,42 +15,54 @@
 
 <div class="card shadow-sm">
     <div class="card-body">
-        <table class="table table-bordered table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>No. Anggota</th>
-                    <th>Nama Lengkap</th>
-                    <th>No. Telp</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach($anggota as $row): ?>
-                <tr>
-                    <td><?= $row['no_anggota'] ?></td>
-                    <td><?= $row['nama_lengkap'] ?></td>
-                    <td><?= $row['no_telp'] ?></td>
-                    <td>
-                        <?php if($row['status'] == 'aktif'): ?>
-                            <span class="badge bg-success">Aktif</span>
-                        <?php else: ?>
-                            <span class="badge bg-danger">Nonaktif</span>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <a href="<?= base_url('anggota/edit/'.$row['id']) ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                        <a href="<?= base_url('anggota/delete/'.$row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus anggota ini? Data transaksi simpan pinjam juga akan hilang!')"><i class="fas fa-trash"></i></a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-                <?php if(empty($anggota)): ?>
-                <tr>
-                    <td colspan="5" class="text-center">Belum ada data anggota.</td>
-                </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" style="white-space: nowrap;">
+                <thead class="table-dark">
+                    <tr>
+                        <th>No. Anggota</th>
+                        <th>Nama Lengkap</th>
+                        <th>No. Telp</th>
+                        <th>Telegram ID</th>
+                        <th>Alamat</th>
+                        <th>Tgl Gabung</th>
+                        <th>Jabatan</th>
+                        <th>Kelompok</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($anggota as $row): ?>
+                    <tr>
+                        <td><?= $row['no_anggota'] ?></td>
+                        <td><?= $row['nama_lengkap'] ?></td>
+                        <td><?= $row['no_telp'] ?></td>
+                        <td><?= !empty($row['telegram_chat_id']) ? $row['telegram_chat_id'] : '-' ?></td>
+                        <td><?= $row['alamat'] ?></td>
+                        <td><?= date('d/m/Y', strtotime($row['tanggal_bergabung'])) ?></td>
+                        <td><?= $row['jabatan'] ?? 'Anggota' ?></td>
+                        <td><?= $row['kelompok'] ?? 'Umum' ?></td>
+                        <td>
+                            <?php if($row['status'] == 'aktif'): ?>
+                                <span class="badge bg-success">Aktif</span>
+                            <?php else: ?>
+                                <span class="badge bg-danger">Nonaktif</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <a href="<?= base_url('anggota/edit/'.$row['id']) ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                            <a href="<?= base_url('anggota/delete/'.$row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus anggota ini? Data transaksi simpan pinjam juga akan hilang!')"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php if(empty($anggota)): ?>
+                    <tr>
+                        <td colspan="10" class="text-center">Belum ada data anggota.</td>
+                    </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <?= $this->endSection() ?>

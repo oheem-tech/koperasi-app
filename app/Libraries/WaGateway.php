@@ -82,6 +82,7 @@ class WaGateway
             CURLOPT_POSTFIELDS => array(
                 'target' => $formattedPhone,
                 'message' => $message,
+                'delay' => '2-4', // Tambahan jeda 2-4 detik antar pesan agar tidak dicurigai spam
             ),
             CURLOPT_HTTPHEADER => array(
                 'Authorization: ' . $this->token

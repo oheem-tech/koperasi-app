@@ -1,0 +1,21 @@
+{
+    "name": "Aplikasi Koperasi",
+    "short_name": "Koperasi",
+    "description": "Sistem manajemen keuangan koperasi",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3b82f6",
+    "icons": [
+        {
+            "src": "assets/img/og-image.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "assets/img/og-image.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

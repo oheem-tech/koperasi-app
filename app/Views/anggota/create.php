@@ -22,6 +22,10 @@
                     <input type="text" class="form-control" name="no_telp" required>
                 </div>
                 <div class="col-md-6 mb-3">
+                    <label class="form-label">Telegram Chat ID (Opsional)</label>
+                    <input type="text" class="form-control" name="telegram_chat_id" placeholder="Cek dari bot telegram">
+                </div>
+                <div class="col-md-6 mb-3">
                     <label class="form-label">Tanggal Bergabung</label>
                     <input type="date" class="form-control" name="tanggal_bergabung" value="<?= date('Y-m-d') ?>" required>
                 </div>

@@ -184,9 +184,9 @@ class Angsuran extends BaseController
             return redirect()->back()->with('error', 'Gagal memproses pembayaran angsuran.');
         }
 
-        // === WA NOTIFICATION ANGSURAN ===
+        // === WA & TELEGRAM NOTIFICATION ANGSURAN ===
         $waAktif = $this->pengaturanModel->where('pengaturan_key', 'wa_angsuran_aktif')->first();
-        if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota && !empty($anggota['no_telp'])) {
+        if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota) {
             $waTemplate = $this->pengaturanModel->where('pengaturan_key', 'wa_template_angsuran')->first();
             if ($waTemplate) {
                 // Hitung sisa tagihan jika belum lunas, anggap sisa pokok
@@ -199,8 +199,15 @@ class Angsuran extends BaseController
                     $waTemplate['pengaturan_value']
                 );
                 
-                $waService = new \App\Libraries\WaGateway();
-                $waService->sendMessage($anggota['no_telp'], $pesan);
+                if (!empty($anggota['no_telp'])) {
+                    $waService = new \App\Libraries\WaGateway();
+                    $waService->sendMessage($anggota['no_telp'], $pesan);
+                }
+
+                if (!empty($anggota['telegram_chat_id'])) {
+                    $telegramService = new \App\Libraries\TelegramGateway();
+                    $telegramService->sendMessage($anggota['telegram_chat_id'], $pesan);
+                }
             }
         }
         // ================================
@@ -330,9 +337,9 @@ class Angsuran extends BaseController
             return redirect()->back()->with('error', 'Gagal proses pelunasan.');
         }
 
-        // === WA NOTIFICATION PELUNASAN (ANGSURAN) ===
+        // === WA & TELEGRAM NOTIFICATION PELUNASAN (ANGSURAN) ===
         $waAktif = $this->pengaturanModel->where('pengaturan_key', 'wa_angsuran_aktif')->first();
-        if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota && !empty($anggota['no_telp'])) {
+        if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota) {
             $waTemplate = $this->pengaturanModel->where('pengaturan_key', 'wa_template_angsuran')->first();
             if ($waTemplate) {
                 $pesan = str_replace(
@@ -341,8 +348,15 @@ class Angsuran extends BaseController
                     $waTemplate['pengaturan_value']
                 );
                 
-                $waService = new \App\Libraries\WaGateway();
-                $waService->sendMessage($anggota['no_telp'], $pesan);
+                if (!empty($anggota['no_telp'])) {
+                    $waService = new \App\Libraries\WaGateway();
+                    $waService->sendMessage($anggota['no_telp'], $pesan);
+                }
+
+                if (!empty($anggota['telegram_chat_id'])) {
+                    $telegramService = new \App\Libraries\TelegramGateway();
+                    $telegramService->sendMessage($anggota['telegram_chat_id'], $pesan);
+                }
             }
         }
         // ================================

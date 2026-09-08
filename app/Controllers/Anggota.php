@@ -77,6 +77,7 @@ class Anggota extends BaseController
             'nama_lengkap'      => $this->request->getPost('nama_lengkap'),
             'alamat'            => $this->request->getPost('alamat'),
             'no_telp'           => $this->request->getPost('no_telp'),
+            'telegram_chat_id'  => $this->request->getPost('telegram_chat_id'),
             'tanggal_bergabung' => $this->request->getPost('tanggal_bergabung'),
             'kelompok'          => $this->request->getPost('kelompok') ?? 'Umum',
             'status'            => 'aktif'
@@ -121,6 +122,7 @@ class Anggota extends BaseController
             'nama_lengkap'      => $this->request->getPost('nama_lengkap'),
             'alamat'            => $this->request->getPost('alamat'),
             'no_telp'           => $this->request->getPost('no_telp'),
+            'telegram_chat_id'  => $this->request->getPost('telegram_chat_id'),
             'status'            => $this->request->getPost('status'),
             'jabatan'           => $this->request->getPost('jabatan'),
             'kelompok'          => $this->request->getPost('kelompok') ?? 'Umum',

@@ -121,6 +121,18 @@
     }
     .btn-login:hover { opacity: .92; transform: translateY(-1px); }
     .btn-login:active { transform: translateY(0); }
+    .btn-install-app {
+        width: 100%; padding: 12px;
+        background: transparent;
+        border: 1.5px dashed #3b82f6; border-radius: 10px;
+        color: #1d4ed8; font-weight: 700; font-size: .95rem;
+        cursor: pointer; transition: background .2s, transform .15s;
+        margin-top: 16px; font-family: 'Inter', sans-serif;
+        display: flex; align-items: center; justify-content: center;
+        gap: 8px;
+    }
+    .btn-install-app:hover { background: rgba(59,130,246,.05); }
+    .btn-install-app.d-none { display: none !important; }
     .alert-danger-custom {
         background: #fee2e2; color: #991b1b; border-radius: 10px;
         padding: 11px 14px; font-size: .84rem; margin-bottom: 18px;
@@ -357,6 +369,10 @@
                 </button>
             </form>
 
+            <button type="button" class="btn-install-app d-none" id="btnInstallApp">
+                <i class="fas fa-download"></i> Pasang Aplikasi di Perangkat Ini
+            </button>
+
             <div class="mt-4 text-center" style="font-size:.75rem; color:#94a3b8; font-weight:400; margin-bottom:4px;">sherka v1.0.0</div>
             <p class="text-center" style="font-size:.75rem; color:#64748b; font-weight:600;">
                 &copy; <?= date('Y') ?> <?= esc(get_pengaturan('koperasi_nama', 'Koperasi Simpan Pinjam')) ?> &middot; Semua hak dilindungi
@@ -372,6 +388,39 @@
         input.setAttribute('type', isPassword ? 'text' : 'password');
         this.classList.toggle('fa-eye-slash');
         this.classList.toggle('fa-eye');
+    });
+
+    let deferredPrompt;
+    const installAppBtn = document.getElementById('btnInstallApp');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        // Update UI to notify the user they can add to home screen
+        installAppBtn.classList.remove('d-none');
+    });
+
+    installAppBtn.addEventListener('click', (e) => {
+        // hide our user interface that shows our A2HS button
+        installAppBtn.classList.add('d-none');
+        // Show the prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the A2HS prompt');
+            } else {
+                console.log('User dismissed the A2HS prompt');
+            }
+            deferredPrompt = null;
+        });
+    });
+
+    window.addEventListener('appinstalled', (evt) => {
+        // Log install to analytics
+        console.log('INSTALL: Success');
     });
 </script>
 

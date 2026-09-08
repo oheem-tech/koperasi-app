@@ -109,10 +109,10 @@ class Simpanan extends BaseController
             return redirect()->back()->with('error', 'Gagal memproses transaksi.');
         }
 
-        // === WA NOTIFICATION SIMPANAN ===
+        // === WA & TELEGRAM NOTIFICATION SIMPANAN ===
         $pengaturanModel = new \App\Models\PengaturanModel();
         $waAktif = $pengaturanModel->where('pengaturan_key', 'wa_simpanan_aktif')->first();
-        if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota && !empty($anggota['no_telp'])) {
+        if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota) {
             $waTemplate = $pengaturanModel->where('pengaturan_key', 'wa_template_simpanan')->first();
             if ($waTemplate) {
                 $jenisSimpanan = $this->jenisSimpananModel->find($this->request->getPost('jenis_simpanan_id'));
@@ -124,8 +124,17 @@ class Simpanan extends BaseController
                     $waTemplate['pengaturan_value']
                 );
                 
-                $waService = new \App\Libraries\WaGateway();
-                $waService->sendMessage($anggota['no_telp'], $pesan);
+                // Kirim via WhatsApp jika ada nomor HP
+                if (!empty($anggota['no_telp'])) {
+                    $waService = new \App\Libraries\WaGateway();
+                    $waService->sendMessage($anggota['no_telp'], $pesan);
+                }
+                
+                // Kirim via Telegram jika ada Chat ID
+                if (!empty($anggota['telegram_chat_id'])) {
+                    $telegramService = new \App\Libraries\TelegramGateway();
+                    $telegramService->sendMessage($anggota['telegram_chat_id'], $pesan);
+                }
             }
         }
         // ================================

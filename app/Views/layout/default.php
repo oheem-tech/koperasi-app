@@ -14,6 +14,8 @@
     <meta property="og:url"         content="<?= base_url() ?>">
     <meta property="og:title"       content="<?= $title ?? esc(get_pengaturan('koperasi_nama', 'Koperasi App')) ?>">
     <meta property="og:description" content="Aplikasi Koperasi Simpan Pinjam - Kelola anggota, simpanan, dan pinjaman dengan mudah.">
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="theme-color" content="#3b82f6">
     <style>
 
         :root {
@@ -512,6 +514,17 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('<?= base_url('sw.js') ?>').then(registration => {
+      console.log('SW registered: ', registration);
+    }).catch(registrationError => {
+      console.log('SW registration failed: ', registrationError);
+    });
+  });
+}
 </script>
 </body>
 </html>

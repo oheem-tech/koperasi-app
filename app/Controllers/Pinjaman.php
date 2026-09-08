@@ -153,10 +153,10 @@ class Pinjaman extends BaseController
                 return redirect()->to('/pinjaman')->with('error', 'Gagal memproses persetujuan pinjaman.');
             }
 
-            // === WA NOTIFICATION PINJAMAN ===
+            // === WA & TELEGRAM NOTIFICATION PINJAMAN ===
             $pengaturanModel = new \App\Models\PengaturanModel();
             $waAktif = $pengaturanModel->where('pengaturan_key', 'wa_pinjaman_aktif')->first();
-            if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota && !empty($anggota['no_telp'])) {
+            if ($waAktif && $waAktif['pengaturan_value'] == '1' && $anggota) {
                 $waTemplate = $pengaturanModel->where('pengaturan_key', 'wa_template_pinjaman')->first();
                 if ($waTemplate) {
                     $pesan = str_replace(
@@ -165,8 +165,15 @@ class Pinjaman extends BaseController
                         $waTemplate['pengaturan_value']
                     );
                     
-                    $waService = new \App\Libraries\WaGateway();
-                    $waService->sendMessage($anggota['no_telp'], $pesan);
+                    if (!empty($anggota['no_telp'])) {
+                        $waService = new \App\Libraries\WaGateway();
+                        $waService->sendMessage($anggota['no_telp'], $pesan);
+                    }
+
+                    if (!empty($anggota['telegram_chat_id'])) {
+                        $telegramService = new \App\Libraries\TelegramGateway();
+                        $telegramService->sendMessage($anggota['telegram_chat_id'], $pesan);
+                    }
                 }
             }
             // ================================
