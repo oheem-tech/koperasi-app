@@ -101,10 +101,11 @@ class Laporan extends BaseController
 
         // Pinjaman cair (disetujui atau lunas)
         $pinjamanCair = $db->table('pinjaman')
-            ->select('pinjaman.*, anggota.nama_lengkap, anggota.no_anggota, kas_koperasi.tanggal as tanggal_cair')
+            ->select('pinjaman.*, anggota.nama_lengkap, anggota.no_anggota, MAX(kas_koperasi.tanggal) as tanggal_cair')
             ->join('anggota', 'anggota.id = pinjaman.anggota_id')
             ->join('kas_koperasi', "kas_koperasi.kategori = 'pinjaman' AND kas_koperasi.jenis = 'keluar' AND kas_koperasi.nominal = pinjaman.jumlah_pinjaman AND kas_koperasi.keterangan LIKE CONCAT('%', anggota.nama_lengkap, '%')", 'left')
-            ->whereIn('pinjaman.status', ['disetujui', 'lunas']);
+            ->whereIn('pinjaman.status', ['disetujui', 'lunas'])
+            ->groupBy('pinjaman.id');
         if ($periode !== 'all') {
             $pinjamanCair->groupStart();
             if ($periode['type'] === 'bulan') {
