@@ -352,6 +352,9 @@
             <a href="<?= base_url('pengaturan') ?>" class="<?= current_url(true)->getSegment(1) == 'pengaturan' ? 'active' : '' ?>">
                 <i class="nav-icon fas fa-sliders-h"></i> Pengaturan Master
             </a>
+            <a href="<?= base_url('updatesystem') ?>" class="<?= current_url(true)->getSegment(1) == 'updatesystem' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-sync-alt"></i> Pembaruan (Update)
+            </a>
             <?php endif; ?>
 
             <?php if(has_permission('manage_backup')): ?>
