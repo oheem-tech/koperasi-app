@@ -249,6 +249,26 @@ class Pinjaman extends BaseController
             $updateData['anggota_id'] = $anggota_id;
         }
 
+        // Update kas_koperasi jika nominal berubah dan pinjaman sudah cair
+        if (in_array($pinjaman['status'], ['disetujui', 'lunas']) && $pinjaman['jumlah_pinjaman'] != $jumlah_pinjaman) {
+            $anggota = $this->anggotaModel->find($pinjaman['anggota_id']);
+            $namaAnggota = $anggota ? $anggota['nama_lengkap'] : 'Anggota';
+            $keteranganKas = 'Pencairan Pinjaman - ' . $namaAnggota;
+            
+            $db = \Config\Database::connect();
+            $kasLama = $db->table('kas_koperasi')
+               ->where('kategori', 'pinjaman')
+               ->where('jenis', 'keluar')
+               ->where('nominal', $pinjaman['jumlah_pinjaman'])
+               ->where('keterangan', $keteranganKas)
+               ->limit(1)
+               ->get()->getRowArray();
+               
+            if ($kasLama) {
+                $db->table('kas_koperasi')->where('id', $kasLama['id'])->update(['nominal' => $jumlah_pinjaman]);
+            }
+        }
+
         $this->pinjamanModel->update($id, $updateData);
 
         if (function_exists('catat_log')) {
@@ -265,13 +285,29 @@ class Pinjaman extends BaseController
         $pinjaman = $this->pinjamanModel->find($id);
         if (!$pinjaman) return redirect()->to('/pinjaman')->with('error', 'Data pinjaman tidak ditemukan.');
 
+        // Hapus catatan kas jika pinjaman sudah cair
+        if (in_array($pinjaman['status'], ['disetujui', 'lunas'])) {
+            $anggota = $this->anggotaModel->find($pinjaman['anggota_id']);
+            $namaAnggota = $anggota ? $anggota['nama_lengkap'] : 'Anggota';
+            $keteranganKas = 'Pencairan Pinjaman - ' . $namaAnggota;
+            
+            $db = \Config\Database::connect();
+            $db->table('kas_koperasi')
+               ->where('kategori', 'pinjaman')
+               ->where('jenis', 'keluar')
+               ->where('nominal', $pinjaman['jumlah_pinjaman'])
+               ->where('keterangan', $keteranganKas)
+               ->limit(1)
+               ->delete();
+        }
+
         $this->pinjamanModel->delete($id);
 
         if (function_exists('catat_log')) {
             catat_log('Hapus Pinjaman', 'Menghapus data pinjaman ID: ' . $id);
         }
 
-        return redirect()->to('/pinjaman')->with('success', 'Data pinjaman berhasil dihapus.');
+        return redirect()->to('/pinjaman')->with('success', 'Data pinjaman berhasil dihapus beserta mutasi kasnya.');
     }
 
     public function print($id)
