@@ -92,4 +92,29 @@ class Pengaturan extends BaseController
 
         return redirect()->to('/pengaturan')->with('error', 'Tidak ada data yang diperbarui.');
     }
+    public function add_parameter()
+    {
+        if (!has_permission('manage_pengaturan')) return redirect()->to('/dashboard');
+        
+        $nama = $this->request->getPost('nama_jabatan');
+        $nilai = $this->request->getPost('nilai');
+        
+        if ($nama) {
+            $key = 'shu_pengurus_' . strtolower(str_replace(' ', '_', $nama));
+            
+            // Cek apakah sudah ada
+            $exists = $this->pengaturanModel->where('pengaturan_key', $key)->first();
+            if (!$exists) {
+                $this->pengaturanModel->insert([
+                    'pengaturan_key' => $key,
+                    'pengaturan_value' => $nilai,
+                    'keterangan' => 'Persentase SHU Pengurus - ' . ucwords($nama) . ' (%)'
+                ]);
+                return redirect()->to('/pengaturan')->with('success', 'Parameter pengurus dinamis berhasil ditambahkan.');
+            } else {
+                return redirect()->to('/pengaturan')->with('error', 'Parameter pengurus tersebut sudah ada.');
+            }
+        }
+        return redirect()->to('/pengaturan')->with('error', 'Nama jabatan tidak boleh kosong.');
+    }
 }

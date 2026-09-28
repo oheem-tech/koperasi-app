@@ -139,6 +139,13 @@ $groupColors = [
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        <?php if($groupName == 'Distribusi SHU'): ?>
+                        <div class="p-2 border-top bg-light text-end">
+                            <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#addPengurusModal">
+                                <i class="fas fa-plus"></i> Tambah Parameter Pengurus
+                            </button>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -230,4 +237,35 @@ function copyWebhook() {
     }, 2000);
 }
 </script>
+
+<!-- Modal Tambah Parameter Pengurus -->
+<div class="modal fade" id="addPengurusModal" tabindex="-1" aria-labelledby="addPengurusModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="addPengurusModalLabel"><i class="fas fa-plus-circle"></i> Tambah Parameter Pengurus Baru</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="<?= base_url('pengaturan/add_parameter') ?>" method="post">
+        <?= csrf_field() ?>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">Nama Jabatan / Parameter</label>
+                <input type="text" class="form-control" name="nama_jabatan" placeholder="Contoh: Wakil Ketua" required>
+                <small class="text-muted">Parameter akan otomatis berawalan <code>shu_pengurus_...</code></small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Persentase SHU (%)</label>
+                <input type="number" step="0.01" min="0" max="100" class="form-control" name="nilai" value="0" required>
+            </div>
+        </div>
+        <div class="modal-footer border-top-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-success">Simpan Parameter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <?= $this->endSection() ?>

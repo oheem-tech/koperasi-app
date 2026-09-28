@@ -80,6 +80,7 @@ $routes->group('angsuran', ['filter' => 'auth'], static function ($routes) {
 $routes->group('pengaturan', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Pengaturan::index');
     $routes->post('update', 'Pengaturan::update');
+    $routes->post('add_parameter', 'Pengaturan::add_parameter');
 });
 
 $routes->group('kas', ['filter' => 'auth'], static function ($routes) {
@@ -150,3 +151,10 @@ $routes->group('updatesystem', ['filter' => 'auth'], static function ($routes) {
 $routes->match(['get', 'post'], 'webhook/whatsapp', 'WhatsappWebhook::receive');
 
 // Routes end here.
+
+// Laporan Nusapersada (Dinamis DB)
+$routes->get('laporan-nusapersada/jasa-pinjaman', 'LaporanNusapersada::jasa_pinjaman_dan_simpanan');
+$routes->get('laporan-nusapersada/pembagian-jasa', 'LaporanNusapersada::pembagian_jasa_pinjaman');
+$routes->get('laporan-nusapersada/kas-rat', 'LaporanNusapersada::kas_rat');
+$routes->get('laporan-nusapersada/perhitungan-shu', 'LaporanNusapersada::perhitungan_shu');
+$routes->get('laporan-nusapersada/perhitungan-jasa', 'LaporanNusapersada::perhitungan_jasa_simpanan');
