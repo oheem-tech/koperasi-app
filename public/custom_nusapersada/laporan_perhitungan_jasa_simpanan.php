@@ -1,0 +1,126 @@
+<?php
+$data = [
+    ["1", "Hadiyanto Budiono, SE", "100,000", "375,000", "2,400,000.00", "2,875,000.00", "14,035"],
+    ["2", "Andi Hernowo, S.Pd.", "100,000", "570,000", "600,000.00", "1,270,000.00", "6,200"],
+    ["4", "Yuli Setyowati, S.Pd.", "100,000", "570,000", "720,000.00", "1,390,000.00", "6,786"],
+    ["5", "Adinda Puspitasari, SE.", "100,000", "570,000", "1,200,000.00", "1,870,000.00", "9,129"],
+    ["6", "Retnaningsih, S.Pd", "100,000", "570,000", "6,000,000.00", "6,670,000.00", "32,562"],
+    ["7", "Prisca Candra D, M.Pd.", "100,000", "510,000", "600,000.00", "1,210,000.00", "5,907"],
+    ["8", "Didik Isdiyanto, BA", "100,000", "570,000", "1,800,000.00", "2,470,000.00", "12,058"],
+    ["9", "Lukito Budi N, S.Kom", "100,000", "390,000", "6,600,000.00", "7,090,000.00", "34,612"],
+    ["10", "Elly Pravitasari, Amd", "100,000", "510,000", "4,200,000.00", "4,810,000.00", "23,481"],
+    ["11", "Kustiyono", "100,000", "570,000", "1,200,000.00", "1,870,000.00", "9,129"],
+    ["12", "apt.Eny Kusnarti, S.Farm.", "100,000", "570,000", "3,600,000.00", "4,270,000.00", "20,845"],
+    ["13", "Alma Syifa Trihapsari, S.Farm.", "100,000", "150,000", "1,200,000.00", "1,450,000.00", "7,079"],
+    ["14", "Gunawan", "100,000", "60,000", "600,000.00", "760,000.00", "3,710"],
+    ["16", "Mungki Vitaresti, M.Pd", "100,000", "505,000", "1,800,000.00", "2,405,000.00", "11,741"],
+    ["17", "Sekar Arum Septianti, S.Pd", "100,000", "150,000", "600,000.00", "850,000.00", "4,150"],
+    ["18", "Ganik Arianti, SPd.", "100,000", "185,000", "600,000.00", "885,000.00", "4,320"],
+    ["19", "Ulfa Arbain, S.Ak", "100,000", "370,000", "4,200,000.00", "4,670,000.00", "22,798"],
+    ["21", "Muh Muzaki", "100,000", "570,000", "600,000.00", "1,270,000.00", "6,200"],
+    ["22", "Lilis Setyanta", "100,000", "370,000", "600,000.00", "1,070,000.00", "5,224"],
+    ["23", "Muji Syukur", "100,000", "210,000", "1,200,000.00", "1,510,000.00", "7,372"],
+    ["24", "Muh Ispandi", "100,000", "505,000", "6,000,000.00", "6,605,000.00", "32,244"],
+    ["25", "Agus Susanto", "100,000", "60,000", "240,000.00", "400,000.00", "1,953"],
+    ["26", "Drs. H.Purwanto, BSc. MPd.", "100,000", "395,000", "2,400,000.00", "2,895,000.00", "14,133"],
+    ["27", "Suroso Kuntjoro", "100,000", "395,000", "1,200,000.00", "1,695,000.00", "8,275"],
+    ["28", "Eddy Laksono", "100,000", "395,000", "2,400,000.00", "2,895,000.00", "14,133"]
+];
+$totals = ["2,800,000", "10,935,000", "57,960,000.00", "71,695,000.00", "350,000"];
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Perhitungan Jasa Simpanan Pokok, Wajib, Sukarela</title>
+    <style>
+        @page { size: A4 portrait; margin: 15mm; }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 10pt; color: #000; }
+        .header-container { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-bottom: 2px solid black; padding-bottom: 10px; }
+        .logo-placeholder { width: 50px; height: 50px; border: 1px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8pt; text-align: center; margin-right: 20px; }
+        .header-title { font-weight: bold; font-size: 14pt; text-align: center; }
+        .sub-header { text-align: center; font-weight: bold; font-size: 11pt; margin-bottom: 15px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid black; padding: 4px 6px; vertical-align: middle; }
+        th { text-align: center; font-weight: bold; }
+        
+        .col-no { text-align: center; width: 30px; }
+        .col-nama { width: 180px; }
+        
+        .curr-rp { float: left; }
+        .curr-val { float: right; }
+        .clear { clear: both; }
+        
+        .footer-table { width: 100%; border: none; margin-top: 30px; page-break-inside: avoid; }
+        .footer-table td { border: none; text-align: center; padding: 0; }
+        .date-text { text-align: right; margin-bottom: 20px; padding-right: 30px; }
+        .signature-name { margin-top: 70px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="logo-placeholder">LOGO<br>KOPERASI</div>
+        <div class="header-title">
+            KOPERASI KARYAWAN SMK NUSAPERSADA
+        </div>
+    </div>
+    
+    <div class="sub-header">
+        PERHITUNGAN JASA SIMPANAN POKOK, WAJIB, SUKARELA<br>
+        PER 31 DESEMBER 2024
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>NO</th>
+                <th>NAMA</th>
+                <th>SIMPANAN<br>POKOK</th>
+                <th>SIMPANAN<br>WAJIB</th>
+                <th>SIMPANAN<br>SUKARELA</th>
+                <th>JUMLAH</th>
+                <th>JASA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($data as $row): ?>
+            <tr>
+                <td class="col-no"><?= $row[0] ?></td>
+                <td class="col-nama"><?= $row[1] ?></td>
+                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[2] ?></span><div class="clear"></div></td>
+                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[3] ?></span><div class="clear"></div></td>
+                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[4] ?></span><div class="clear"></div></td>
+                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[5] ?></span><div class="clear"></div></td>
+                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[6] ?></span><div class="clear"></div></td>
+            </tr>
+            <?php endforeach; ?>
+            <tr>
+                <th colspan="2">JUMLAH</th>
+                <?php foreach ($totals as $tot): ?>
+                <th><span class="curr-rp">Rp</span><span class="curr-val"><?= $tot ?></span><div class="clear"></div></th>
+                <?php endforeach; ?>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="footer-table">
+        <tr>
+            <td style="width: 50%;"></td>
+            <td style="width: 50%;">
+                <div class="date-text">Kab. Semarang, 31 Desember 2024</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>Ketua</div>
+                <div class="signature-name">Hafid Nur Prasetyo, S.Pd.</div>
+            </td>
+            <td>
+                <div>Bendahara</div>
+                <div class="signature-name">Yuli Setyowati, S.Pd.</div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

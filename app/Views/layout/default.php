@@ -326,6 +326,23 @@
             <a href="<?= base_url('laporan/anggota') ?>" class="<?= current_url(true)->getSegment(1) == 'laporan' && current_url(true)->getSegment(2) == 'anggota' ? 'active' : '' ?>">
                 <i class="nav-icon fas fa-users-viewfinder"></i> Keuangan Anggota
             </a>
+            
+            <div class="nav-section-label text-warning mt-2">Laporan Khusus</div>
+            <a href="<?= base_url('laporan-nusapersada/jasa-pinjaman') ?>" target="_blank">
+                <i class="nav-icon fas fa-file-pdf text-warning"></i> 1. Jasa Pinjaman & Simpanan
+            </a>
+            <a href="<?= base_url('laporan-nusapersada/pembagian-jasa') ?>" target="_blank">
+                <i class="nav-icon fas fa-file-pdf text-warning"></i> 2. Pembagian Jasa Pinjaman
+            </a>
+            <a href="<?= base_url('laporan-nusapersada/kas-rat') ?>" target="_blank">
+                <i class="nav-icon fas fa-file-pdf text-warning"></i> 3. Laporan Kas RAT
+            </a>
+            <a href="<?= base_url('laporan-nusapersada/perhitungan-shu') ?>" target="_blank">
+                <i class="nav-icon fas fa-file-pdf text-warning"></i> 4. Perhitungan SHU
+            </a>
+            <a href="<?= base_url('laporan-nusapersada/perhitungan-jasa') ?>" target="_blank">
+                <i class="nav-icon fas fa-file-pdf text-warning"></i> 5. Perhitungan Jasa Simpanan
+            </a>
             <?php endif; ?>
 
             <?php if(has_permission('manage_anggota') || has_permission('manage_pengaturan') || has_permission('manage_roles') || has_permission('manage_backup')): ?>
