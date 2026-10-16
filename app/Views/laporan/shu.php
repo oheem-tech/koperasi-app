@@ -112,7 +112,22 @@
                 <?php foreach($shuPerAnggota as $r): ?>
                 <tr>
                     <td><?= $r['no_anggota'] ?></td>
-                    <td><?= $r['nama_lengkap'] ?> <?= $r['jabatan'] != 'anggota' ? '<span class="badge bg-secondary ms-1">'.ucfirst($r['jabatan']).'</span>' : '' ?></td>
+                    <td>
+                        <?= esc($r['nama_lengkap']) ?>
+                        <?php
+                        $j = $r['jabatan'] ?? 'anggota';
+                        if (strpos($j, 'pengurus_') === 0) {
+                            $sub = ucwords(str_replace('_', ' ', substr($j, 9)));
+                            echo '<span class="badge bg-primary ms-1">Pengurus (' . esc($sub) . ')</span>';
+                        } elseif ($j === 'pengurus') {
+                            echo '<span class="badge bg-primary ms-1">Pengurus</span>';
+                        } elseif ($j === 'pengawas') {
+                            echo '<span class="badge bg-info text-dark ms-1">Pengawas</span>';
+                        } elseif ($j === 'pembina') {
+                            echo '<span class="badge bg-secondary ms-1">Pembina</span>';
+                        }
+                        ?>
+                    </td>
                     <td class="text-center">
                         <small class="text-muted d-block">Simpanan: Rp <?= number_format($r['saldo_simpanan'], 0, ',', '.') ?></small>
                         <small class="text-muted d-block">Angsuran: Rp <?= number_format($r['total_jasa'], 0, ',', '.') ?></small>

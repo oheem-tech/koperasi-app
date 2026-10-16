@@ -1,97 +1,58 @@
-
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Perhitungan Jasa Simpanan Pokok, Wajib, Sukarela</title>
-    <style>
-        @page { size: A4 portrait; margin: 15mm; }
-        body { font-family: 'Times New Roman', Times, serif; font-size: 10pt; color: #000; }
-        .header-container { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-bottom: 2px solid black; padding-bottom: 10px; }
-        .logo-placeholder { width: 50px; height: 50px; border: 1px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8pt; text-align: center; margin-right: 20px; }
-        .header-title { font-weight: bold; font-size: 14pt; text-align: center; }
-        .sub-header { text-align: center; font-weight: bold; font-size: 11pt; margin-bottom: 15px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid black; padding: 4px 6px; vertical-align: middle; }
-        th { text-align: center; font-weight: bold; }
-        
-        .col-no { text-align: center; width: 30px; }
-        .col-nama { width: 180px; }
-        
-        .curr-rp { float: left; }
-        .curr-val { float: right; }
-        .clear { clear: both; }
-        
-        .footer-table { width: 100%; border: none; margin-top: 30px; page-break-inside: avoid; }
-        .footer-table td { border: none; text-align: center; padding: 0; }
-        .date-text { text-align: right; margin-bottom: 20px; padding-right: 30px; }
-        .signature-name { margin-top: 70px; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <div class="header-container">
-        <div class="logo-placeholder">LOGO<br>KOPERASI</div>
-        <div class="header-title">
-            KOPERASI KARYAWAN SMK NUSAPERSADA
-        </div>
-    </div>
-    
-    <div class="sub-header">
-        PERHITUNGAN JASA SIMPANAN POKOK, WAJIB, SUKARELA<br>
-        PER 31 DESEMBER 2024
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>NO</th>
-                <th>NAMA</th>
-                <th>SIMPANAN<br>POKOK</th>
-                <th>SIMPANAN<br>WAJIB</th>
-                <th>SIMPANAN<br>SUKARELA</th>
-                <th>JUMLAH</th>
-                <th>JASA</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($data as $row): ?>
-            <tr>
-                <td class="col-no"><?= $row[0] ?></td>
-                <td class="col-nama"><?= $row[1] ?></td>
-                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[2] ?></span><div class="clear"></div></td>
-                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[3] ?></span><div class="clear"></div></td>
-                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[4] ?></span><div class="clear"></div></td>
-                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[5] ?></span><div class="clear"></div></td>
-                <td><span class="curr-rp">Rp</span><span class="curr-val"><?= $row[6] ?></span><div class="clear"></div></td>
-            </tr>
-            <?php endforeach; ?>
-            <tr>
-                <th colspan="2">JUMLAH</th>
-                <?php foreach ($totals as $tot): ?>
-                <th><span class="curr-rp">Rp</span><span class="curr-val"><?= $tot ?></span><div class="clear"></div></th>
-                <?php endforeach; ?>
-            </tr>
-        </tbody>
-    </table>
-
-    <table class="footer-table">
+<?= $this->extend('layout/print') ?>
+<?= $this->section('content') ?>
+<style>
+    @page { size: A4 portrait; margin: 15mm; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11pt; }
+    th, td { border: 1px solid black !important; padding: 5px; color: #000 !important; }
+    th { text-align: center; font-weight: bold; }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .font-bold { font-weight: bold; }
+    h4 { text-align: center; font-weight: bold; margin-bottom: 20px; }
+</style>
+<h4>
+    PERHITUNGAN JASA SIMPANAN TAHUN <?= date('Y') ?>
+</h4>
+<table>
+    <thead>
         <tr>
-            <td style="width: 50%;"></td>
-            <td style="width: 50%;">
-                <div class="date-text">Kab. Semarang, 31 Desember 2024</div>
-            </td>
+            <th rowspan="2">No</th>
+            <th rowspan="2">Nama</th>
+            <th colspan="3">Jenis Simpanan (Rp)</th>
+            <th rowspan="2">Jumlah (Rp)</th>
+            <th rowspan="2">Jasa Diterima (Rp)</th>
         </tr>
         <tr>
-            <td>
-                <div>Ketua</div>
-                <div class="signature-name">Hafid Nur Prasetyo, S.Pd.</div>
-            </td>
-            <td>
-                <div>Bendahara</div>
-                <div class="signature-name">Yuli Setyowati, S.Pd.</div>
-            </td>
+            <th>Pokok</th>
+            <th>Wajib</th>
+            <th>Sukarela</th>
         </tr>
-    </table>
-</body>
-</html>
+    </thead>
+    <tbody>
+        <?php foreach ($data as $row): ?>
+        <tr>
+            <td class="text-center"><?= $row[0] ?></td>
+            <td><?= $row[1] ?></td>
+            <td class="text-right"><?= $row[2] ?></td>
+            <td class="text-right"><?= $row[3] ?></td>
+            <td class="text-right"><?= $row[4] ?></td>
+            <td class="text-right font-bold"><?= $row[5] ?></td>
+            <td class="text-right font-bold text-success"><?= $row[6] ?></td>
+        </tr>
+        <?php endforeach; ?>
+        <?php if(empty($data)): ?>
+        <tr><td colspan="7" class="text-center">Belum ada data simpanan.</td></tr>
+        <?php endif; ?>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">TOTAL</th>
+            <th class="text-right"><?= $totals[0] ?></th>
+            <th class="text-right"><?= $totals[1] ?></th>
+            <th class="text-right"><?= $totals[2] ?></th>
+            <th class="text-right font-bold"><?= $totals[3] ?></th>
+            <th class="text-right font-bold"><?= $totals[4] ?></th>
+        </tr>
+    </tfoot>
+</table>
+<?= $this->endSection() ?>

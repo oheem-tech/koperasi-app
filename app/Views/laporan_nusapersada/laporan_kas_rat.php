@@ -1,144 +1,131 @@
+<?= $this->extend('layout/print') ?>
+<?= $this->section('content') ?>
 <?php
-$months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "Nopember", "Desember"];
-$pemasukan = [
-    ["1", "Saldo awal bulan", "9,135,000", "10,500,000", "14,980,000", "21,555,000", "27,775,000", "27,350,000", "34,675,000", "40,985,000", "41,035,000", "32,715,000", "39,445,000", "46,030,000"],
-    ["2", "Simpanan", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "a. Simpanan Pokok", "40,000", "40,000", "40,000", "40,000", "20,000", "-", "-", "-", "-", "-", "-", "-"],
-    ["", "b. Simpanan wajib", "145,000", "145,000", "145,000", "140,000", "140,000", "140,000", "135,000", "135,000", "130,000", "130,000", "125,000", "125,000"],
-    ["", "c. Simpanan Sukarela", "5,140,000", "5,140,000", "5,140,000", "5,040,000", "5,040,000", "5,040,000", "4,690,000", "4,690,000", "4,690,000", "4,540,000", "4,540,000", "4,540,000"],
-    ["3", "Angsuran", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "a. Angsuran jangka panjang", "1,400,000", "1,050,000", "1,250,000", "1,250,000", "1,250,000", "1,950,000", "2,120,000", "700,000", "2,300,000", "1,900,000", "2,500,000", "2,300,000"],
-    ["4", "Jasa", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "a. Jasa Jangka panjang", "140,000", "105,000", "145,000", "145,000", "145,000", "215,000", "185,000", "100,000", "230,000", "173,000", "220,000", "282,000"],
-    ["5", "Pelunasan", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "a. Pelunasan jangka panjang", "200,000", "", "", "", "", "", "2,700,000", "1,800,000", "", "", "", "3,145,000"],
-    ["6", "Cadangan", "450,000", "", "", "", "", "", "", "", "", "", "", ""]
-];
-$pemasukan_jumlah = ["16,650,000", "16,980,000", "21,555,000", "28,170,000", "34,370,000", "34,695,000", "44,505,000", "48,410,000", "48,385,000", "39,458,000", "46,830,000", "56,422,000"];
-
-$pengeluaran = [
-    ["1", "Pinjaman", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "a. Pinjaman jangka panjang", "6,000,000", "2,000,000", "", "", "7,000,000", "", "1,000,000", "6,300,000", "15,000,000", "", "800,000", ""],
-    ["2", "Anggota Keluar", "", "", "", "375,000", "", "", "2,500,000", "1,045,000", "670,000", "", "", ""],
-    ["3", "Saldo Tunai", "10,500,000", "14,980,000", "21,555,000", "27,775,000", "27,350,000", "34,675,000", "40,985,000", "41,035,000", "32,715,000", "39,445,000", "46,030,000", "56,422,000"]
-];
-$pengeluaran_jumlah = ["16,500,000", "16,980,000", "21,555,000", "28,150,000", "34,350,000", "34,675,000", "44,485,000", "48,380,000", "48,385,000", "39,445,000", "46,830,000", "56,422,000"];
-
 function renderCell($val) {
-    if ($val === "" || $val === "-") return '<span style="float: right;">'.$val.'</span>';
-    return '<span class="currency-symbol">Rp</span><span class="currency-value">' . $val . '</span><div class="clear"></div>';
+    if (!$val || $val == 0) return '<span style="float:right;">-</span>';
+    return '<span style="float:left;">Rp</span><span style="float:right;">' . number_format($val, 0, ',', '.') . '</span><div style="clear:both;"></div>';
+}
+
+$months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Juni", "Juli", "Agst", "Sept", "Okt", "Nov", "Des"];
+
+// Variables from controller: $tahun, $p_pokok, $p_wajib, $p_sukarela, $p_angsuran, $p_jasa, $p_pelunasan, $k_pinjaman, $k_keluar
+
+$saldo_awal = array_fill(1, 12, 0);
+$pemasukan_jumlah = array_fill(1, 12, 0);
+$pengeluaran_jumlah = array_fill(1, 12, 0);
+$saldo_akhir = array_fill(1, 12, 0);
+
+// Basic loop to calculate rolling balance
+$current_balance = 0; // Seharusnya query saldo kas tahun lalu, untuk sekarang kita mulai dari 0 atau dummy agar tidak error logikanya
+for ($i = 1; $i <= 12; $i++) {
+    $saldo_awal[$i] = $current_balance;
+    $pemasukan_jumlah[$i] = $saldo_awal[$i] + $p_pokok[$i] + $p_wajib[$i] + $p_sukarela[$i] + $p_angsuran[$i] + $p_jasa[$i] + $p_pelunasan[$i];
+    $pengeluaran_jumlah[$i] = $k_pinjaman[$i] + $k_keluar[$i];
+    
+    // Ending balance is total in minus out
+    $saldo_akhir[$i] = $pemasukan_jumlah[$i] - $pengeluaran_jumlah[$i];
+    $current_balance = $saldo_akhir[$i];
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Laporan Kas Simpan Pinjam</title>
-    <style>
-        @page { size: A4 landscape; margin: 10mm; }
-        body { font-family: 'Times New Roman', Times, serif; font-size: 8pt; color: #000; }
-        .header-container { display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border-bottom: 2px solid black; padding-bottom: 10px; }
-        .logo-placeholder { width: 50px; height: 50px; border: 1px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7pt; text-align: center; margin-right: 20px; }
-        .header-title { font-weight: bold; font-size: 14pt; text-align: center; }
-        .sub-header { text-align: center; font-weight: bold; font-size: 11pt; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid black; padding: 3px; }
-        th { text-align: center; font-weight: bold; }
-        .col-no { text-align: center; width: 20px; }
-        .col-rincian { width: 140px; }
-        .currency-symbol { float: left; }
-        .currency-value { float: right; }
-        .clear { clear: both; }
-        .font-bold { font-weight: bold; }
-        .footer-table { width: 100%; border: none; margin-top: 15px; page-break-inside: avoid; }
-        .footer-table td { border: none; text-align: center; padding: 0; }
-        .date-text { text-align: right; margin-bottom: 20px; font-size: 9pt;}
-        .signature-name { margin-top: 60px; font-weight: bold; font-size: 9pt;}
-        .signature-title { font-size: 9pt; }
-    </style>
-</head>
-<body>
-    <div class="header-container">
-        <div class="logo-placeholder">LOGO<br>KOPERASI</div>
-        <div class="header-title">
-            KOPERASI GUKAR SMK NUSAPERSADA
-        </div>
-    </div>
-    
-    <div class="sub-header">
-        KAS SIMPAN PINJAM PER 31 DESEMBER 2025
-    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>NO</th>
-                <th>RINCIAN</th>
-                <?php foreach ($months as $m): ?>
-                <th><?= $m ?></th>
-                <?php endforeach; ?>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="font-bold">A</td>
-                <td colspan="13" class="font-bold">PEMASUKAN</td>
-            </tr>
-            <?php foreach ($pemasukan as $row): ?>
-            <tr>
-                <td class="col-no"><?= $row[0] ?></td>
-                <td class="col-rincian <?= $row[0] !== "" ? 'font-bold' : '' ?>"><?= $row[1] ?></td>
-                <?php for($i=2; $i<=13; $i++): ?>
-                <td><?= renderCell($row[$i]) ?></td>
-                <?php endfor; ?>
-            </tr>
-            <?php endforeach; ?>
-            <tr>
-                <th colspan="2">JUMLAH</th>
-                <?php foreach ($pemasukan_jumlah as $val): ?>
-                <th style="font-weight: bold;"><?= renderCell($val) ?></th>
-                <?php endforeach; ?>
-            </tr>
+<style>
+    @page { size: A4 landscape; margin: 10mm; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 8pt; }
+    th, td { border: 1px solid black !important; padding: 3px; color: #000 !important; }
+    th { text-align: center; font-weight: bold; background-color: #f8f9fa !important; }
+    .col-no { text-align: center; width: 25px; font-weight: bold; }
+    .col-rincian { width: 150px; }
+    .font-bold { font-weight: bold; }
+    h4 { text-align: center; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+</style>
 
-            <tr>
-                <td class="font-bold">B</td>
-                <td colspan="13" class="font-bold">PENGELUARAN</td>
-            </tr>
-            <?php foreach ($pengeluaran as $row): ?>
-            <tr>
-                <td class="col-no"><?= $row[0] ?></td>
-                <td class="col-rincian <?= $row[0] !== "" ? 'font-bold' : '' ?>"><?= $row[1] ?></td>
-                <?php for($i=2; $i<=13; $i++): ?>
-                <td><?= renderCell($row[$i]) ?></td>
-                <?php endfor; ?>
-            </tr>
-            <?php endforeach; ?>
-            <tr>
-                <th colspan="2">JUMLAH</th>
-                <?php foreach ($pengeluaran_jumlah as $val): ?>
-                <th style="font-weight: bold;"><?= renderCell($val) ?></th>
-                <?php endforeach; ?>
-            </tr>
-        </tbody>
-    </table>
+<h4>KAS SIMPAN PINJAM PER 31 DESEMBER <?= $tahun ?></h4>
 
-    <table class="footer-table">
+<table>
+    <thead>
         <tr>
-            <td style="width: 50%;"></td>
-            <td style="width: 50%;">
-                <div class="date-text">Kab. Semarang, 3 Januari 2026</div>
-            </td>
+            <th>NO</th>
+            <th>RINCIAN</th>
+            <?php foreach ($months as $m): ?>
+            <th><?= $m ?></th>
+            <?php endforeach; ?>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- PEMASUKAN -->
+        <tr>
+            <td class="font-bold">A</td>
+            <td colspan="13" class="font-bold">PEMASUKAN</td>
         </tr>
         <tr>
-            <td>
-                <div class="signature-title">Ketua</div>
-                <div class="signature-name">Hafid Nur Prasetyo, S.Pd.</div>
-            </td>
-            <td>
-                <div class="signature-title">Bendahara</div>
-                <div class="signature-name">Yuli Setyowati, S.Pd.</div>
-            </td>
+            <td class="col-no">1</td><td class="col-rincian font-bold">Saldo awal bulan</td>
+            <?php for($i=1; $i<=12; $i++) echo "<td>".renderCell($saldo_awal[$i])."</td>"; ?>
         </tr>
-    </table>
-</body>
-</html>
+        <tr>
+            <td class="col-no">2</td><td class="col-rincian font-bold">Simpanan</td><td colspan="12"></td>
+        </tr>
+        <tr>
+            <td></td><td class="col-rincian">a. Simpanan Pokok</td>
+            <?php for($i=1; $i<=12; $i++) echo "<td>".renderCell($p_pokok[$i])."</td>"; ?>
+        </tr>
+        <tr>
+            <td></td><td class="col-rincian">b. Simpanan Wajib</td>
+            <?php for($i=1; $i<=12; $i++) echo "<td>".renderCell($p_wajib[$i])."</td>"; ?>
+        </tr>
+        <tr>
+            <td></td><td class="col-rincian">c. Simpanan Sukarela</td>
+            <?php for($i=1; $i<=12; $i++) echo "<td>".renderCell($p_sukarela[$i])."</td>"; ?>
+        </tr>
+        <tr>
+            <td class="col-no">3</td><td class="col-rincian font-bold">Angsuran</td><td colspan="12"></td>
+        </tr>
+        <tr>
+            <td></td><td class="col-rincian">a. Angsuran Pokok Pinjaman</td>
+            <?php for($i=1; $i<=12; $i++) echo "<td>".renderCell($p_angsuran[$i])."</td>"; ?>
+        </tr>
+        <tr>
+            <td class="col-no">4</td><td class="col-rincian font-bold">Jasa</td><td colspan="12"></td>
+        </tr>
+        <tr>
+            <td></td><td class="col-rincian">a. Jasa Pinjaman</td>
+            <?php for($i=1; $i<=12; $i++) echo "<td>".renderCell($p_jasa[$i])."</td>"; ?>
+        </tr>
+        <tr>
+            <td class="col-no">5</td><td class="col-rincian font-bold">Pelunasan</td><td colspan="12"></td>
+        </tr>
+        <tr>
+            <td></td><td class="col-rincian">a. Pelunasan Pinjaman</td>
+            <?php for($i=1; $i<=12; $i++) echo "<td>".renderCell($p_pelunasan[$i])."</td>"; ?>
+        </tr>
+        <tr>
+            <th colspan="2">JUMLAH PEMASUKAN</th>
+            <?php for($i=1; $i<=12; $i++) echo "<th>".renderCell($pemasukan_jumlah[$i])."</th>"; ?>
+        </tr>
+
+        <!-- PENGELUARAN -->
+        <tr>
+            <td class="font-bold">B</td>
+            <td colspan="13" class="font-bold">PENGELUARAN</td>
+        </tr>
+        <tr>
+            <td class="col-no">1</td><td class="col-rincian font-bold">Pinjaman</td><td colspan="12"></td>
+        </tr>
+        <tr>
+            <td></td><td class="col-rincian">a. Pinjaman Dicairkan</td>
+            <?php for($i=1; $i<=12; $i++) echo "<td>".renderCell($k_pinjaman[$i])."</td>"; ?>
+        </tr>
+        <tr>
+            <td class="col-no">2</td><td class="col-rincian font-bold">Anggota Keluar / Tarik Tunai</td>
+            <?php for($i=1; $i<=12; $i++) echo "<td>".renderCell($k_keluar[$i])."</td>"; ?>
+        </tr>
+        <tr>
+            <th colspan="2">JUMLAH PENGELUARAN</th>
+            <?php for($i=1; $i<=12; $i++) echo "<th>".renderCell($pengeluaran_jumlah[$i])."</th>"; ?>
+        </tr>
+        <tr>
+            <td class="col-no">3</td><td class="col-rincian font-bold" style="background:#e9ecef;">SALDO TUNAI AKHIR</td>
+            <?php for($i=1; $i<=12; $i++) echo "<th style='background:#e9ecef;'>".renderCell($saldo_akhir[$i])."</th>"; ?>
+        </tr>
+    </tbody>
+</table>
+<?= $this->endSection() ?>

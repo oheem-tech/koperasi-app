@@ -1,100 +1,56 @@
-
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>JASA PINJAMAN DAN SIMPANAN</title>
-    <style>
-        @page { size: A4 portrait; margin: 15mm; }
-        body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; }
-        .header-title { text-align: center; font-weight: bold; font-size: 14pt; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid black; padding: 4px 6px; }
-        th { text-align: center; font-weight: bold; }
-        .col-no { text-align: center; width: 30px; }
-        .rupiah { float: left; }
-        .nominal { float: right; }
-        .clear { clear: both; }
-        .footer-table { width: 100%; border: none; margin-top: 20px; page-break-inside: avoid; }
-        .footer-table td { border: none; text-align: center; padding: 0; }
-        .date-text { margin-bottom: 20px; }
-        .signature-name { margin-top: 80px; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <div class="header-title">
-        JASA PINJAMAN DAN SIMPANAN<br>
-        PER 31 DESEMBER 2024
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th rowspan="2">NO</th>
-                <th rowspan="2">NAMA</th>
-                <th colspan="2">JASA</th>
-                <th rowspan="2">SHU TOKO</th>
-                <th rowspan="2">TOTAL JASA<br>DITERIMA</th>
-            </tr>
-            <tr>
-                <th>SIMPANAN</th>
-                <th>PINJAMAN</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($data as $index => $row): ?>
-            <tr>
-                <td class="col-no"><?= $index + 1 ?></td>
-                <td><?= $row[0] ?></td>
-                <td>
-                    <?php if($row[1]): ?>
-                    <span class="rupiah">Rp</span><span class="nominal"><?= $row[1] ?></span><div class="clear"></div>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <?php if($row[2]): ?>
-                    <span class="rupiah">Rp</span><span class="nominal"><?= $row[2] ?></span><div class="clear"></div>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <?php if($row[3]): ?>
-                    <span class="rupiah">Rp</span><span class="nominal"><?= $row[3] ?></span><div class="clear"></div>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <?php if($row[4]): ?>
-                    <span class="rupiah">Rp</span><span class="nominal"><?= $row[4] ?></span><div class="clear"></div>
-                    <?php endif; ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-            <tr>
-                <th colspan="2">Jumlah</th>
-                <th><span class="rupiah">Rp</span><span class="nominal">500,000</span><div class="clear"></div></th>
-                <th><span class="rupiah">Rp</span><span class="nominal">150,000</span><div class="clear"></div></th>
-                <th><span class="rupiah">Rp</span><span class="nominal">74,000</span><div class="clear"></div></th>
-                <th><span class="rupiah">Rp</span><span class="nominal">724,000</span><div class="clear"></div></th>
-            </tr>
-        </tbody>
-    </table>
-
-    <table class="footer-table">
+<?= $this->extend('layout/print') ?>
+<?= $this->section('content') ?>
+<style>
+    @page { size: A4 landscape; margin: 15mm; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11pt; }
+    th, td { border: 1px solid black !important; padding: 5px; color: #000 !important; }
+    th { text-align: center; font-weight: bold; }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .font-bold { font-weight: bold; }
+    h4 { text-align: center; font-weight: bold; margin-bottom: 20px; }
+</style>
+<h4>
+    DAFTAR JASA PINJAMAN, SIMPANAN DAN SHU TOKO<br>
+    YANG DITERIMAKAN KEPADA ANGGOTA TUTUP BUKU TAHUN <?= date('Y') ?>
+</h4>
+<table>
+    <thead>
         <tr>
-            <td style="width: 50%;"></td>
-            <td style="width: 50%;">
-                <div class="date-text">Kab. Semarang, 31 Desember 2024</div>
-            </td>
+            <th rowspan="2">No</th>
+            <th rowspan="2">Nama</th>
+            <th colspan="3">Jasa</th>
+            <th rowspan="2">Total Diterimakan (Rp)</th>
         </tr>
         <tr>
-            <td>
-                <div>Ketua</div>
-                <div class="signature-name">Hafid Nur Prasetyo, S.Pd.</div>
-            </td>
-            <td>
-                <div>Bendahara</div>
-                <div class="signature-name">Yuli Setyowati, S.Pd.</div>
-            </td>
+            <th>Simpanan (Rp)</th>
+            <th>Pinjaman (Rp)</th>
+            <th>SHU Toko (Rp)</th>
         </tr>
-    </table>
-</body>
-</html>
+    </thead>
+    <tbody>
+        <?php $no = 1; foreach ($data as $row): ?>
+        <tr>
+            <td class="text-center"><?= $no++ ?></td>
+            <td><?= $row[0] ?></td>
+            <td class="text-right"><?= $row[1] ?></td>
+            <td class="text-right"><?= $row[2] ?></td>
+            <td class="text-right"><?= $row[3] ?></td>
+            <td class="text-right font-bold"><?= $row[4] ?></td>
+        </tr>
+        <?php endforeach; ?>
+        <?php if(empty($data)): ?>
+        <tr><td colspan="6" class="text-center">Tidak ada data transaksi.</td></tr>
+        <?php endif; ?>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">Total</th>
+            <th class="text-right"><?= $totals[0] ?></th>
+            <th class="text-right"><?= $totals[1] ?></th>
+            <th class="text-right"><?= $totals[2] ?></th>
+            <th class="text-right"><?= $totals[3] ?></th>
+        </tr>
+    </tfoot>
+</table>
+<?= $this->endSection() ?>

@@ -80,6 +80,44 @@ class Pengaturan extends BaseController
         }
 
         if ($settings) {
+            // Validasi persentase Distribusi SHU Koperasi (Level 1) & Pembagian Internal Pengurus (Level 2)
+            $shuRows = $this->pengaturanModel
+                ->whereIn('id', array_keys($settings))
+                ->like('pengaturan_key', 'shu_', 'after')
+                ->where('pengaturan_key !=', 'shu_metode_modal')
+                ->findAll();
+
+            if (!empty($shuRows)) {
+                $totalGlobal = 0;
+                $totalPengurus = 0;
+
+                foreach ($shuRows as $sr) {
+                    $k = $sr['pengaturan_key'];
+                    $val = floatval(str_replace(',', '.', $settings[$sr['id']] ?? 0));
+
+                    if (strpos($k, 'shu_pengurus_') === 0 && $k !== 'shu_pengurus_anggota') {
+                        // Level 2: Pembagian Internal Pengurus
+                        $totalPengurus += $val;
+                    } else {
+                        // Level 1: Alokasi SHU Global Koperasi
+                        $totalGlobal += $val;
+                    }
+                }
+
+                $totalGlobal = round($totalGlobal, 2);
+                $totalPengurus = round($totalPengurus, 2);
+
+                if ($totalGlobal > 100.0) {
+                    $lebih = round($totalGlobal - 100, 2);
+                    return redirect()->to('/pengaturan')->with('error', "Gagal menyimpan: Total alokasi Distribusi SHU Koperasi adalah {$totalGlobal}%, melebihi batas maksimal 100% (Kelebihan {$lebih}%). Harap sesuaikan persentase alokasi utama.");
+                }
+
+                if ($totalPengurus > 100.0) {
+                    $lebih = round($totalPengurus - 100, 2);
+                    return redirect()->to('/pengaturan')->with('error', "Gagal menyimpan: Total Pembagian Internal Pengurus adalah {$totalPengurus}%, melebihi batas maksimal 100% (Kelebihan {$lebih}%). Harap sesuaikan persentase porsi jabatan pengurus.");
+                }
+            }
+
             foreach ($settings as $id => $val) {
                 $this->pengaturanModel->update($id, ['pengaturan_value' => $val]);
             }
@@ -89,32 +127,81 @@ class Pengaturan extends BaseController
         }
 
         return redirect()->to('/pengaturan')->with('success', 'Pengaturan berhasil diperbarui.');
-
-        return redirect()->to('/pengaturan')->with('error', 'Tidak ada data yang diperbarui.');
     }
+
     public function add_parameter()
     {
         if (!has_permission('manage_pengaturan')) return redirect()->to('/dashboard');
         
-        $nama = $this->request->getPost('nama_jabatan');
-        $nilai = $this->request->getPost('nilai');
+        $nama = trim($this->request->getPost('nama_jabatan') ?? '');
+        $nilai = floatval(str_replace(',', '.', $this->request->getPost('nilai') ?? 0));
         
         if ($nama) {
-            $key = 'shu_pengurus_' . strtolower(str_replace(' ', '_', $nama));
+            $key = 'shu_pengurus_' . strtolower(preg_replace('/[^a-zA-Z0-9]+/', '_', $nama));
             
             // Cek apakah sudah ada
             $exists = $this->pengaturanModel->where('pengaturan_key', $key)->first();
-            if (!$exists) {
-                $this->pengaturanModel->insert([
-                    'pengaturan_key' => $key,
-                    'pengaturan_value' => $nilai,
-                    'keterangan' => 'Persentase SHU Pengurus - ' . ucwords($nama) . ' (%)'
-                ]);
-                return redirect()->to('/pengaturan')->with('success', 'Parameter pengurus dinamis berhasil ditambahkan.');
-            } else {
+            if ($exists) {
                 return redirect()->to('/pengaturan')->with('error', 'Parameter pengurus tersebut sudah ada.');
             }
+
+            // Validasi agar total pembagian internal pengurus tidak melebihi 100%
+            $pengurusRows = $this->pengaturanModel
+                ->like('pengaturan_key', 'shu_pengurus_', 'after')
+                ->where('pengaturan_key !=', 'shu_pengurus_anggota')
+                ->findAll();
+
+            $currentTotal = 0;
+            foreach ($pengurusRows as $sr) {
+                $currentTotal += floatval(str_replace(',', '.', $sr['pengaturan_value']));
+            }
+            $currentTotal = round($currentTotal, 2);
+            $newTotal = round($currentTotal + $nilai, 2);
+
+            if ($newTotal > 100.0) {
+                $kelebihan = round($newTotal - 100, 2);
+                return redirect()->to('/pengaturan')->with('error', "Gagal menambahkan: Total pembagian internal pengurus saat ini ({$currentTotal}%) jika ditambah jabatan baru ({$nilai}%) menjadi {$newTotal}%, melebihi batas 100% (Kelebihan {$kelebihan}%).");
+            }
+
+            $this->pengaturanModel->insert([
+                'pengaturan_key' => $key,
+                'pengaturan_value' => $nilai,
+                'keterangan' => 'Persentase SHU Pengurus - ' . ucwords($nama) . ' (%)'
+            ]);
+            return redirect()->to('/pengaturan')->with('success', 'Parameter jabatan pengurus berhasil ditambahkan.');
         }
         return redirect()->to('/pengaturan')->with('error', 'Nama jabatan tidak boleh kosong.');
+    }
+
+    public function delete_parameter($id)
+    {
+        if (!has_permission('manage_pengaturan')) return redirect()->to('/dashboard');
+
+        $param = $this->pengaturanModel->find($id);
+        if (!$param) {
+            return redirect()->to('/pengaturan')->with('error', 'Parameter tidak ditemukan.');
+        }
+
+        // Hanya boleh menghapus parameter dinamis shu_pengurus_... yang bukan parameter bawaan sistem
+        $coreKeys = [
+            'shu_jasa_modal', 'shu_jasa_anggota', 'shu_cadangan', 
+            'shu_pengurus_anggota', 'shu_pengawas', 'shu_pembina', 
+            'shu_dana_sosial', 'shu_dana_pendidikan', 'shu_metode_modal'
+        ];
+
+        if (in_array($param['pengaturan_key'], $coreKeys)) {
+            return redirect()->to('/pengaturan')->with('error', 'Parameter standar sistem tidak dapat dihapus.');
+        }
+
+        if (strpos($param['pengaturan_key'], 'shu_pengurus_') !== 0) {
+            return redirect()->to('/pengaturan')->with('error', 'Parameter ini tidak dapat dihapus.');
+        }
+
+        $this->pengaturanModel->delete($id);
+        if (function_exists('catat_log')) {
+            catat_log('Hapus Parameter Pengaturan', 'Menghapus parameter SHU: ' . $param['pengaturan_key']);
+        }
+
+        return redirect()->to('/pengaturan')->with('success', 'Parameter dinamis berhasil dihapus.');
     }
 }

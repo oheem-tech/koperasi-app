@@ -8,7 +8,6 @@ class AddTelegramFeatures extends Migration
 {
     public function up()
     {
-        // Add telegram_chat_id to anggota
         $fields = [
             'telegram_chat_id' => [
                 'type'       => 'VARCHAR',
@@ -17,7 +16,9 @@ class AddTelegramFeatures extends Migration
                 'after'      => 'no_telp',
             ],
         ];
-        $this->forge->addColumn('anggota', $fields);
+        if (!$this->db->fieldExists('telegram_chat_id', 'anggota')) {
+            $this->forge->addColumn('anggota', $fields);
+        }
 
         // Insert telegram_token to pengaturan if not exists
         $db = \Config\Database::connect();

@@ -5,18 +5,21 @@ namespace App\Controllers;
 use App\Models\AnggotaModel;
 use App\Models\UserModel;
 use App\Models\KelompokModel;
+use App\Models\PengaturanModel;
 
 class Anggota extends BaseController
 {
     protected $anggotaModel;
     protected $userModel;
     protected $kelompokModel;
+    protected $pengaturanModel;
 
     public function __construct()
     {
         $this->anggotaModel = new AnggotaModel();
         $this->userModel = new UserModel();
         $this->kelompokModel = new KelompokModel();
+        $this->pengaturanModel = new PengaturanModel();
     }
 
     public function index()
@@ -50,11 +53,20 @@ class Anggota extends BaseController
         $autoNoAnggota = 'A' . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
 
         $data = [
-            'title' => 'Tambah Anggota | Koperasi',
-            'autoNoAnggota' => $autoNoAnggota,
-            'kelompok'      => $this->kelompokModel->findAll()
+            'title'           => 'Tambah Anggota | Koperasi',
+            'autoNoAnggota'   => $autoNoAnggota,
+            'kelompok'        => $this->kelompokModel->findAll(),
+            'jabatanPengurus' => $this->getJabatanPengurus()
         ];
         return view('anggota/create', $data);
+    }
+
+    protected function getJabatanPengurus()
+    {
+        return $this->pengaturanModel
+            ->like('pengaturan_key', 'shu_pengurus_', 'after')
+            ->where('pengaturan_key !=', 'shu_pengurus_anggota')
+            ->findAll();
     }
 
     public function store()
@@ -80,6 +92,7 @@ class Anggota extends BaseController
             'telegram_chat_id'  => $this->request->getPost('telegram_chat_id'),
             'tanggal_bergabung' => $this->request->getPost('tanggal_bergabung'),
             'kelompok'          => $this->request->getPost('kelompok') ?? 'Umum',
+            'jabatan'           => $this->request->getPost('jabatan') ?? 'anggota',
             'status'            => 'aktif'
         ]);
 
@@ -104,10 +117,11 @@ class Anggota extends BaseController
         $user = $this->userModel->find($anggota['user_id']);
 
         $data = [
-            'title'   => 'Edit Anggota | Koperasi',
-            'anggota' => $anggota,
-            'user'    => $user,
-            'kelompok'=> $this->kelompokModel->findAll()
+            'title'           => 'Edit Anggota | Koperasi',
+            'anggota'         => $anggota,
+            'user'            => $user,
+            'kelompok'        => $this->kelompokModel->findAll(),
+            'jabatanPengurus' => $this->getJabatanPengurus()
         ];
         return view('anggota/edit', $data);
     }

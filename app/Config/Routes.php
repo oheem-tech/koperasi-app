@@ -81,6 +81,7 @@ $routes->group('pengaturan', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Pengaturan::index');
     $routes->post('update', 'Pengaturan::update');
     $routes->post('add_parameter', 'Pengaturan::add_parameter');
+    $routes->get('delete_parameter/(:num)', 'Pengaturan::delete_parameter/$1');
 });
 
 $routes->group('kas', ['filter' => 'auth'], static function ($routes) {

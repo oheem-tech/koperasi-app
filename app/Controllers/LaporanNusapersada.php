@@ -17,30 +17,33 @@ class LaporanNusapersada extends BaseController
         $data = [];
         $totalSimpanan = 0; $totalPinjaman = 0; $totalSHU = 0; $totalTerima = 0;
         
+        // Ambil pengaturan persentase, default ke nilai sebelumnya jika tidak ada
+        $p_jasa_simpanan = get_pengaturan('shu_jasa_modal', 35) / 100;
+        $p_jasa_pinjaman = get_pengaturan('shu_jasa_anggota', 15) / 100;
+
         foreach ($anggota as $a) {
-            // Ambil total Jasa Pinjaman dari database
             $jasaPinjamanQuery = $this->db->query("SELECT SUM(a.jumlah_jasa) as total FROM angsuran a JOIN pinjaman p ON p.id = a.pinjaman_id WHERE p.anggota_id = ?", [$a['id']])->getRow();
             $jasaPinjaman = $jasaPinjamanQuery ? $jasaPinjamanQuery->total : 0;
             
-            // Ambil total Simpanan (Pokok + Wajib + Sukarela)
             $simpananQuery = $this->db->query("SELECT SUM(IF(jenis_transaksi='setor', jumlah, -jumlah)) as total FROM simpanan WHERE anggota_id = ?", [$a['id']])->getRow();
             $simpananTotal = $simpananQuery ? $simpananQuery->total : 0;
             
-            // Simulasi Jasa Simpanan (misal 5% dari saldo simpanan)
-            $jasaSimpanan = $simpananTotal > 0 ? ($simpananTotal * 0.05) : 0;
-            $shuToko = 0; // Belum ada tabel SHU Toko khusus, diset 0
+            // Jasa proporsional (dinamis dari pengaturan)
+            $jasaSimpanan = $simpananTotal > 0 ? ($simpananTotal * $p_jasa_simpanan) : 0;
+            $jasaPinjamanHitung = $jasaPinjaman > 0 ? ($jasaPinjaman * $p_jasa_pinjaman) : 0;
+            $shuToko = 0; 
             
-            if ($jasaSimpanan > 0 || $jasaPinjaman > 0 || $shuToko > 0) {
-                $terima = $jasaSimpanan + $jasaPinjaman + $shuToko;
+            if ($jasaSimpanan > 0 || $jasaPinjamanHitung > 0 || $shuToko > 0) {
+                $terima = $jasaSimpanan + $jasaPinjamanHitung + $shuToko;
                 $data[] = [
                     $a['nama_lengkap'],
-                    $jasaSimpanan ? number_format($jasaSimpanan, 0, ',', '.') : "",
-                    $jasaPinjaman ? number_format($jasaPinjaman, 0, ',', '.') : "",
-                    $shuToko ? number_format($shuToko, 0, ',', '.') : "",
+                    $jasaSimpanan > 0 ? number_format($jasaSimpanan, 0, ',', '.') : "-",
+                    $jasaPinjamanHitung > 0 ? number_format($jasaPinjamanHitung, 0, ',', '.') : "-",
+                    $shuToko > 0 ? number_format($shuToko, 0, ',', '.') : "-",
                     number_format($terima, 0, ',', '.')
                 ];
                 $totalSimpanan += $jasaSimpanan;
-                $totalPinjaman += $jasaPinjaman;
+                $totalPinjaman += $jasaPinjamanHitung;
                 $totalSHU += $shuToko;
                 $totalTerima += $terima;
             }
@@ -61,7 +64,10 @@ class LaporanNusapersada extends BaseController
     {
         $anggota = $this->db->table('anggota')->where('status', 'aktif')->get()->getResultArray();
         $data2 = [];
-        $totals = array_fill(0, 14, 0); // 12 bulan + 2 total
+        $totals = array_fill(0, 14, 0);
+        
+        // Menggunakan pengaturan master
+        $p_jasa_pinjaman = get_pengaturan('shu_jasa_anggota', 15) / 100;
 
         foreach ($anggota as $a) {
             $row = [$a['nama_lengkap']];
@@ -69,7 +75,7 @@ class LaporanNusapersada extends BaseController
             $hasData = false;
 
             for ($m = 1; $m <= 12; $m++) {
-                $jasaBulanQuery = $this->db->query("SELECT SUM(a.jumlah_jasa) as total FROM angsuran a JOIN pinjaman p ON p.id = a.pinjaman_id WHERE p.anggota_id = ? AND MONTH(a.tanggal_bayar) = ?", [$a['id'], $m])->getRow();
+                $jasaBulanQuery = $this->db->query("SELECT SUM(a.jumlah_jasa) as total FROM angsuran a JOIN pinjaman p ON p.id = a.pinjaman_id WHERE p.anggota_id = ? AND MONTH(a.tanggal_bayar) = ? AND YEAR(a.tanggal_bayar) = YEAR(CURDATE())", [$a['id'], $m])->getRow();
                 $jasaBulan = $jasaBulanQuery ? $jasaBulanQuery->total : 0;
                 
                 if ($jasaBulan > 0) {
@@ -78,12 +84,13 @@ class LaporanNusapersada extends BaseController
                     $totals[$m-1] += $jasaBulan;
                     $hasData = true;
                 } else {
-                    $row[] = "";
+                    $row[] = "-";
                 }
             }
             
             if ($hasData) {
-                $jasaFinal = $totalJasaMember * 0.1; // Contoh porsi 10%
+                // Kalkulasi jasa otomatis mengambil persentase dinamis
+                $jasaFinal = $totalJasaMember * $p_jasa_pinjaman;
                 $row[] = number_format($totalJasaMember, 0, ',', '.');
                 $row[] = number_format($jasaFinal, 0, ',', '.');
                 $totals[12] += $totalJasaMember;
@@ -104,6 +111,8 @@ class LaporanNusapersada extends BaseController
         $anggota = $this->db->table('anggota')->where('status', 'aktif')->get()->getResultArray();
         $data = [];
         $totalPokok = 0; $totalWajib = 0; $totalSukarela = 0; $totalJumlah = 0; $totalJasa = 0;
+        
+        $p_jasa_simpanan = get_pengaturan('shu_jasa_modal', 35) / 100;
 
         foreach ($anggota as $idx => $a) {
             $pokok = $this->db->query("SELECT SUM(IF(jenis_transaksi='setor', jumlah, -jumlah)) as total FROM simpanan WHERE anggota_id = ? AND jenis_simpanan_id = 1", [$a['id']])->getRow()->total ?? 0;
@@ -111,16 +120,16 @@ class LaporanNusapersada extends BaseController
             $sukarela = $this->db->query("SELECT SUM(IF(jenis_transaksi='setor', jumlah, -jumlah)) as total FROM simpanan WHERE anggota_id = ? AND jenis_simpanan_id = 3", [$a['id']])->getRow()->total ?? 0;
             
             $jumlah = $pokok + $wajib + $sukarela;
-            $jasa = $jumlah * 0.02; // Contoh jasa 2%
+            $jasa = $jumlah * $p_jasa_simpanan; 
 
             if ($jumlah > 0) {
                 $data[] = [
                     $idx + 1,
                     $a['nama_lengkap'],
-                    $pokok ? number_format($pokok, 0, ',', '.') : "-",
-                    $wajib ? number_format($wajib, 0, ',', '.') : "-",
-                    $sukarela ? number_format($sukarela, 2, ',', '.') : "-",
-                    number_format($jumlah, 2, ',', '.'),
+                    $pokok > 0 ? number_format($pokok, 0, ',', '.') : "-",
+                    $wajib > 0 ? number_format($wajib, 0, ',', '.') : "-",
+                    $sukarela > 0 ? number_format($sukarela, 0, ',', '.') : "-",
+                    number_format($jumlah, 0, ',', '.'),
                     number_format($jasa, 0, ',', '.')
                 ];
                 $totalPokok += $pokok;
@@ -134,8 +143,8 @@ class LaporanNusapersada extends BaseController
         $totals = [
             number_format($totalPokok, 0, ',', '.'),
             number_format($totalWajib, 0, ',', '.'),
-            number_format($totalSukarela, 2, ',', '.'),
-            number_format($totalJumlah, 2, ',', '.'),
+            number_format($totalSukarela, 0, ',', '.'),
+            number_format($totalJumlah, 0, ',', '.'),
             number_format($totalJasa, 0, ',', '.')
         ];
         return view('laporan_nusapersada/laporan_perhitungan_jasa_simpanan', ['data' => $data, 'totals' => $totals]);
@@ -143,82 +152,88 @@ class LaporanNusapersada extends BaseController
 
     public function kas_rat()
     {
-        return view('laporan_nusapersada/laporan_kas_rat');
+        $tahun = date('Y');
+        
+        // Pemasukan
+        $p_pokok = []; $p_wajib = []; $p_sukarela = [];
+        $p_angsuran = []; $p_jasa = []; $p_pelunasan = [];
+        
+        // Pengeluaran
+        $k_pinjaman = [];
+        $k_keluar = [];
+        
+        for($i=1; $i<=12; $i++) {
+            // Simpanan Pokok
+            $p_pokok[$i] = $this->db->query("SELECT SUM(jumlah) as t FROM simpanan WHERE jenis_transaksi='setor' AND jenis_simpanan_id=1 AND MONTH(tanggal_transaksi)=? AND YEAR(tanggal_transaksi)=?", [$i, $tahun])->getRow()->t ?? 0;
+            $p_wajib[$i] = $this->db->query("SELECT SUM(jumlah) as t FROM simpanan WHERE jenis_transaksi='setor' AND jenis_simpanan_id=2 AND MONTH(tanggal_transaksi)=? AND YEAR(tanggal_transaksi)=?", [$i, $tahun])->getRow()->t ?? 0;
+            $p_sukarela[$i] = $this->db->query("SELECT SUM(jumlah) as t FROM simpanan WHERE jenis_transaksi='setor' AND jenis_simpanan_id=3 AND MONTH(tanggal_transaksi)=? AND YEAR(tanggal_transaksi)=?", [$i, $tahun])->getRow()->t ?? 0;
+            
+            $angsuranData = $this->db->query("SELECT SUM(jumlah_pokok) as pokok, SUM(jumlah_jasa) as jasa FROM angsuran WHERE MONTH(tanggal_bayar)=? AND YEAR(tanggal_bayar)=?", [$i, $tahun])->getRow();
+            $p_angsuran[$i] = $angsuranData->pokok ?? 0;
+            $p_jasa[$i] = $angsuranData->jasa ?? 0;
+            $p_pelunasan[$i] = 0; // Opsional jika tabel angsuran punya flag pelunasan
+            
+            $k_pinjaman[$i] = $this->db->query("SELECT SUM(jumlah_pinjaman) as t FROM pinjaman WHERE status IN ('disetujui', 'lunas') AND MONTH(tanggal_pengajuan)=? AND YEAR(tanggal_pengajuan)=?", [$i, $tahun])->getRow()->t ?? 0;
+            $k_keluar[$i] = $this->db->query("SELECT SUM(jumlah) as t FROM simpanan WHERE jenis_transaksi='tarik' AND MONTH(tanggal_transaksi)=? AND YEAR(tanggal_transaksi)=?", [$i, $tahun])->getRow()->t ?? 0;
+        }
+
+        return view('laporan_nusapersada/laporan_kas_rat', [
+            'tahun' => $tahun,
+            'p_pokok' => $p_pokok,
+            'p_wajib' => $p_wajib,
+            'p_sukarela' => $p_sukarela,
+            'p_angsuran' => $p_angsuran,
+            'p_jasa' => $p_jasa,
+            'p_pelunasan' => $p_pelunasan,
+            'k_pinjaman' => $k_pinjaman,
+            'k_keluar' => $k_keluar
+        ]);
     }
 
     public function perhitungan_shu()
     {
-        // 1. Ambil Total Pendapatan & Biaya dari Kas Koperasi
-        $pendapatan = $this->db->query("SELECT SUM(nominal) as total FROM kas_koperasi WHERE jenis='masuk' AND kategori != 'simpanan'")->getRow()->total ?? 0;
-        $biaya = $this->db->query("SELECT SUM(nominal) as total FROM kas_koperasi WHERE jenis='keluar'")->getRow()->total ?? 0;
+        $tahun = date('Y');
+
+        // Logika 100% sama dengan Laporan Utama (Total Jasa + Total Denda + Pendapatan Kas Lainnya)
+        $totalJasaGlobal = $this->db->table('angsuran')->where("YEAR(tanggal_bayar)", $tahun)->selectSum('jumlah_jasa')->get()->getRow()->jumlah_jasa ?? 0;
+        $totalDendaGlobal = $this->db->table('angsuran')->where("YEAR(tanggal_bayar)", $tahun)->selectSum('denda')->get()->getRow()->denda ?? 0;
+        
+        $pendapatanMasukGlobal = $this->db->table('kas_koperasi')->where('kategori', 'pendapatan_biaya')->where('jenis', 'masuk')->where("YEAR(tanggal)", $tahun)->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+        $biayaKeluarGlobal = $this->db->table('kas_koperasi')->where('kategori', 'pendapatan_biaya')->where('jenis', 'keluar')->where("YEAR(tanggal)", $tahun)->selectSum('nominal')->get()->getRow()->nominal ?? 0;
+
+        $pendapatan = $totalJasaGlobal + $totalDendaGlobal + $pendapatanMasukGlobal;
+        $biaya = $biayaKeluarGlobal;
         $shu_bersih = $pendapatan - $biaya;
         
-        // Jika data kosong, gunakan default 3 juta sesuai contoh agar layout terlihat
-        if ($shu_bersih <= 0) {
-            $pendapatan = 3800000;
-            $biaya = 800000;
-            $shu_bersih = 3000000;
-        }
-
-        // 2. Ambil Persentase Utama dari Pengaturan
         $p_cadangan = get_pengaturan('shu_cadangan', 30);
         $p_modal = get_pengaturan('shu_jasa_modal', 35);
         $p_anggota = get_pengaturan('shu_jasa_anggota', 15);
-        
         $p_total_anggota = $p_modal + $p_anggota;
-        $p_pengurus = 100 - ($p_cadangan + $p_total_anggota); // Sisa untuk pengurus
+        $p_pengurus = 100 - ($p_cadangan + $p_total_anggota);
         
-        // 3. Ambil Persentase Jabatan Spesifik (Dinamis dengan fallback default Nusapersada)
         $p_ketua = get_pengaturan('shu_pengurus_ketua', 35);
         $p_bendahara = get_pengaturan('shu_pengurus_bendahara', 25);
         $p_sekretaris = get_pengaturan('shu_pengurus_sekretaris', 15);
         $p_bp1 = get_pengaturan('shu_pengurus_bp1', 12.5);
         $p_bp2 = get_pengaturan('shu_pengurus_bp2', 12.5);
         
-        // 4. Hitung Nilai Nominal
         $val_cadangan = $shu_bersih * ($p_cadangan / 100);
         $val_anggota = $shu_bersih * ($p_total_anggota / 100);
         $val_pengurus = $shu_bersih * ($p_pengurus / 100);
         
-        $val_ketua = $val_pengurus * ($p_ketua / 100);
-        $val_bendahara = $val_pengurus * ($p_bendahara / 100);
-        $val_sekretaris = $val_pengurus * ($p_sekretaris / 100);
-        $val_bp1 = $val_pengurus * ($p_bp1 / 100);
-        $val_bp2 = $val_pengurus * ($p_bp2 / 100);
-        
-        $val_simpanan = $shu_bersih * ($p_modal / 100);
-        $val_pinjaman = $shu_bersih * ($p_anggota / 100);
-
         $data = [
-            'pendapatan' => $pendapatan,
-            'biaya' => $biaya,
-            'shu_bersih' => $shu_bersih,
-            
-            'p_cadangan' => $p_cadangan,
-            'p_total_anggota' => $p_total_anggota,
-            'p_pengurus' => $p_pengurus,
-            
-            'p_ketua' => $p_ketua,
-            'p_bendahara' => $p_bendahara,
-            'p_sekretaris' => $p_sekretaris,
-            'p_bp1' => $p_bp1,
-            'p_bp2' => $p_bp2,
-            
-            'val_cadangan' => $val_cadangan,
-            'val_anggota' => $val_anggota,
-            'val_pengurus' => $val_pengurus,
-            
-            'val_ketua' => $val_ketua,
-            'val_bendahara' => $val_bendahara,
-            'val_sekretaris' => $val_sekretaris,
-            'val_bp1' => $val_bp1,
-            'val_bp2' => $val_bp2,
-            
-            'p_modal' => $p_modal,
-            'p_anggota' => $p_anggota,
-            
-            'val_simpanan' => $val_simpanan,
-            'val_pinjaman' => $val_pinjaman,
+            'pendapatan' => $pendapatan, 'biaya' => $biaya, 'shu_bersih' => $shu_bersih,
+            'p_cadangan' => $p_cadangan, 'p_total_anggota' => $p_total_anggota, 'p_pengurus' => $p_pengurus,
+            'p_ketua' => $p_ketua, 'p_bendahara' => $p_bendahara, 'p_sekretaris' => $p_sekretaris, 'p_bp1' => $p_bp1, 'p_bp2' => $p_bp2,
+            'val_cadangan' => $val_cadangan, 'val_anggota' => $val_anggota, 'val_pengurus' => $val_pengurus,
+            'val_ketua' => $val_pengurus * ($p_ketua / 100),
+            'val_bendahara' => $val_pengurus * ($p_bendahara / 100),
+            'val_sekretaris' => $val_pengurus * ($p_sekretaris / 100),
+            'val_bp1' => $val_pengurus * ($p_bp1 / 100),
+            'val_bp2' => $val_pengurus * ($p_bp2 / 100),
+            'p_modal' => $p_modal, 'p_anggota' => $p_anggota,
+            'val_simpanan' => $shu_bersih * ($p_modal / 100),
+            'val_pinjaman' => $shu_bersih * ($p_anggota / 100),
         ];
         
         return view('laporan_nusapersada/laporan_perhitungan_shu', $data);

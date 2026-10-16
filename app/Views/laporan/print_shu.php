@@ -64,7 +64,22 @@
         <tr>
             <td><?= $row['no_anggota'] ?></td>
             <td><?= $row['nama_lengkap'] ?></td>
-            <td style="text-align:center"><?= ucfirst($row['jabatan']) ?></td>
+            <td style="text-align:center">
+                <?php
+                $j = $row['jabatan'] ?? 'anggota';
+                if (strpos($j, 'pengurus_') === 0) {
+                    echo 'Pengurus (' . esc(ucwords(str_replace('_', ' ', substr($j, 9)))) . ')';
+                } elseif ($j === 'pengurus') {
+                    echo 'Pengurus';
+                } elseif ($j === 'pengawas') {
+                    echo 'Pengawas';
+                } elseif ($j === 'pembina') {
+                    echo 'Pembina';
+                } else {
+                    echo 'Anggota';
+                }
+                ?>
+            </td>
             <td style="text-align:right"><?= number_format($row['shu_jasa_modal'], 0, ',', '.') ?></td>
             <td style="text-align:right"><?= number_format($row['shu_jasa_anggota'], 0, ',', '.') ?></td>
             <td style="text-align:right"><?= number_format($row['shu_jabatan'], 0, ',', '.') ?></td>
