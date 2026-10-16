@@ -40,7 +40,23 @@
                         <td><?= !empty($row['telegram_chat_id']) ? $row['telegram_chat_id'] : '-' ?></td>
                         <td><?= $row['alamat'] ?></td>
                         <td><?= date('d/m/Y', strtotime($row['tanggal_bergabung'])) ?></td>
-                        <td><?= $row['jabatan'] ?? 'Anggota' ?></td>
+                        <td>
+                            <?php
+                            $jab = $row['jabatan'] ?? 'anggota';
+                            if (strpos($jab, 'pengurus_') === 0) {
+                                $sub = ucwords(str_replace('_', ' ', substr($jab, 9)));
+                                echo '<span class="badge bg-primary">Pengurus (' . esc($sub) . ')</span>';
+                            } elseif ($jab === 'pengurus') {
+                                echo '<span class="badge bg-primary">Pengurus</span>';
+                            } elseif ($jab === 'pengawas') {
+                                echo '<span class="badge bg-info text-dark">Pengawas</span>';
+                            } elseif ($jab === 'pembina') {
+                                echo '<span class="badge bg-secondary">Pembina</span>';
+                            } else {
+                                echo '<span class="badge bg-light text-secondary border">Anggota</span>';
+                            }
+                            ?>
+                        </td>
                         <td><?= $row['kelompok'] ?? 'Umum' ?></td>
                         <td>
                             <?php if($row['status'] == 'aktif'): ?>

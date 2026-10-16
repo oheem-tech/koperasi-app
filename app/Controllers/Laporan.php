@@ -244,19 +244,16 @@ class Laporan extends BaseController
         $db = \Config\Database::connect();
         $tahun = $this->request->getGet('tahun') ?? date('Y');
 
-        // Ambil semua setting SHU (versi baru + backward compat)
+        // Ambil semua setting SHU & parameter terkait (termasuk porsi dinamis internal pengurus)
         $settings = [];
-        $rows = $this->pengaturanModel->whereIn('pengaturan_key', [
-            'shu_jasa_modal', 'shu_jasa_anggota',
-            'shu_pengurus_anggota', 'shu_pengawas', 'shu_pembina',
-            'shu_dana_sosial', 'shu_dana_pendidikan', 'shu_cadangan',
-            'bunga_pinjaman', 'shu_metode_modal'
-        ])->findAll();
+        $rows = $this->pengaturanModel->findAll();
         foreach ($rows as $r) {
             if ($r['pengaturan_key'] === 'shu_metode_modal') {
                 $settings[$r['pengaturan_key']] = $r['pengaturan_value'];
-            } else {
+            } elseif (is_numeric($r['pengaturan_value'])) {
                 $settings[$r['pengaturan_key']] = (float)$r['pengaturan_value'];
+            } else {
+                $settings[$r['pengaturan_key']] = $r['pengaturan_value'];
             }
         }
 
@@ -323,14 +320,71 @@ class Laporan extends BaseController
         ];
         $alokasiSHU['total_dialokasikan'] = array_sum($alokasiSHU) - $alokasiSHU['total_shu'];
 
-        // 5. Hitung jumlah personel per jabatan
-        $countJabatan = ['pengurus' => 0, 'pengawas' => 0, 'pembina' => 0];
+        // 5. Hitung jumlah personel per jabatan & distribusi Jasa Jabatan
+        $countJabatan = [];
+        $totalPengurusCount = 0;
+        $countPerPengurusRole = [];
+
         foreach ($anggotaDB as $a) {
-            if (isset($countJabatan[$a['jabatan']])) $countJabatan[$a['jabatan']]++;
+            $jab = $a['jabatan'] ?? 'anggota';
+            $countJabatan[$jab] = ($countJabatan[$jab] ?? 0) + 1;
+
+            if (strpos($jab, 'pengurus') === 0) {
+                $totalPengurusCount++;
+                $countPerPengurusRole[$jab] = ($countPerPengurusRole[$jab] ?? 0) + 1;
+            }
         }
-        $jasaPerPengurus = $countJabatan['pengurus'] > 0 ? $alokasiSHU['pengurus_anggota'] / $countJabatan['pengurus'] : 0;
-        $jasaPerPengawas = $countJabatan['pengawas'] > 0 ? $alokasiSHU['pengawas']         / $countJabatan['pengawas'] : 0;
-        $jasaPerPembina  = $countJabatan['pembina']  > 0 ? $alokasiSHU['pembina']          / $countJabatan['pembina']  : 0;
+
+        $countPengawas   = $countJabatan['pengawas'] ?? 0;
+        $countPembina    = $countJabatan['pembina'] ?? 0;
+        $jasaPerPengawas = $countPengawas > 0 ? $alokasiSHU['pengawas'] / $countPengawas : 0;
+        $jasaPerPembina  = $countPembina  > 0 ? $alokasiSHU['pembina']  / $countPembina  : 0;
+
+        // Distribusi Internal Pengurus (Level 2)
+        $totalDanaPengurus = $alokasiSHU['pengurus_anggota'];
+        $jasaPerJabatanPengurus = [];
+
+        // Cek apakah ada konfigurasi dinamis internal pengurus (shu_pengurus_*)
+        $hasSpecificPengurus = false;
+        foreach ($countPerPengurusRole as $jab => $cnt) {
+            if ($jab !== 'pengurus' && isset($settings['shu_' . $jab]) && $settings['shu_' . $jab] > 0) {
+                $hasSpecificPengurus = true;
+                break;
+            }
+        }
+
+        if ($hasSpecificPengurus) {
+            $allocatedPersen = 0;
+            $genericCount = $countPerPengurusRole['pengurus'] ?? 0;
+
+            foreach ($countPerPengurusRole as $jab => $cnt) {
+                $settingKey = 'shu_' . $jab;
+                if (isset($settings[$settingKey]) && $settings[$settingKey] > 0) {
+                    $persen = (float)$settings[$settingKey];
+                    // Porsi per personil = (Total Dana Pengurus * persen%) / jumlah personil jabatan tsb
+                    $jasaPerJabatanPengurus[$jab] = ($totalDanaPengurus * ($persen / 100)) / $cnt;
+                    $allocatedPersen += $persen;
+                }
+            }
+
+            // Jika ada pengurus dengan jabatan umum 'pengurus', alokasikan dari sisa persentase atau fallback
+            if ($genericCount > 0) {
+                $sisaPersen = max(0, 100 - $allocatedPersen);
+                if ($sisaPersen > 0) {
+                    $jasaPerJabatanPengurus['pengurus'] = ($totalDanaPengurus * ($sisaPersen / 100)) / $genericCount;
+                } elseif ($totalPengurusCount > 0) {
+                    $jasaPerJabatanPengurus['pengurus'] = $totalDanaPengurus / $totalPengurusCount;
+                }
+            }
+        } else {
+            // Mode umum / fallback: bagi rata ke seluruh pengurus
+            if ($totalPengurusCount > 0) {
+                $rataRata = $totalDanaPengurus / $totalPengurusCount;
+                foreach (array_keys($countPerPengurusRole) as $jab) {
+                    $jasaPerJabatanPengurus[$jab] = $rataRata;
+                }
+            }
+        }
 
         // 6. Hitung Rincian Hak Penerimaan SHU per Anggota Individu
         $shuPerAnggota = [];
@@ -350,9 +404,13 @@ class Laporan extends BaseController
 
             // Distribusi Jasa Jabatan
             $shu_jabatan = 0;
-            if ($a['jabatan'] === 'pengurus') $shu_jabatan = $jasaPerPengurus;
-            elseif ($a['jabatan'] === 'pengawas') $shu_jabatan = $jasaPerPengawas;
-            elseif ($a['jabatan'] === 'pembina') $shu_jabatan = $jasaPerPembina;
+            if (isset($jasaPerJabatanPengurus[$a['jabatan']])) {
+                $shu_jabatan = $jasaPerJabatanPengurus[$a['jabatan']];
+            } elseif ($a['jabatan'] === 'pengawas') {
+                $shu_jabatan = $jasaPerPengawas;
+            } elseif ($a['jabatan'] === 'pembina') {
+                $shu_jabatan = $jasaPerPembina;
+            }
 
             $total_shu_diterima = round($shu_jasa_angsuran + $shu_modal + $shu_jabatan);
 

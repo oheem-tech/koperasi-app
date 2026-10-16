@@ -22,8 +22,37 @@
                     <input type="text" class="form-control" name="no_telp" required>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">Telegram Chat ID (Opsional)</label>
-                    <input type="text" class="form-control" name="telegram_chat_id" placeholder="Cek dari bot telegram">
+                    <label class="form-label">Telegram Chat ID <small class="text-muted">(Pilihan / Opsional)</small></label>
+                    <input type="text" class="form-control" name="telegram_chat_id" placeholder="Opsional (Hanya jika anggota menggunakan Telegram)">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Jabatan <small class="text-muted">(berpengaruh pada distribusi SHU)</small></label>
+                    <select class="form-select" name="jabatan">
+                        <optgroup label="Umum (Statis)">
+                            <option value="anggota" selected>Anggota Biasa</option>
+                            <option value="pengawas">Pengawas</option>
+                            <option value="pembina">Pembina</option>
+                        </optgroup>
+                        <optgroup label="Kepengurusan (Dinamis dari Pengaturan)">
+                            <?php if(!empty($jabatanPengurus)): ?>
+                                <?php foreach($jabatanPengurus as $jp): ?>
+                                    <?php 
+                                    $val = substr($jp['pengaturan_key'], 4);
+                                    $label = $jp['keterangan'];
+                                    if (preg_match('/-\s*([^(]+)/', $jp['keterangan'], $m)) {
+                                        $label = trim($m[1]);
+                                    } else {
+                                        $label = ucwords(str_replace('_', ' ', substr($val, 9)));
+                                    }
+                                    ?>
+                                    <option value="<?= esc($val) ?>">
+                                        Pengurus - <?= esc($label) ?> (<?= esc($jp['pengaturan_value']) ?>%)
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            <option value="pengurus">Pengurus (Umum / Non-Spesifik)</option>
+                        </optgroup>
+                    </select>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Tanggal Bergabung</label>

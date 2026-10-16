@@ -22,8 +22,8 @@
                     <input type="text" class="form-control" name="no_telp" value="<?= $anggota['no_telp'] ?>" required>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">Telegram Chat ID (Opsional)</label>
-                    <input type="text" class="form-control" name="telegram_chat_id" value="<?= $anggota['telegram_chat_id'] ?? '' ?>" placeholder="Cek dari bot telegram">
+                    <label class="form-label">Telegram Chat ID <small class="text-muted">(Pilihan / Opsional)</small></label>
+                    <input type="text" class="form-control" name="telegram_chat_id" value="<?= $anggota['telegram_chat_id'] ?? '' ?>" placeholder="Opsional (Hanya jika anggota menggunakan Telegram)">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Status</label>
@@ -35,10 +35,46 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Jabatan <small class="text-muted">(berpengaruh pada distribusi SHU)</small></label>
                     <select class="form-select" name="jabatan">
-                        <option value="anggota"  <?= ($anggota['jabatan'] ?? 'anggota') == 'anggota'  ? 'selected' : '' ?>>Anggota</option>
-                        <option value="pengurus" <?= ($anggota['jabatan'] ?? '') == 'pengurus' ? 'selected' : '' ?>>Pengurus</option>
-                        <option value="pengawas" <?= ($anggota['jabatan'] ?? '') == 'pengawas' ? 'selected' : '' ?>>Pengawas</option>
-                        <option value="pembina"  <?= ($anggota['jabatan'] ?? '') == 'pembina'  ? 'selected' : '' ?>>Pembina</option>
+                        <optgroup label="Umum (Statis)">
+                            <option value="anggota" <?= ($anggota['jabatan'] ?? 'anggota') == 'anggota' ? 'selected' : '' ?>>Anggota Biasa</option>
+                            <option value="pengawas" <?= ($anggota['jabatan'] ?? '') == 'pengawas' ? 'selected' : '' ?>>Pengawas</option>
+                            <option value="pembina" <?= ($anggota['jabatan'] ?? '') == 'pembina' ? 'selected' : '' ?>>Pembina</option>
+                        </optgroup>
+                        <optgroup label="Kepengurusan (Dinamis dari Pengaturan)">
+                            <?php 
+                            $foundCurrent = false;
+                            if(!empty($jabatanPengurus)): 
+                            ?>
+                                <?php foreach($jabatanPengurus as $jp): ?>
+                                    <?php 
+                                    $val = substr($jp['pengaturan_key'], 4); // misal: pengurus_ketua
+                                    $label = $jp['keterangan'];
+                                    if (preg_match('/-\s*([^(]+)/', $jp['keterangan'], $m)) {
+                                        $label = trim($m[1]);
+                                    } else {
+                                        $label = ucwords(str_replace('_', ' ', substr($val, 9)));
+                                    }
+                                    $isSelected = (($anggota['jabatan'] ?? '') == $val);
+                                    if ($isSelected) $foundCurrent = true;
+                                    ?>
+                                    <option value="<?= esc($val) ?>" <?= $isSelected ? 'selected' : '' ?>>
+                                        Pengurus - <?= esc($label) ?> (<?= esc($jp['pengaturan_value']) ?>%)
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            <option value="pengurus" <?= ($anggota['jabatan'] ?? '') == 'pengurus' ? 'selected' : '' ?>>
+                                Pengurus (Umum / Non-Spesifik)
+                            </option>
+                            <?php 
+                            $currJab = $anggota['jabatan'] ?? '';
+                            if (!$foundCurrent && !empty($currJab) && strpos($currJab, 'pengurus_') === 0): 
+                                $oldLabel = ucwords(str_replace('_', ' ', substr($currJab, 9)));
+                            ?>
+                                <option value="<?= esc($currJab) ?>" selected>
+                                    Pengurus - <?= esc($oldLabel) ?> (Hanya Historis)
+                                </option>
+                            <?php endif; ?>
+                        </optgroup>
                     </select>
                 </div>
                 <div class="col-md-6 mb-3">
