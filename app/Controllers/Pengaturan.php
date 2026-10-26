@@ -65,6 +65,37 @@ class Pengaturan extends BaseController
             $this->pengaturanModel->where('pengaturan_key', 'shu_dana_cadangan')->delete();
         }
 
+        // Kalibrasi otomatis jika alokasi SHU masih menggunakan nilai default migrasi lama (total 85.5%)
+        $jasaModal = $this->pengaturanModel->where('pengaturan_key', 'shu_jasa_modal')->first();
+        $pengurusAnggota = $this->pengaturanModel->where('pengaturan_key', 'shu_pengurus_anggota')->first();
+        if ($jasaModal && $jasaModal['pengaturan_value'] == '20' && $pengurusAnggota && $pengurusAnggota['pengaturan_value'] == '10') {
+            $kalibrasiSHU = [
+                'shu_jasa_modal'       => ['value' => '30', 'ket' => 'Persentase Pembagian SHU - Jasa Modal/Simpanan (%)'],
+                'shu_jasa_anggota'     => ['value' => '20', 'ket' => 'Persentase Pembagian SHU - Jasa Anggota/Pinjaman (%)'],
+                'shu_cadangan'         => ['value' => '10', 'ket' => 'Persentase Pembagian SHU untuk Dana Cadangan (%)'],
+                'shu_pengurus_anggota' => ['value' => '16', 'ket' => 'Persentase Pembagian SHU untuk Pengurus (%)'],
+                'shu_pengawas'         => ['value' => '7.5','ket' => 'Persentase Pembagian SHU untuk Pengawas (%)'],
+                'shu_pembina'          => ['value' => '5',  'ket' => 'Persentase Pembagian SHU untuk Pembina (%)'],
+                'shu_dana_sosial'      => ['value' => '6',  'ket' => 'Persentase Pembagian SHU untuk Dana Sosial (%)'],
+                'shu_dana_pendidikan'  => ['value' => '5.5','ket' => 'Persentase Pembagian SHU untuk Dana Pendidikan (%)'],
+            ];
+            foreach ($kalibrasiSHU as $kKey => $kConf) {
+                $rowK = $this->pengaturanModel->where('pengaturan_key', $kKey)->first();
+                if ($rowK) {
+                    $this->pengaturanModel->update($rowK['id'], [
+                        'pengaturan_value' => $kConf['value'],
+                        'keterangan'       => $kConf['ket'],
+                    ]);
+                } else {
+                    $this->pengaturanModel->insert([
+                        'pengaturan_key'   => $kKey,
+                        'pengaturan_value' => $kConf['value'],
+                        'keterangan'       => $kConf['ket'],
+                    ]);
+                }
+            }
+        }
+
         // Pastikan parameter bawaan pembagian internal pengurus ada jika belum pernah dibuat
         $hasPengurus = $this->pengaturanModel
             ->like('pengaturan_key', 'shu_pengurus_', 'after')

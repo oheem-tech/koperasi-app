@@ -8,7 +8,7 @@ class AdminSeeder extends Seeder
 {
     public function run()
     {
-        // ── 1. Buat user admin ──────────────────────────────────────────
+        // â”€â”€ 1. Buat user admin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $this->db->table('users')->insert([
             'username'   => 'admin',
             'password'   => password_hash('admin123', PASSWORD_DEFAULT),
@@ -17,7 +17,7 @@ class AdminSeeder extends Seeder
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
-        // ── 2. Isi tabel roles (jika belum ada datanya) ─────────────────
+        // â”€â”€ 2. Isi tabel roles (jika belum ada datanya) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $roles = [
             [
                 'name'        => 'admin',
@@ -67,7 +67,7 @@ class AdminSeeder extends Seeder
             }
         }
 
-        // ── 3. Data default: jenis_simpanan ────────────────────────────
+        // â”€â”€ 3. Data default: jenis_simpanan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $jenisSimpanan = [
             ['nama_simpanan' => 'Simpanan Pokok',    'minimal_setoran' => 100000],
             ['nama_simpanan' => 'Simpanan Wajib',    'minimal_setoran' => 50000],
@@ -80,7 +80,7 @@ class AdminSeeder extends Seeder
             }
         }
 
-        // ── 4. Data default: master_kelompok ───────────────────────────
+        // â”€â”€ 4. Data default: master_kelompok â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $kelompok = [
             ['nama_kelompok' => 'Umum',      'keterangan' => 'Kelompok standar untuk anggota umum',        'created_at' => date('Y-m-d H:i:s')],
             ['nama_kelompok' => 'ASN/PNS',   'keterangan' => 'Pegawai Negeri Sipil & ASN',                 'created_at' => date('Y-m-d H:i:s')],
@@ -142,9 +142,14 @@ class AdminSeeder extends Seeder
         ];
 
         foreach ($defaultPengaturan as $dp) {
-            $exists = $this->db->table('pengaturan')->where('pengaturan_key', $dp['pengaturan_key'])->countAllResults();
-            if ($exists === 0) {
+            $row = $this->db->table('pengaturan')->where('pengaturan_key', $dp['pengaturan_key'])->get()->getRow();
+            if (!$row) {
                 $this->db->table('pengaturan')->insert($dp);
+            } else if (strpos($dp['pengaturan_key'], 'shu_') === 0) {
+                $this->db->table('pengaturan')->where('pengaturan_key', $dp['pengaturan_key'])->update([
+                    'pengaturan_value' => $dp['pengaturan_value'],
+                    'keterangan'       => $dp['keterangan'],
+                ]);
             }
         }
 
