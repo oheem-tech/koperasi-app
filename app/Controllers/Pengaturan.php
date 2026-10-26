@@ -50,6 +50,21 @@ class Pengaturan extends BaseController
             }
         }
 
+                // Pastikan parameter dana pendidikan ada jika belum pernah dibuat
+        if (!$this->pengaturanModel->where('pengaturan_key', 'shu_dana_pendidikan')->first()) {
+            $this->pengaturanModel->insert([
+                'pengaturan_key'   => 'shu_dana_pendidikan',
+                'pengaturan_value' => '5.5',
+                'keterangan'       => 'Persentase Pembagian SHU untuk Dana Pendidikan (%)',
+            ]);
+        }
+
+        // Hapus duplikat parameter lama shu_dana_cadangan jika shu_cadangan sudah ada
+        $cadangan = $this->pengaturanModel->where('pengaturan_key', 'shu_cadangan')->first();
+        if ($cadangan) {
+            $this->pengaturanModel->where('pengaturan_key', 'shu_dana_cadangan')->delete();
+        }
+
         // Pastikan parameter bawaan pembagian internal pengurus ada jika belum pernah dibuat
         $hasPengurus = $this->pengaturanModel
             ->like('pengaturan_key', 'shu_pengurus_', 'after')

@@ -199,26 +199,45 @@ CREATE TABLE IF NOT EXISTS `pengaturan` (
 -- Data Default: pengaturan
 -- ============================================================
 INSERT INTO `pengaturan` (`pengaturan_key`, `pengaturan_value`, `keterangan`) VALUES
-('bunga_pinjaman',             '1.5',         'Persentase Bunga/Jasa Pinjaman per Bulan (%)'),
-('denda_keterlambatan',        '10000',        'Nominal Denda Keterlambatan Angsuran (Rp/Bulan)'),
-('shu_jasa_modal',             '20',           'Persentase Pembagian SHU - Jasa Modal/Simpanan (%)'),
-('shu_jasa_anggota',           '25',           'Persentase Pembagian SHU - Jasa Anggota/Pinjaman (%)'),
-('shu_cadangan',               '40',           'Persentase Pembagian SHU - Cadangan Koperasi (%)'),
-('opsi_tenor_pinjaman',        '3,6,12,24',    'Pilihan Lama Tenor Pinjaman dalam Bulan (Pisahkan dengan koma)'),
-('opsi_jenis_pinjaman',        'Uang,Barang,Emas', 'Pilihan Jenis Pinjaman (Pisahkan dengan koma)'),
-('maks_pinjaman_aktif',        '1',            'Batas Maksimal Pinjaman Aktif untuk Jenis yang Sama'),
-('pelunasan_min_tenor_persen', '50',           'Batas Minimum Tenor (%) sebelum pelunasan bebas biaya jasa'),
-('kebijakan_pelunasan_aktif',  '1',            'Aktifkan Kebijakan Min. Tenor Pelunasan? (1=Ya, 0=Tidak)'),
-('pelunasan_jasa_bebas_persen','100',          'Persentase Jasa yang Dibebankan Saat Pelunasan Setelah Memenuhi Min. Tenor'),
-('shu_pengurus_anggota',       '10',           'SHU Pengurus Anggota (%)'),
-('shu_pengawas',               '5',            'SHU Pengawas (%)'),
-('shu_pembina',                '5',            'SHU Pembina (%)'),
-('shu_dana_sosial',            '5',            'SHU Dana Sosial (%)'),
-('shu_dana_cadangan',          '10',           'SHU Dana Cadangan (%)'),
-('shu_pengurus_ketua',         '34',           'Porsi SHU Pengurus - Ketua (%)'),
-('shu_pengurus_bendahara',     '33',           'Porsi SHU Pengurus - Bendahara (%)'),
-('shu_pengurus_sekretaris',    '33',           'Porsi SHU Pengurus - Sekretaris (%)'),
-('telegram_token',             '',             'Token Bot Telegram dari @BotFather');
+('koperasi_nama',             'Koperasi Bahagia Bersama', 'Nama Koperasi'),
+('koperasi_alamat',           'Jl. Merdeka No. 1, Jakarta', 'Alamat Koperasi'),
+('koperasi_kota',             'Jakarta',                   'Kota (dipakai di tanda tangan laporan)'),
+('koperasi_telepon',          '021-123456',                'Nomor Telepon'),
+('koperasi_ketua',            'Ahmad Santoso',             'Nama Ketua Koperasi'),
+('koperasi_bendahara',        'Budi Setiawan',             'Nama Bendahara'),
+('koperasi_pengawas',         'Citra Lestari',             'Nama Pengawas'),
+('koperasi_pembina',          'Doni Kusuma',               'Nama Pembina'),
+('koperasi_logo',             '',                          'File Logo (Format Gambar)'),
+('kode_lisensi',              '',                          'Kode Lisensi White-Label / Premium'),
+('bunga_pinjaman',             '1.5',                      'Persentase Bunga/Jasa Pinjaman per Bulan (%)'),
+('denda_keterlambatan',        '10000',                    'Nominal Denda Keterlambatan Angsuran (Rp/Bulan)'),
+('opsi_tenor_pinjaman',        '3,6,12,24',                'Pilihan Lama Tenor Pinjaman dalam Bulan (Pisahkan dengan koma)'),
+('opsi_jenis_pinjaman',        'Uang,Barang,Emas',         'Pilihan Jenis Pinjaman (Pisahkan dengan koma)'),
+('maks_pinjaman_aktif',        '1',                        'Batas Maksimal Pinjaman Aktif untuk Jenis yang Sama'),
+('pelunasan_min_tenor_persen', '50',                       'Batas Minimum Tenor (%) sebelum pelunasan bebas biaya jasa'),
+('kebijakan_pelunasan_aktif',  '0',                        'Aktifkan Kebijakan Min. Tenor Pelunasan? (1=Ya, 0=Tidak)'),
+('pelunasan_jasa_bebas_persen','100',                      'Persentase Jasa yang Dibebankan Saat Pelunasan Setelah Memenuhi Min. Tenor'),
+('telegram_token',             '',                         'Token Bot Telegram dari @BotFather'),
+('shu_metode_modal',          'akumulasi_akhir',           'Metode Hitung Jasa Modal SHU'),
+('shu_jasa_modal',             '30',                       'Persentase Pembagian SHU - Jasa Modal/Simpanan (%)'),
+('shu_jasa_anggota',           '20',                       'Persentase Pembagian SHU - Jasa Anggota/Pinjaman (%)'),
+('shu_cadangan',               '10',                       'Persentase Pembagian SHU untuk Dana Cadangan (%)'),
+('shu_pengurus_anggota',       '16',                       'Persentase Pembagian SHU untuk Pengurus (%)'),
+('shu_pengawas',               '7.5',                      'Persentase Pembagian SHU untuk Pengawas (%)'),
+('shu_pembina',                '5',                        'Persentase Pembagian SHU untuk Pembina (%)'),
+('shu_dana_sosial',            '6',                        'Persentase Pembagian SHU untuk Dana Sosial (%)'),
+('shu_dana_pendidikan',        '5.5',                      'Persentase Pembagian SHU untuk Dana Pendidikan (%)'),
+('shu_pengurus_ketua',         '34',                       'Porsi SHU Pengurus - Ketua (%)'),
+('shu_pengurus_bendahara',     '33',                       'Porsi SHU Pengurus - Bendahara (%)'),
+('shu_pengurus_sekretaris',    '33',                       'Porsi SHU Pengurus - Sekretaris (%)'),
+('wa_token',                  '',                          'Token API WhatsApp Gateway (Fonnte)'),
+('wa_simpanan_aktif',         '0',                         'Notifikasi Simpanan (1=Aktif, 0=Nonaktif)'),
+('wa_template_simpanan',      'Halo {Nama}, Setoran Simpanan {Jenis} Anda sebesar Rp {Nominal} pada tanggal {Tanggal} telah berhasil kami terima. Salam, Koperasi.', 'Template Pesan Simpanan'),
+('wa_pinjaman_aktif',         '0',                         'Notifikasi Pencairan Pinjaman (1=Aktif, 0=Nonaktif)'),
+('wa_template_pinjaman',      'Halo {Nama}, Pinjaman Anda sebesar Rp {Nominal} telah dicairkan pada tanggal {Tanggal}.', 'Template Pesan Pinjaman'),
+('wa_angsuran_aktif',         '0',                         'Notifikasi Pembayaran Angsuran (1=Aktif, 0=Nonaktif)'),
+('wa_template_angsuran',      'Halo {Nama}, Pembayaran Angsuran ke-{CicilanKe} sebesar Rp {Nominal} telah berhasil diterima pada tanggal {Tanggal}. Sisa tagihan Anda: Rp {Sisa}.', 'Template Pesan Angsuran'),
+('wa_chatbot_aktif',         '0',                         'Fitur WA Chatbot Inbound (Anggota cek saldo/pinjaman via WA) (1=Aktif, 0=Nonaktif)');
 
 -- ============================================================
 -- Data Default: master_kelompok
@@ -283,4 +302,3 @@ CREATE TABLE IF NOT EXISTS `log_aktivitas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;
-
