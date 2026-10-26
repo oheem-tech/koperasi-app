@@ -43,7 +43,9 @@ INSERT INTO `migrations` (`version`, `class`, `group`, `namespace`, `time`, `bat
 ('2026-04-11-143900', 'App\\Database\\Migrations\\AddKasIdToSimpananAngsuran',      'default', 'App', UNIX_TIMESTAMP(), 1),
 ('2026-04-12-111000', 'App\\Database\\Migrations\\AddKategoriToKasKoperasi',        'default', 'App', UNIX_TIMESTAMP(), 1),
 ('2026-04-12-120000', 'App\\Database\\Migrations\\CreateRoles',                       'default', 'App', UNIX_TIMESTAMP(), 1),
-('2026-06-28-131400', 'App\\Database\\Migrations\\LogAktivitas',                    'default', 'App', UNIX_TIMESTAMP(), 1);
+('2026-06-28-131400', 'App\\Database\\Migrations\\LogAktivitas',                    'default', 'App', UNIX_TIMESTAMP(), 1),
+('2026-08-21-015000', 'App\\Database\\Migrations\\AddTelegramFeatures',             'default', 'App', UNIX_TIMESTAMP(), 1),
+('2026-10-16-091500', 'App\\Database\\Migrations\\UpdateJabatanAnggotaToVarchar',   'default', 'App', UNIX_TIMESTAMP(), 1);
 
 -- ============================================================
 -- Tabel: users
@@ -80,9 +82,10 @@ CREATE TABLE IF NOT EXISTS `anggota` (
   `nama_lengkap`      varchar(150) NOT NULL,
   `alamat`            text NOT NULL,
   `no_telp`           varchar(20) NOT NULL,
+  `telegram_chat_id`  varchar(50) DEFAULT NULL,
   `tanggal_bergabung` date NOT NULL,
   `status`            enum('aktif','nonaktif') NOT NULL DEFAULT 'aktif',
-  `jabatan`           enum('anggota','pengurus','pengawas','pembina') NOT NULL DEFAULT 'anggota',
+  `jabatan`           varchar(100) DEFAULT 'anggota',
   `kelompok`          varchar(100) NOT NULL DEFAULT 'Umum',
   `created_at`        datetime DEFAULT NULL,
   `updated_at`        datetime DEFAULT NULL,
@@ -211,7 +214,11 @@ INSERT INTO `pengaturan` (`pengaturan_key`, `pengaturan_value`, `keterangan`) VA
 ('shu_pengawas',               '5',            'SHU Pengawas (%)'),
 ('shu_pembina',                '5',            'SHU Pembina (%)'),
 ('shu_dana_sosial',            '5',            'SHU Dana Sosial (%)'),
-('shu_dana_cadangan',          '10',           'SHU Dana Cadangan (%)');
+('shu_dana_cadangan',          '10',           'SHU Dana Cadangan (%)'),
+('shu_pengurus_ketua',         '34',           'Porsi SHU Pengurus - Ketua (%)'),
+('shu_pengurus_bendahara',     '33',           'Porsi SHU Pengurus - Bendahara (%)'),
+('shu_pengurus_sekretaris',    '33',           'Porsi SHU Pengurus - Sekretaris (%)'),
+('telegram_token',             '',             'Token Bot Telegram dari @BotFather');
 
 -- ============================================================
 -- Data Default: master_kelompok
