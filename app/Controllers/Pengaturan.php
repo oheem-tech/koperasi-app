@@ -125,9 +125,26 @@ class Pengaturan extends BaseController
 
         $settings = $this->request->getPost('settings');
         
-        // Handle logo upload separately
+        // Handle logo upload separately with strict validation
         $logoFile = $this->request->getFile('koperasi_logo');
         if ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved()) {
+            $validationRule = [
+                'koperasi_logo' => [
+                    'label' => 'Logo Koperasi',
+                    'rules' => 'is_image[koperasi_logo]|mime_in[koperasi_logo,image/jpg,image/jpeg,image/png,image/webp]|ext_in[koperasi_logo,jpg,jpeg,png,webp]|max_size[koperasi_logo,2048]',
+                    'errors' => [
+                        'is_image' => 'File yang diunggah harus berupa gambar valid.',
+                        'mime_in'  => 'Format logo harus berupa gambar JPG, JPEG, PNG, atau WEBP.',
+                        'ext_in'   => 'Ekstensi file harus .jpg, .jpeg, .png, atau .webp.',
+                        'max_size' => 'Ukuran file logo maksimal 2MB.'
+                    ]
+                ]
+            ];
+
+            if (!$this->validate($validationRule)) {
+                return redirect()->back()->with('error', $this->validator->getError('koperasi_logo'))->withInput();
+            }
+
             $newName = $logoFile->getRandomName();
             $logoFile->move(FCPATH . 'uploads/logo', $newName);
             

@@ -10,6 +10,26 @@ class Install extends Controller
     {
         $envPath = ROOTPATH . '.env';
         $envExamplePath = ROOTPATH . '.env.example';
+        $lockFile = WRITEPATH . 'install.lock';
+        $loginUrl = base_url('auth');
+
+        // ─── Guard: Cegah akses installer & manipulasi .env jika aplikasi sudah terpasang ───
+        if (file_exists($lockFile)) {
+            return redirect()->to('/auth')->with('info', 'Aplikasi Koperasi sudah terpasang.');
+        }
+
+        if (file_exists($envPath)) {
+            try {
+                $dbCheck = \Config\Database::connect();
+                if ($dbCheck->tableExists('users') && $dbCheck->table('users')->countAllResults() > 0) {
+                    @file_put_contents($lockFile, 'Installed on ' . date('Y-m-d H:i:s'));
+                    return redirect()->to('/auth')->with('info', 'Aplikasi Koperasi sudah terpasang.');
+                }
+            } catch (\Throwable $e) {
+                // Koneksi DB belum siap -> izinkan lanjutkan konfigurasi
+            }
+        }
+        // ───────────────────────────────────────────────────────────────────────────────────
 
         // Jika form setup .env di-submit
         if ($this->request->getPost('setup_env')) {
@@ -263,8 +283,12 @@ class Install extends Controller
                 } else {
                     $logItems[] = ['info', 'Melewati data demo – database kosong siap digunakan'];
                 }
+
+                // Buat lock file penanda instalasi selesai
+                @file_put_contents($lockFile, 'Installed on ' . date('Y-m-d H:i:s'));
             } else {
                 $logItems[] = ['skip', 'Data admin sudah ada, proses seeder dilewati'];
+                @file_put_contents($lockFile, 'Installed on ' . date('Y-m-d H:i:s'));
             }
 
         } catch (\Throwable $e) {

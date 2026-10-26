@@ -73,6 +73,6 @@ Desktop.ini
 #--------------------------------------------
 # UPLOAD ASSETS (tidak perlu di-commit)
 #--------------------------------------------
-public/uploads/
-# Kecuali folder kosong (agar folder tetap ada)
+public/uploads/*
 !public/uploads/.gitkeep
+!public/uploads/.htaccess

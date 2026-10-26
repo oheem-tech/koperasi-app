@@ -29,7 +29,7 @@
                     <td>Rp <?= number_format($row['minimal_setoran'], 0, ',', '.') ?></td>
                     <td>
                         <a href="<?= base_url('jenis-simpanan/edit/'.$row['id']) ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                        <a href="<?= base_url('jenis-simpanan/delete/'.$row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus jenis simpanan ini?')"><i class="fas fa-trash"></i></a>
+                        <form action="<?= base_url('jenis-simpanan/delete/'.$row['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jenis simpanan ini?')"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button></form>
                     </td>
                 </tr>
                 <?php endforeach; ?>

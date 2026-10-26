@@ -67,7 +67,7 @@
                         </td>
                         <td>
                             <a href="<?= base_url('anggota/edit/'.$row['id']) ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                            <a href="<?= base_url('anggota/delete/'.$row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus anggota ini? Data transaksi simpan pinjam juga akan hilang!')"><i class="fas fa-trash"></i></a>
+                            <form action="<?= base_url('anggota/delete/'.$row['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus anggota ini? Data transaksi simpan pinjam juga akan hilang!')"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash"></i></button></form>
                         </td>
                     </tr>
                     <?php endforeach; ?>

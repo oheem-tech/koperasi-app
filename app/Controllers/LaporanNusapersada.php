@@ -9,6 +9,12 @@ class LaporanNusapersada extends BaseController
     public function __construct()
     {
         $this->db = \Config\Database::connect();
+        // Proteksi hak akses laporan khusus Nusapersada
+        if (!has_permission('view_laporan')) {
+            session()->setFlashdata('error', 'Akses Ditolak. Anda tidak memiliki izin untuk melihat laporan ini.');
+            header('Location: ' . base_url('dashboard'));
+            exit;
+        }
     }
 
     public function jasa_pinjaman_dan_simpanan()

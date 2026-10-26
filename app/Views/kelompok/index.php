@@ -67,7 +67,7 @@
                             <a href="<?= base_url('informasi/support') ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3" title="Fitur PRO"><i class="fas fa-edit"></i></a>
                             <?php endif; ?>
                             <?php if(is_premium()): ?>
-                            <a href="<?= base_url('kelompok/delete/'.$k['id']) ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Yakin ingin menghapus kelompok ini?')"><i class="fas fa-trash"></i></a>
+                            <form action="<?= base_url('kelompok/delete/'.$k['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus kelompok ini?')"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fas fa-trash"></i></button></form>
                             <?php else: ?>
                             <a href="<?= base_url('informasi/support') ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Fitur PRO"><i class="fas fa-trash"></i></a>
                             <?php endif; ?>
