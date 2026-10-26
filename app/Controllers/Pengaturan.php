@@ -50,6 +50,22 @@ class Pengaturan extends BaseController
             }
         }
 
+        // Pastikan parameter bawaan pembagian internal pengurus ada jika belum pernah dibuat
+        $hasPengurus = $this->pengaturanModel
+            ->like('pengaturan_key', 'shu_pengurus_', 'after')
+            ->where('pengaturan_key !=', 'shu_pengurus_anggota')
+            ->first();
+        if (!$hasPengurus) {
+            $defaultPengurus = [
+                ['pengaturan_key' => 'shu_pengurus_ketua', 'pengaturan_value' => '34', 'keterangan' => 'Porsi SHU Pengurus - Ketua (%)'],
+                ['pengaturan_key' => 'shu_pengurus_bendahara', 'pengaturan_value' => '33', 'keterangan' => 'Porsi SHU Pengurus - Bendahara (%)'],
+                ['pengaturan_key' => 'shu_pengurus_sekretaris', 'pengaturan_value' => '33', 'keterangan' => 'Porsi SHU Pengurus - Sekretaris (%)'],
+            ];
+            foreach ($defaultPengurus as $dp) {
+                $this->pengaturanModel->insert($dp);
+            }
+        }
+
         $data = [
             'title' => 'Pengaturan Koperasi',
             'pengaturan' => $this->pengaturanModel->findAll()

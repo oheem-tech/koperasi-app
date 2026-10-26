@@ -68,7 +68,7 @@ $groupIcons = [
     <?= csrf_field() ?>
     <div class="row">
         <?php foreach($groups as $groupName => $rows): ?>
-            <?php if(empty($rows)) continue; ?>
+            <?php if(empty($rows) && $groupName !== 'Pembagian Internal Pengurus') continue; ?>
             <div class="col-md-6 mb-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-<?= $groupColors[$groupName] ?> text-white fw-semibold d-flex justify-content-between align-items-center">
@@ -116,6 +116,15 @@ $groupIcons = [
                                 <tr><th>Parameter</th><th>Keterangan</th><th width="35%">Nilai</th></tr>
                             </thead>
                             <tbody>
+                                <?php if(empty($rows) && $groupName == 'Pembagian Internal Pengurus'): ?>
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        <i class="fas fa-users-cog fa-2x text-secondary mb-2 d-block"></i>
+                                        Belum ada parameter jabatan pengurus.<br>
+                                        <small>Klik tombol <strong>"Tambah Parameter Jabatan"</strong> di bawah untuk menambahkan jabatan baru (misal: Ketua, Bendahara, Sekretaris).</small>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
                                 <?php foreach($rows as $row): ?>
                                 <?php 
                                 $isGlobalShu = ($groupName == 'Distribusi SHU Koperasi');
@@ -472,7 +481,7 @@ function hitungTotalSHUGlobal() {
 // Perhitungan Live Total Persentase Pembagian Internal Pengurus (Level 2)
 function hitungTotalSHUPengurus() {
     const pengurusInputs = document.querySelectorAll('.shu-pengurus-input');
-    if (!pengurusInputs.length) return 0;
+
 
     let total = 0;
     pengurusInputs.forEach(input => {
