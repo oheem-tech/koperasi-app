@@ -339,9 +339,20 @@ class DemoSeeder extends Seeder
             ]);
         }
 
-        // 10. Pengaturan Default Sistem Terbaru (Porsi Jabatan Pengurus & Telegram)
+        // Hapus duplikat lama jika ada
+        $this->db->table('pengaturan')->where('pengaturan_key', 'shu_dana_cadangan')->delete();
+
+        // 10. Pengaturan Default Sistem Terbaru (Distribusi SHU 100%, Porsi Jabatan Pengurus 100% & Telegram)
         $defaultSettings = [
             'kebijakan_pelunasan_aktif'  => ['value' => '0',  'ket' => 'Aktifkan Kebijakan Min. Tenor Pelunasan? (1=Ya, 0=Tidak)'],
+            'shu_jasa_modal'             => ['value' => '30', 'ket' => 'Persentase Pembagian SHU - Jasa Modal/Simpanan (%)'],
+            'shu_jasa_anggota'           => ['value' => '20', 'ket' => 'Persentase Pembagian SHU - Jasa Anggota/Pinjaman (%)'],
+            'shu_cadangan'               => ['value' => '10', 'ket' => 'Persentase Pembagian SHU untuk Dana Cadangan (%)'],
+            'shu_pengurus_anggota'       => ['value' => '16', 'ket' => 'Persentase Pembagian SHU untuk Pengurus (%)'],
+            'shu_pengawas'               => ['value' => '7.5','ket' => 'Persentase Pembagian SHU untuk Pengawas (%)'],
+            'shu_pembina'                => ['value' => '5',  'ket' => 'Persentase Pembagian SHU untuk Pembina (%)'],
+            'shu_dana_sosial'            => ['value' => '6',  'ket' => 'Persentase Pembagian SHU untuk Dana Sosial (%)'],
+            'shu_dana_pendidikan'        => ['value' => '5.5','ket' => 'Persentase Pembagian SHU untuk Dana Pendidikan (%)'],
             'shu_pengurus_ketua'         => ['value' => '34', 'ket' => 'Porsi SHU Pengurus - Ketua (%)'],
             'shu_pengurus_bendahara'     => ['value' => '33', 'ket' => 'Porsi SHU Pengurus - Bendahara (%)'],
             'shu_pengurus_sekretaris'    => ['value' => '33', 'ket' => 'Porsi SHU Pengurus - Sekretaris (%)'],
@@ -349,8 +360,8 @@ class DemoSeeder extends Seeder
         ];
 
         foreach ($defaultSettings as $key => $conf) {
-            $exists = $this->db->table('pengaturan')->where('pengaturan_key', $key)->countAllResults();
-            if ($exists == 0) {
+            $row = $this->db->table('pengaturan')->where('pengaturan_key', $key)->get()->getRow();
+            if (!$row) {
                 $this->db->table('pengaturan')->insert([
                     'pengaturan_key'   => $key,
                     'pengaturan_value' => $conf['value'],
@@ -358,9 +369,15 @@ class DemoSeeder extends Seeder
                     'created_at'       => date('Y-m-d H:i:s'),
                     'updated_at'       => date('Y-m-d H:i:s'),
                 ]);
+            } else if (strpos($key, 'shu_') === 0 && $key === 'shu_cadangan' && $row->pengaturan_value == '40') {
+                $this->db->table('pengaturan')->where('pengaturan_key', $key)->update([
+                    'pengaturan_value' => $conf['value'],
+                    'keterangan'       => $conf['ket'],
+                    'updated_at'       => date('Y-m-d H:i:s'),
+                ]);
             }
         }
 
-        echo "✅ Data Demo berhasil di-seed sesuai arsitektur sistem terbaru (Jabatan Level 2, Telegram, & Status Pinjaman)\n";
+        echo "âœ… Data Demo berhasil di-seed sesuai arsitektur sistem terbaru (Jabatan Level 2, Telegram, & Status Pinjaman)\n";
     }
 }
