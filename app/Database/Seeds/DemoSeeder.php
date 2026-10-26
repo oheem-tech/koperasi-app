@@ -369,7 +369,7 @@ class DemoSeeder extends Seeder
                     'created_at'       => date('Y-m-d H:i:s'),
                     'updated_at'       => date('Y-m-d H:i:s'),
                 ]);
-            } else if (strpos($key, 'shu_') === 0 && $key === 'shu_cadangan' && $row->pengaturan_value == '40') {
+            } else if (strpos($key, 'shu_') === 0) {
                 $this->db->table('pengaturan')->where('pengaturan_key', $key)->update([
                     'pengaturan_value' => $conf['value'],
                     'keterangan'       => $conf['ket'],
