@@ -148,7 +148,7 @@ $routes->group('updatesystem', ['filter' => 'auth'], static function ($routes) {
 });
 
 
-// WhatsApp Inbound Webhook (TANPA auth — dipanggil server Fonnte)
+// WhatsApp Inbound Webhook (TANPA auth â€” dipanggil server Fonnte)
 $routes->match(['get', 'post'], 'webhook/whatsapp', 'WhatsappWebhook::receive');
 
 // Routes end here.
