@@ -331,47 +331,67 @@ class LaporanNusapersada extends BaseController
         $p_anggota = (float)($calc['settings']['shu_jasa_anggota'] ?? 20);
         $p_total_anggota = $p_modal + $p_anggota;
         
-        // Porsi pengurus sesuai pengaturan master (atau alokasi pengurus)
+        // Porsi pengurus sesuai pengaturan master
         $p_pengurus = (float)($calc['settings']['shu_pengurus_anggota'] ?? 16);
-
-        $p_ketua = (float)($calc['settings']['shu_pengurus_ketua'] ?? 34);
-        $p_bendahara = (float)($calc['settings']['shu_pengurus_bendahara'] ?? 33);
-        $p_sekretaris = (float)($calc['settings']['shu_pengurus_sekretaris'] ?? 33);
-        $p_bp1 = (float)($calc['settings']['shu_pengurus_bp1'] ?? 0);
-        $p_bp2 = (float)($calc['settings']['shu_pengurus_bp2'] ?? 0);
 
         $val_cadangan = round($shu_bersih * ($p_cadangan / 100));
         $val_anggota = round($shu_bersih * ($p_total_anggota / 100));
         $val_pengurus = round($shu_bersih * ($p_pengurus / 100));
 
+        // Ambil SEMUA parameter dinamis pembagian internal pengurus (Level 2)
+        // dari tabel pengaturan master (shu_pengurus_*)
+        $rowsInternal = $this->db->table('pengaturan')
+            ->like('pengaturan_key', 'shu_pengurus_', 'after')
+            ->where('pengaturan_key !=', 'shu_pengurus_anggota')
+            ->orderBy('id', 'ASC')
+            ->get()->getResultArray();
+
+        $pengurus_internal = [];
+        foreach ($rowsInternal as $ri) {
+            $key = $ri['pengaturan_key'];
+            $persen = (float)$ri['pengaturan_value'];
+
+            // Tentukan label jabatan dari keterangan atau key
+            $label = '';
+            if (!empty($ri['keterangan']) && preg_match('/Pengurus\s*-\s*([^(\n\r]+)/i', $ri['keterangan'], $m)) {
+                $label = trim($m[1]);
+            } else {
+                $cleanKey = str_replace('shu_pengurus_', '', $key);
+                $label = ucwords(str_replace('_', ' ', $cleanKey));
+                $label = preg_replace_callback('/\b(bp)[-_\s]*(\d+)\b/i', function($m) {
+                    return strtoupper($m[1]) . '-' . $m[2];
+                }, $label);
+            }
+
+            $nominal = round($val_pengurus * ($persen / 100));
+
+            $pengurus_internal[] = [
+                'key'     => $key,
+                'label'   => $label,
+                'persen'  => $persen,
+                'nominal' => $nominal,
+            ];
+        }
+
         $val_simpanan = round($shu_bersih * ($p_modal / 100));
         $val_pinjaman = round($shu_bersih * ($p_anggota / 100));
 
         $data = [
-            'tahun'           => $tahun,
-            'pendapatan'      => $pendapatan,
-            'biaya'           => $biaya,
-            'shu_bersih'      => $shu_bersih,
-            'p_cadangan'      => $p_cadangan,
-            'p_total_anggota' => $p_total_anggota,
-            'p_pengurus'      => $p_pengurus,
-            'p_ketua'         => $p_ketua,
-            'p_bendahara'     => $p_bendahara,
-            'p_sekretaris'    => $p_sekretaris,
-            'p_bp1'           => $p_bp1,
-            'p_bp2'           => $p_bp2,
-            'val_cadangan'    => $val_cadangan,
-            'val_anggota'     => $val_anggota,
-            'val_pengurus'    => $val_pengurus,
-            'val_ketua'       => round($val_pengurus * ($p_ketua / 100)),
-            'val_bendahara'   => round($val_pengurus * ($p_bendahara / 100)),
-            'val_sekretaris'  => round($val_pengurus * ($p_sekretaris / 100)),
-            'val_bp1'         => round($val_pengurus * ($p_bp1 / 100)),
-            'val_bp2'         => round($val_pengurus * ($p_bp2 / 100)),
-            'p_modal'         => $p_modal,
-            'p_anggota'       => $p_anggota,
-            'val_simpanan'    => $val_simpanan,
-            'val_pinjaman'    => $val_pinjaman,
+            'tahun'             => $tahun,
+            'pendapatan'        => $pendapatan,
+            'biaya'             => $biaya,
+            'shu_bersih'        => $shu_bersih,
+            'p_cadangan'        => $p_cadangan,
+            'p_total_anggota'   => $p_total_anggota,
+            'p_pengurus'        => $p_pengurus,
+            'pengurus_internal' => $pengurus_internal,
+            'val_cadangan'      => $val_cadangan,
+            'val_anggota'       => $val_anggota,
+            'val_pengurus'      => $val_pengurus,
+            'p_modal'           => $p_modal,
+            'p_anggota'         => $p_anggota,
+            'val_simpanan'      => $val_simpanan,
+            'val_pinjaman'      => $val_pinjaman,
         ];
 
         return view('laporan_nusapersada/laporan_perhitungan_shu', $data);

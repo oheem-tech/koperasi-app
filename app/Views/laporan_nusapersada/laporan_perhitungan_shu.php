@@ -122,36 +122,17 @@
         <td></td>
         <td></td>
     </tr>
+    <?php 
+    $char = 'a';
+    foreach ($pengurus_internal as $pi): 
+    ?>
     <tr>
-        <td class="indent-2">a. Ketua <?= $p_ketua ?>%</td>
-        <td><span class="curr-rp"></span><span class="curr-val"><?= number_format($val_ketua, 2, ',', '.') ?></span><div class="clear"></div></td>
+        <td class="indent-2"><?= $char++ ?>. <?= esc($pi['label']) ?> <?= $pi['persen'] ?>%</td>
+        <td><span class="curr-rp"></span><span class="curr-val"><?= number_format($pi['nominal'], 2, ',', '.') ?></span><div class="clear"></div></td>
         <td></td>
         <td></td>
     </tr>
-    <tr>
-        <td class="indent-2">b. Bendahara <?= $p_bendahara ?>%</td>
-        <td><span class="curr-rp"></span><span class="curr-val"><?= number_format($val_bendahara, 2, ',', '.') ?></span><div class="clear"></div></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="indent-2">c. Sekretaris <?= $p_sekretaris ?>%</td>
-        <td><span class="curr-rp"></span><span class="curr-val"><?= number_format($val_sekretaris, 2, ',', '.') ?></span><div class="clear"></div></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="indent-2">d. BP-1 <?= $p_bp1 ?>%</td>
-        <td><span class="curr-rp"></span><span class="curr-val"><?= number_format($val_bp1, 2, ',', '.') ?></span><div class="clear"></div></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="indent-2">e. BP-2 <?= $p_bp2 ?>%</td>
-        <td><span class="curr-rp"></span><span class="curr-val"><?= number_format($val_bp2, 2, ',', '.') ?></span><div class="clear"></div></td>
-        <td></td>
-        <td></td>
-    </tr>
+    <?php endforeach; ?>
 
     <!-- SECTION 3 -->
     <tr>
