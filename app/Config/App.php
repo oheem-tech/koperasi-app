@@ -199,4 +199,21 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Auto-detect dynamic baseURL jika belum diset di .env atau masih default localhost:8080
+        if (empty($this->baseURL) || $this->baseURL === 'http://localhost:8080/') {
+            if (isset($_SERVER['HTTP_HOST'])) {
+                $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+                $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+                $scriptDir = preg_replace('/\/public\/?$/', '', $scriptDir);
+                $this->baseURL = rtrim($protocol . '://' . $_SERVER['HTTP_HOST'] . $scriptDir, '/') . '/';
+            } else {
+                $this->baseURL = 'http://localhost/';
+            }
+        }
+    }
 }

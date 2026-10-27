@@ -15,7 +15,12 @@ class Install extends Controller
 
         // ─── Guard: Cegah akses installer & manipulasi .env jika aplikasi sudah terpasang ───
         if (file_exists($lockFile)) {
-            return redirect()->to('/auth')->with('info', 'Aplikasi Koperasi sudah terpasang.');
+            // Jika lock file ada tapi .env tidak ada (misal copy folder tanpa .env), bersihkan lock file
+            if (!file_exists($envPath)) {
+                @unlink($lockFile);
+            } else {
+                return redirect()->to('/auth')->with('info', 'Aplikasi Koperasi sudah terpasang.');
+            }
         }
 
         if (file_exists($envPath)) {
@@ -39,6 +44,20 @@ class Install extends Controller
             $dbPass = $this->request->getPost('db_pass');
             $dbName = $this->request->getPost('db_name');
             $baseURL = $this->request->getPost('base_url');
+
+            // ── Auto-create database jika belum ada di MySQL ──
+            try {
+                $mysqli = @new \mysqli($dbHost, $dbUser, $dbPass, '', (int)$dbPort);
+                if (!$mysqli->connect_error) {
+                    $safeDbName = preg_replace('/[^a-zA-Z0-9_]/', '', $dbName);
+                    if (!empty($safeDbName)) {
+                        $mysqli->query("CREATE DATABASE IF NOT EXISTS `{$safeDbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                    }
+                    $mysqli->close();
+                }
+            } catch (\Throwable $e) {
+                // Abaikan jika user DB tidak memiliki privilege CREATE DATABASE
+            }
 
             if (file_exists($envExamplePath)) {
                 $envContent = file_get_contents($envExamplePath);
@@ -78,6 +97,19 @@ class Install extends Controller
             $script = preg_replace('/\/public\/?$/', '/', $script);
             $guessedBaseUrl = rtrim($protocol . "://" . $host . $script, '/') . '/';
 
+            // Deteksi port MySQL lokal aktif (3306 default, otomatis 3307 jika 3307 yang aktif)
+            $defaultPort = 3306;
+            $test3307 = @fsockopen('127.0.0.1', 3307, $errno, $errstr, 0.1);
+            if ($test3307) {
+                fclose($test3307);
+                $test3306 = @fsockopen('127.0.0.1', 3306, $errno, $errstr, 0.1);
+                if (!$test3306) {
+                    $defaultPort = 3307;
+                } else {
+                    fclose($test3306);
+                }
+            }
+
             echo "<div style='font-family: sans-serif; padding: 20px; max-width: 600px; margin: 40px auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>";
             echo "<h2 style='text-align: center;'>⚙️ Setup Konfigurasi Koperasi</h2>";
             echo "<p style='text-align: center; color: #555;'>File konfigurasi database (<strong>.env</strong>) belum terdeteksi. Silakan lengkapi form di bawah ini.</p>";
@@ -87,7 +119,7 @@ class Install extends Controller
             echo "<div><label style='font-weight:bold; font-size:14px;'>Base URL Aplikasi:</label><br><input type='text' name='base_url' value='{$guessedBaseUrl}' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
             echo "<div style='display:flex; gap:10px;'>";
             echo "<div style='flex:3;'><label style='font-weight:bold; font-size:14px;'>Database Host:</label><br><input type='text' name='db_host' value='localhost' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
-            echo "<div style='flex:1;'><label style='font-weight:bold; font-size:14px;'>Port:</label><br><input type='number' name='db_port' value='3306' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
+            echo "<div style='flex:1;'><label style='font-weight:bold; font-size:14px;'>Port:</label><br><input type='number' name='db_port' value='{$defaultPort}' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
             echo "</div>";
             echo "<div><label style='font-weight:bold; font-size:14px;'>Nama Database:</label><br><input type='text' name='db_name' placeholder='Misal: koperasi_db' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";
             echo "<div><label style='font-weight:bold; font-size:14px;'>Username Database:</label><br><input type='text' name='db_user' value='root' style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;' required></div>";

@@ -5,7 +5,7 @@
     Options -Indexes
     
     # Paksa semua traffic untuk masuk ke dalam folder public/
-    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_URI} !/public/ [NC]
     RewriteRule ^(.*)$ public/$1 [L,QSA]
 </IfModule>
 
