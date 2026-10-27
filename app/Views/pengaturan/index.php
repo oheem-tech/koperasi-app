@@ -243,12 +243,7 @@ $groupIcons = [
                                                                required>
                                                         <span class="input-group-text bg-light text-muted px-2">%</span>
                                                     </div>
-                                                    <a href="<?= base_url('pengaturan/delete_parameter/' . $row['id']) ?>" 
-                                                       class="btn btn-outline-danger btn-sm px-2" 
-                                                       title="Hapus parameter jabatan ini"
-                                                       onclick="return confirm('Apakah Anda yakin ingin menghapus parameter <?= esc($row['pengaturan_key']) ?>?')">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </a>
+                                                    <form action="<?= base_url('pengaturan/delete_parameter/' . $row['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus parameter <?= esc($row['pengaturan_key']) ?>?')"><?= csrf_field() ?><button type="submit" class="btn btn-outline-danger btn-sm px-2" title="Hapus parameter jabatan ini"><i class="fas fa-trash-alt"></i></button></form>
                                                 </div>
                                             <?php else: ?>
                                                 <input type="text" class="form-control form-control-sm <?= $isLocked ? 'bg-light text-muted' : '' ?>"

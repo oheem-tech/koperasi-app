@@ -118,7 +118,7 @@
                     <td class="text-center">
                         <?php if(isset($row['is_auto']) && !$row['is_auto']): ?>
                             <a href="<?= base_url('kas/edit/'.$row['id']) ?>" class="btn btn-sm btn-warning" title="Edit"><i class="fas fa-edit"></i></a>
-                            <a href="<?= base_url('kas/delete/'.$row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus entri kas manual ini?');" title="Hapus"><i class="fas fa-trash"></i></a>
+                            <form action="<?= base_url('kas/delete/'.$row['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus entri kas manual ini?');"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash"></i></button></form>
                         <?php else: ?>
                             -
                         <?php endif; ?>

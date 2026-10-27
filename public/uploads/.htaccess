@@ -1,0 +1,12 @@
+# Matikan eksekusi script PHP dan skrip executable di dalam folder uploads
+<FilesMatch "(?i)\.(php|phtml|php3|php4|php5|php7|phps|inc|pl|py|cgi|sh|bash)$">
+    <IfModule authz_core_module>
+        Require all denied
+    </IfModule>
+    <IfModule !authz_core_module>
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Nonaktifkan eksekusi CGI
+Options -ExecCGI -Indexes

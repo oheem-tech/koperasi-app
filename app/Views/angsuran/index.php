@@ -174,9 +174,7 @@ if ($selected_anggota) {
                         <a href="<?= base_url('angsuran/edit/'.$row['id']) ?>" class="btn btn-sm btn-outline-warning" title="Edit Transaksi">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="<?= base_url('angsuran/delete/'.$row['id']) ?>" class="btn btn-sm btn-outline-danger" title="Hapus Transaksi" onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi angsuran ini? Pencatatan pada Kas Koperasi juga akan dibatalkan, dan jika ini adalah angsuran pelunasan, status pinjaman akan dikembalikan ke Belum Lunas.');">
-                            <i class="fas fa-trash"></i>
-                        </a>
+                        <form action="<?= base_url('angsuran/delete/'.$row['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transaksi angsuran ini? Pencatatan pada Kas Koperasi juga akan dibatalkan, dan jika ini adalah angsuran pelunasan, status pinjaman akan dikembalikan ke Belum Lunas.');"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Transaksi"><i class="fas fa-trash"></i></button></form>
                         <?php endif; ?>
                     </td>
                 </tr>

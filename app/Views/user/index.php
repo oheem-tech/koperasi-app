@@ -98,9 +98,7 @@
                                 <?php endif; ?>
 
                                 <?php if($u['id'] != session()->get('user_id') && !$isAnggota): ?>
-                                    <a href="<?= base_url('user/delete/'.$u['id']) ?>" class="btn btn-sm btn-outline-danger shadow-sm ms-1" onclick="return confirm('Hapus staf ini? Aksi ini tidak dapat dibatalkan.')" title="Hapus Staf">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <form action="<?= base_url('user/delete/'.$u['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Hapus staf ini? Aksi ini tidak dapat dibatalkan.')"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline-danger shadow-sm ms-1" title="Hapus Staf"><i class="fas fa-trash"></i></button></form>
                                 <?php endif; ?>
                             </td>
                         </tr>

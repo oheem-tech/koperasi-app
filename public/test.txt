@@ -1,2 +1,0 @@
-Berhasil memigrasi 0 data Angsuran lama.
- Migrasi Selesai! Integrasi Kas 100% tersambung!

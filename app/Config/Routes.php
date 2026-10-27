@@ -19,14 +19,14 @@ $routes->group('anggota', ['filter' => 'auth'], static function ($routes) {
     $routes->post('store', 'Anggota::store');
     $routes->get('edit/(:num)', 'Anggota::edit/$1');
     $routes->post('update/(:num)', 'Anggota::update/$1');
-    $routes->get('delete/(:num)', 'Anggota::delete/$1');
+    $routes->post('delete/(:num)', 'Anggota::delete/$1');
 });
 
 $routes->group('kelompok', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Kelompok::index');
     $routes->post('store', 'Kelompok::store');
     $routes->post('update/(:num)', 'Kelompok::update/$1');
-    $routes->get('delete/(:num)', 'Kelompok::delete/$1');
+    $routes->post('delete/(:num)', 'Kelompok::delete/$1');
     
     $routes->get('bulk', 'Kelompok::bulk_index');
     $routes->post('bulk_process', 'Kelompok::bulk_process');
@@ -38,7 +38,7 @@ $routes->group('jenis-simpanan', ['filter' => 'auth'], static function ($routes)
     $routes->post('store', 'JenisSimpanan::store');
     $routes->get('edit/(:num)', 'JenisSimpanan::edit/$1');
     $routes->post('update/(:num)', 'JenisSimpanan::update/$1');
-    $routes->get('delete/(:num)', 'JenisSimpanan::delete/$1');
+    $routes->post('delete/(:num)', 'JenisSimpanan::delete/$1');
 });
 
 $routes->group('simpanan', ['filter' => 'auth'], static function ($routes) {
@@ -47,7 +47,7 @@ $routes->group('simpanan', ['filter' => 'auth'], static function ($routes) {
     $routes->post('store', 'Simpanan::store');
     $routes->get('edit/(:num)', 'Simpanan::edit/$1');
     $routes->post('update/(:num)', 'Simpanan::update/$1');
-    $routes->get('delete/(:num)', 'Simpanan::delete/$1');
+    $routes->post('delete/(:num)', 'Simpanan::delete/$1');
     $routes->get('print/(:num)', 'Simpanan::print/$1');
     $routes->get('api/get_saldo', 'Simpanan::getSaldo');
 });
@@ -56,11 +56,11 @@ $routes->group('pinjaman', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Pinjaman::index');
     $routes->get('create', 'Pinjaman::create');
     $routes->post('store', 'Pinjaman::store');
-    $routes->get('approve/(:num)', 'Pinjaman::approve/$1');
-    $routes->get('reject/(:num)', 'Pinjaman::reject/$1');
+    $routes->post('approve/(:num)', 'Pinjaman::approve/$1');
+    $routes->post('reject/(:num)', 'Pinjaman::reject/$1');
     $routes->get('edit/(:num)', 'Pinjaman::edit/$1');
     $routes->post('update/(:num)', 'Pinjaman::update/$1');
-    $routes->get('delete/(:num)', 'Pinjaman::delete/$1');
+    $routes->post('delete/(:num)', 'Pinjaman::delete/$1');
     $routes->get('print/(:num)', 'Pinjaman::print/$1');
 });
 
@@ -70,7 +70,7 @@ $routes->group('angsuran', ['filter' => 'auth'], static function ($routes) {
     $routes->post('store', 'Angsuran::store');
     $routes->get('edit/(:num)', 'Angsuran::edit/$1');
     $routes->post('update/(:num)', 'Angsuran::update/$1');
-    $routes->get('delete/(:num)', 'Angsuran::delete/$1');
+    $routes->post('delete/(:num)', 'Angsuran::delete/$1');
     $routes->get('pelunasan/(:num)', 'Angsuran::pelunasan/$1');
     $routes->post('prosespelunasan/(:num)', 'Angsuran::prosespelunasan/$1');
     $routes->get('api/pinjaman/(:num)', 'Angsuran::getPinjamanByAnggota/$1');
@@ -81,7 +81,7 @@ $routes->group('pengaturan', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Pengaturan::index');
     $routes->post('update', 'Pengaturan::update');
     $routes->post('add_parameter', 'Pengaturan::add_parameter');
-    $routes->get('delete_parameter/(:num)', 'Pengaturan::delete_parameter/$1');
+    $routes->post('delete_parameter/(:num)', 'Pengaturan::delete_parameter/$1');
 });
 
 $routes->group('kas', ['filter' => 'auth'], static function ($routes) {
@@ -90,7 +90,7 @@ $routes->group('kas', ['filter' => 'auth'], static function ($routes) {
     $routes->post('store', 'KasKoperasi::store');
     $routes->get('edit/(:num)', 'KasKoperasi::edit/$1');
     $routes->post('update/(:num)', 'KasKoperasi::update/$1');
-    $routes->get('delete/(:num)', 'KasKoperasi::delete/$1');
+    $routes->post('delete/(:num)', 'KasKoperasi::delete/$1');
 });
 
 $routes->group('laporan', ['filter' => 'auth'], static function ($routes) {
@@ -111,7 +111,7 @@ $routes->group('role', ['filter' => 'auth'], static function ($routes) {
     $routes->post('store', 'Role::store');
     $routes->get('edit/(:num)', 'Role::edit/$1');
     $routes->post('update/(:num)', 'Role::update/$1');
-    $routes->get('delete/(:num)', 'Role::delete/$1');
+    $routes->post('delete/(:num)', 'Role::delete/$1');
 });
 
 $routes->group('user', ['filter' => 'auth'], static function ($routes) {
@@ -120,7 +120,7 @@ $routes->group('user', ['filter' => 'auth'], static function ($routes) {
     $routes->post('store', 'User::store');
     $routes->get('edit/(:num)', 'User::edit/$1');
     $routes->post('update/(:num)', 'User::update/$1');
-    $routes->get('delete/(:num)', 'User::delete/$1');
+    $routes->post('delete/(:num)', 'User::delete/$1');
 });
 
 $routes->group('massal', ['filter' => 'auth'], static function ($routes) {
@@ -153,9 +153,3 @@ $routes->match(['get', 'post'], 'webhook/whatsapp', 'WhatsappWebhook::receive');
 
 // Routes end here.
 
-// Laporan Nusapersada (Dinamis DB)
-$routes->get('laporan-nusapersada/jasa-pinjaman', 'LaporanNusapersada::jasa_pinjaman_dan_simpanan');
-$routes->get('laporan-nusapersada/pembagian-jasa', 'LaporanNusapersada::pembagian_jasa_pinjaman');
-$routes->get('laporan-nusapersada/kas-rat', 'LaporanNusapersada::kas_rat');
-$routes->get('laporan-nusapersada/perhitungan-shu', 'LaporanNusapersada::perhitungan_shu');
-$routes->get('laporan-nusapersada/perhitungan-jasa', 'LaporanNusapersada::perhitungan_jasa_simpanan');

@@ -62,9 +62,7 @@
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <?php if(!in_array($r['name'], ['admin', 'anggota'])): ?>
-                            <a href="<?= base_url('role/delete/'.$r['id']) ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus role ini? Semua anggota dengan role ini mungkin akan kesulitan login jika tidak diubah.')" title="Hapus Role">
-                                <i class="fas fa-trash"></i>
-                            </a>
+                            <form action="<?= base_url('role/delete/'.$r['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Hapus role ini? Semua anggota dengan role ini mungkin akan kesulitan login jika tidak diubah.')"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Role"><i class="fas fa-trash"></i></button></form>
                             <?php endif; ?>
                         </td>
                     </tr>

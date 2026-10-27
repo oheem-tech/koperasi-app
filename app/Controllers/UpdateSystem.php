@@ -103,10 +103,17 @@ class UpdateSystem extends BaseController
                 // Copy file dari hasil ekstrak ke root, overwrite yang ada
                 $this->copyDir($sourceDir, $targetDir);
 
-                // Eksekusi skrip migrasi/update database jika ada
+                // Jalankan migrasi resmi CodeIgniter 4 jika ada skema database baru
+                try {
+                    $migrate = \Config\Services::migrations();
+                    $migrate->latest();
+                } catch (\Throwable $e) {
+                    log_message('error', 'Auto-updater database migration failed: ' . $e->getMessage());
+                }
+
+                // Bersihkan file skrip database_update.php legacy jika terbawa dalam arsip
                 $dbUpdateScript = $targetDir . 'database_update.php';
                 if (file_exists($dbUpdateScript)) {
-                    include $dbUpdateScript;
                     @unlink($dbUpdateScript);
                 }
 

@@ -9,6 +9,16 @@
     RewriteRule ^(.*)$ public/$1 [L,QSA]
 </IfModule>
 
+# Blokir akses langsung ke file sensitif di root direktori
+<FilesMatch "(?i)\.(env.*|sql|phar|lock|json|dist|md|spark)$">
+    <IfModule authz_core_module>
+        Require all denied
+    </IfModule>
+    <IfModule !authz_core_module>
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
 # [OPSIONAL] Cache aset statis agar aplikasi memuat lebih cepat di Hosting
 <IfModule mod_expires.c>
     ExpiresActive On

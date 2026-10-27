@@ -164,12 +164,12 @@ if ($selected_anggota) {
                     <td class="text-center text-nowrap">
                         <a href="<?= base_url('pinjaman/print/'.$row['id']) ?>" target="_blank" class="btn btn-sm btn-outline-secondary" title="Cetak Pengajuan"><i class="fas fa-print"></i></a>
                         <a href="<?= base_url('pinjaman/edit/'.$row['id']) ?>" class="btn btn-sm btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></a>
-                        <a href="<?= base_url('pinjaman/delete/'.$row['id']) ?>" class="btn btn-sm btn-outline-danger" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus pinjaman ini?')"><i class="fas fa-trash"></i></a>
+                        <form action="<?= base_url('pinjaman/delete/'.$row['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pinjaman ini?')"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus"><i class="fas fa-trash"></i></button></form>
 
                         <?php if($row['status'] == 'pending'): ?>
                         <div class="mt-1">
-                            <a href="<?= base_url('pinjaman/approve/'.$row['id']) ?>" class="btn btn-sm btn-outline-success" onclick="return confirm('Persetujuan pinjaman akan menambahkan dana tersebut ke daftar angsuran. Lanjutkan?')" title="Setujui"><i class="fas fa-check"></i></a>
-                            <a href="<?= base_url('pinjaman/reject/'.$row['id']) ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tolak pinjaman ini?')" title="Tolak"><i class="fas fa-times"></i></a>
+                            <form action="<?= base_url('pinjaman/approve/'.$row['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Persetujuan pinjaman akan menambahkan dana tersebut ke daftar angsuran. Lanjutkan?')"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline-success" title="Setujui"><i class="fas fa-check"></i></button></form>
+                            <form action="<?= base_url('pinjaman/reject/'.$row['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Tolak pinjaman ini?')"><?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline-danger" title="Tolak"><i class="fas fa-times"></i></button></form>
                         </div>
                         <?php elseif($row['status'] == 'disetujui'): ?>
                         <div class="mt-1">
