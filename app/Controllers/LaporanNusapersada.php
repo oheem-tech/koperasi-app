@@ -8,6 +8,7 @@ class LaporanNusapersada extends BaseController
 
     public function __construct()
     {
+        helper(['auth', 'pengaturan', 'log']);
         $this->db = \Config\Database::connect();
         // Proteksi hak akses laporan khusus Nusapersada
         if (!has_permission('view_laporan')) {
