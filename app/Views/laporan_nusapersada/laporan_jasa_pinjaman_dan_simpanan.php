@@ -12,7 +12,7 @@
 </style>
 <h4>
     DAFTAR JASA PINJAMAN, SIMPANAN DAN SHU TOKO<br>
-    YANG DITERIMAKAN KEPADA ANGGOTA TUTUP BUKU TAHUN <?= date('Y') ?>
+    YANG DITERIMAKAN KEPADA ANGGOTA TUTUP BUKU TAHUN <?= $tahun ?? date('Y') ?>
 </h4>
 <table>
     <thead>

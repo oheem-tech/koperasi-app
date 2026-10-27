@@ -11,7 +11,7 @@
     h4 { text-align: center; font-weight: bold; margin-bottom: 20px; }
 </style>
 <h4>
-    PEMBAGIAN JASA PINJAMAN ANGGOTA TAHUN <?= date('Y') ?>
+    PEMBAGIAN JASA PINJAMAN ANGGOTA TAHUN <?= $tahun ?? date('Y') ?>
 </h4>
 <table>
     <thead>

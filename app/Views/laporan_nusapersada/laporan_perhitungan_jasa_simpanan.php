@@ -11,7 +11,7 @@
     h4 { text-align: center; font-weight: bold; margin-bottom: 20px; }
 </style>
 <h4>
-    PERHITUNGAN JASA SIMPANAN TAHUN <?= date('Y') ?>
+    PERHITUNGAN JASA SIMPANAN TAHUN <?= $tahun ?? date('Y') ?>
 </h4>
 <table>
     <thead>

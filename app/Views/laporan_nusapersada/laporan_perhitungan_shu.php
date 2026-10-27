@@ -20,7 +20,7 @@
     <tr>
         <td colspan="4" class="title-row">
             PERHITUNGAN SISA HASIL USAHA SIMPAN PINJAM<br>
-            PER 31 DESEMBER <?= date('Y') ?>
+            PER 31 DESEMBER <?= $tahun ?? date('Y') ?>
         </td>
     </tr>
     <tr>
@@ -83,7 +83,7 @@
     <tr>
         <td colspan="4" class="title-row" style="border-top: 2px solid #000;">
             PEMBAGIAN HASIL USAHA SIMPAN PINJAM<br>
-            PER 31 DESEMBER <?= date('Y') ?>
+            PER 31 DESEMBER <?= $tahun ?? date('Y') ?>
         </td>
     </tr>
     <tr>
@@ -157,7 +157,7 @@
     <tr>
         <td colspan="4" class="title-row" style="border-top: 2px solid #000;">
             PEMBAGIAN HASIL USAHA UNTUK ANGGOTA<br>
-            PER 31 DESEMBER <?= date('Y') ?>
+            PER 31 DESEMBER <?= $tahun ?? date('Y') ?>
         </td>
     </tr>
     <tr>
