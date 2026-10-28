@@ -32,8 +32,8 @@ class UpdateSystem extends BaseController
         ];
 
         if (isset($latestRelease['tag_name'])) {
-            $latestVersion = str_replace('v', '', $latestRelease['tag_name']);
-            $currVer = str_replace('v', '', $currentVersion);
+            $latestVersion = preg_replace('/^[^\d]+/', '', trim($latestRelease['tag_name']));
+            $currVer = preg_replace('/^[^\d]+/', '', trim($currentVersion));
             if (version_compare($latestVersion, $currVer, '>')) {
                 $data['hasUpdate'] = true;
             }
@@ -45,6 +45,10 @@ class UpdateSystem extends BaseController
     public function process()
     {
         if (!has_permission('manage_pengaturan')) return redirect()->to('/dashboard');
+
+        // Beri waktu dan memori yang cukup untuk download & ekstrak di hosting
+        @set_time_limit(300);
+        @ini_set('memory_limit', '256M');
 
         $updaterConfig = new Updater();
         $repo = $updaterConfig->githubRepo;
@@ -98,7 +102,7 @@ class UpdateSystem extends BaseController
             $subDirs = glob($extractPath . '*', GLOB_ONLYDIR);
             if (!empty($subDirs)) {
                 $sourceDir = $subDirs[0] . '/';
-                $targetDir = FCPATH . '../'; // Root direktori aplikasi
+                $targetDir = defined('ROOTPATH') ? ROOTPATH : (FCPATH . '../'); // Root direktori aplikasi
 
                 // Copy file dari hasil ekstrak ke root, overwrite yang ada
                 $this->copyDir($sourceDir, $targetDir);
@@ -118,7 +122,7 @@ class UpdateSystem extends BaseController
                 }
 
                 // Update versi di file konfigurasi lokal
-                $newVersion = str_replace('v', '', $latestRelease['tag_name']);
+                $newVersion = preg_replace('/^[^\d]+/', '', trim($latestRelease['tag_name']));
                 $configPath = APPPATH . 'Config/Updater.php';
                 if (file_exists($configPath)) {
                     $configContent = file_get_contents($configPath);
@@ -147,6 +151,8 @@ class UpdateSystem extends BaseController
                     if ($file == 'writable' || $file == '.git') continue;
                     $this->copyDir($src . '/' . $file, $dst . '/' . $file);
                 } else {
+                    // Jangan overwrite file konfigurasi server & environment database production
+                    if ($file == '.env' || $file == '.htaccess') continue;
                     copy($src . '/' . $file, $dst . '/' . $file);
                 }
             }
