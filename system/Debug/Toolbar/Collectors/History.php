@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -88,7 +90,7 @@ class History extends BaseCollector
             $contents = @json_decode($contents);
             if (json_last_error() === JSON_ERROR_NONE) {
                 preg_match('/debugbar_(.*)\.json$/s', $filename, $time);
-                $time = sprintf('%.6f', $time[1] ?? 0);
+                $time = sprintf('%.6F', $time[1] ?? 0);
 
                 // Debugbar files shown in History Collector
                 $files[] = [

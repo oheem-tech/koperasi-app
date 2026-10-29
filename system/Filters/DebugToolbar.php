@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -13,7 +15,6 @@ namespace CodeIgniter\Filters;
 
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use Config\Services;
 
 /**
  * Debug toolbar filter
@@ -29,6 +30,7 @@ class DebugToolbar implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
+        return null;
     }
 
     /**
@@ -39,6 +41,8 @@ class DebugToolbar implements FilterInterface
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        Services::toolbar()->prepare($request, $response);
+        service('toolbar')->prepare($request, $response);
+
+        return null;
     }
 }

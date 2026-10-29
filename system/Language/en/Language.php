@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -11,5 +13,6 @@
 
 // "Language" language settings
 return [
+    // @deprecated v4.6.3 - never used
     'invalidMessageFormat' => 'Invalid message format: "{0}", args: "{1}"',
 ];

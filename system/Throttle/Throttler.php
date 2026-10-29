@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -88,8 +90,6 @@ class Throttler implements ThrottlerInterface
      * @param int    $capacity The number of requests the "bucket" can hold
      * @param int    $seconds  The time it takes the "bucket" to completely refill
      * @param int    $cost     The number of tokens this action uses.
-     *
-     * @internal param int $maxRequests
      */
     public function check(string $key, int $capacity, int $seconds, int $cost = 1): bool
     {
@@ -100,8 +100,11 @@ class Throttler implements ThrottlerInterface
         // Number of seconds to get one token
         $refresh = 1 / $rate;
 
+        /** @var float|int|null $tokens */
+        $tokens = $this->cache->get($tokenName);
+
         // Check to see if the bucket has even been created yet.
-        if (($tokens = $this->cache->get($tokenName)) === null) {
+        if ($tokens === null) {
             // If it hasn't been created, then we'll set it to the maximum
             // capacity - 1, and save it to the cache.
             $tokens = $capacity - $cost;
@@ -122,7 +125,7 @@ class Throttler implements ThrottlerInterface
         // should be refilled, then checked against capacity
         // to be sure the bucket didn't overflow.
         $tokens += $rate * $elapsed;
-        $tokens = $tokens > $capacity ? $capacity : $tokens;
+        $tokens = min($tokens, $capacity);
 
         // If $tokens >= 1, then we are safe to perform the action, but
         // we need to decrement the number of available tokens.

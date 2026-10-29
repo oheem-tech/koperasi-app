@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -11,14 +13,8 @@
 
 namespace CodeIgniter\Entity\Cast;
 
-/**
- * Class IntegerCast
- */
 class IntegerCast extends BaseCast
 {
-    /**
-     * {@inheritDoc}
-     */
     public static function get($value, array $params = []): int
     {
         return (int) $value;

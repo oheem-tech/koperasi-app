@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -11,26 +13,17 @@
 
 namespace CodeIgniter\Entity\Cast;
 
-/**
- * Class ArrayCast
- */
 class ArrayCast extends BaseCast
 {
-    /**
-     * {@inheritDoc}
-     */
     public static function get($value, array $params = []): array
     {
-        if (is_string($value) && (strpos($value, 'a:') === 0 || strpos($value, 's:') === 0)) {
+        if (is_string($value) && (str_starts_with($value, 'a:') || str_starts_with($value, 's:'))) {
             $value = unserialize($value);
         }
 
         return (array) $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function set($value, array $params = []): string
     {
         return serialize($value);

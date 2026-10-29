@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -11,7 +13,6 @@
 
 use CodeIgniter\Cookie\Cookie;
 use Config\Cookie as CookieConfig;
-use Config\Services;
 
 // =============================================================================
 // CodeIgniter Cookie Helpers
@@ -23,33 +24,44 @@ if (! function_exists('set_cookie')) {
      *
      * Accepts seven parameters, or you can submit an associative
      * array in the first parameter containing all the values.
+     * ['', 'value', 'expire', '', '', '', '', '', 'name']
      *
-     * @param array|Cookie|string $name     Cookie name / array containing binds / Cookie object
-     * @param string              $value    The value of the cookie
-     * @param string              $expire   The number of seconds until expiration
-     * @param string              $domain   For site-wide cookie. Usually: .yourdomain.com
-     * @param string              $path     The cookie path
-     * @param string              $prefix   The cookie prefix ('': the default prefix)
-     * @param bool|null           $secure   True makes the cookie secure
-     * @param bool|null           $httpOnly True makes the cookie accessible via http(s) only (no javascript)
-     * @param string|null         $sameSite The cookie SameSite value
-     *
-     * @return void
+     * @param array{
+     *   name?: string,
+     *   value?: string,
+     *   prefix?: string,
+     *   max-age?: int|numeric-string,
+     *   expire?: DateTimeInterface|int|string,
+     *   path?: string,
+     *   domain?: string,
+     *   secure?: bool,
+     *   httponly?: bool,
+     *   samesite?: string,
+     *   raw?: bool
+     *  }|Cookie|string $name     Cookie name / array containing binds / Cookie object
+     * @param string      $value    The value of the cookie
+     * @param int         $expire   The number of seconds until expiration
+     * @param string      $domain   For site-wide cookie. Usually: .yourdomain.com
+     * @param string      $path     The cookie path
+     * @param string      $prefix   The cookie prefix ('': the default prefix)
+     * @param bool|null   $secure   True makes the cookie secure
+     * @param bool|null   $httpOnly True makes the cookie accessible via http(s) only (no javascript)
+     * @param string|null $sameSite The cookie SameSite value
      *
      * @see \CodeIgniter\HTTP\Response::setCookie()
      */
     function set_cookie(
         $name,
         string $value = '',
-        string $expire = '',
+        int $expire = 0,
         string $domain = '',
         string $path = '/',
         string $prefix = '',
         ?bool $secure = null,
         ?bool $httpOnly = null,
-        ?string $sameSite = null
-    ) {
-        $response = Services::response();
+        ?string $sameSite = null,
+    ): void {
+        $response = service('response');
         $response->setCookie($name, $value, $expire, $domain, $path, $prefix, $secure, $httpOnly, $sameSite);
     }
 }
@@ -63,7 +75,7 @@ if (! function_exists('get_cookie')) {
      *                            '': the prefix in Config\Cookie
      *                            null: no prefix
      *
-     * @return array|string|null
+     * @return array<string, mixed>|string|null
      *
      * @see \CodeIgniter\HTTP\IncomingRequest::getCookie()
      */
@@ -75,7 +87,7 @@ if (! function_exists('get_cookie')) {
             $prefix = $cookie->prefix;
         }
 
-        $request = Services::request();
+        $request = service('request');
         $filter  = $xssClean ? FILTER_SANITIZE_FULL_SPECIAL_CHARS : FILTER_DEFAULT;
 
         return $request->getCookie($prefix . $index, $filter);
@@ -91,13 +103,11 @@ if (! function_exists('delete_cookie')) {
      * @param string $path   the cookie path
      * @param string $prefix the cookie prefix
      *
-     * @return void
-     *
      * @see \CodeIgniter\HTTP\Response::deleteCookie()
      */
-    function delete_cookie($name, string $domain = '', string $path = '/', string $prefix = '')
+    function delete_cookie($name, string $domain = '', string $path = '/', string $prefix = ''): void
     {
-        Services::response()->deleteCookie($name, $domain, $path, $prefix);
+        service('response')->deleteCookie($name, $domain, $path, $prefix);
     }
 }
 
@@ -107,6 +117,6 @@ if (! function_exists('has_cookie')) {
      */
     function has_cookie(string $name, ?string $value = null, string $prefix = ''): bool
     {
-        return Services::response()->hasCookie($name, $value, $prefix);
+        return service('response')->hasCookie($name, $value, $prefix);
     }
 }

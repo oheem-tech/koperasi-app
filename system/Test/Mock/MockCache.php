@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -29,7 +31,7 @@ class MockCache extends BaseHandler implements CacheInterface
     /**
      * Expiration times.
      *
-     * @var ?list<int>
+     * @var array<string, int|null>
      */
     protected $expirations = [];
 
@@ -60,7 +62,7 @@ class MockCache extends BaseHandler implements CacheInterface
     {
         $key = static::validateKey($key, $this->prefix);
 
-        return array_key_exists($key, $this->cache) ? $this->cache[$key] : null;
+        return $this->cache[$key] ?? null;
     }
 
     /**
@@ -90,11 +92,10 @@ class MockCache extends BaseHandler implements CacheInterface
      * @param string $key   Cache item name
      * @param mixed  $value the data to save
      * @param int    $ttl   Time To Live, in seconds (default 60)
-     * @param bool   $raw   Whether to store the raw value.
      *
      * @return bool
      */
-    public function save(string $key, $value, int $ttl = 60, bool $raw = false)
+    public function save(string $key, $value, int $ttl = 60)
     {
         if ($this->bypass) {
             return false;
@@ -213,8 +214,9 @@ class MockCache extends BaseHandler implements CacheInterface
     /**
      * Returns detailed information about the specific item in the cache.
      *
-     * @return array|null Returns null if the item does not exist, otherwise array<string, mixed>
-     *                    with at least the 'expire' key for absolute epoch expiry (or null).
+     * @return array{expire: int|null}|null Returns null if the item does not exist,
+     *                                      otherwise, array with the 'expire' key for
+     *                                      absolute epoch expiry (or null).
      */
     public function getMetaData(string $key)
     {

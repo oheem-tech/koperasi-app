@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -12,7 +14,9 @@
 namespace CodeIgniter\Database\SQLSRV;
 
 use CodeIgniter\Database\BaseConnection;
+use CodeIgniter\Database\Exceptions\DatabaseException;
 use CodeIgniter\Database\Forge as BaseForge;
+use Throwable;
 
 /**
  * Forge for SQLSRV
@@ -40,7 +44,7 @@ class Forge extends BaseForge
      *
      * @var string
      */
-    protected $createDatabaseIfStr = "DECLARE @DBName VARCHAR(255) = '%s'\nDECLARE @SQL VARCHAR(max) = 'IF DB_ID( ''' + @DBName + ''' ) IS NULL CREATE DATABASE ' + @DBName\nEXEC( @SQL )";
+    protected $createDatabaseIfStr = "DECLARE @DBName VARCHAR(255) = '%s'\nDECLARE @SQL VARCHAR(max) = 'IF DB_ID( ''' + @DBName + ''' ) IS NULL CREATE DATABASE %s'\nEXEC( @SQL )";
 
     /**
      * CREATE DATABASE IF statement
@@ -118,6 +122,53 @@ class Forge extends BaseForge
     }
 
     /**
+     * Create database
+     *
+     * @param bool $ifNotExists Whether to add IF NOT EXISTS condition
+     *
+     * @throws DatabaseException
+     */
+    public function createDatabase(string $dbName, bool $ifNotExists = false): bool
+    {
+        if ($ifNotExists) {
+            $sql = sprintf(
+                $this->createDatabaseIfStr,
+                $dbName,
+                $this->db->escapeIdentifier($dbName),
+            );
+        } else {
+            $sql = sprintf(
+                $this->createDatabaseStr,
+                $this->db->escapeIdentifier($dbName),
+            );
+        }
+
+        try {
+            if (! $this->db->query($sql)) {
+                // @codeCoverageIgnoreStart
+                if ($this->db->DBDebug) {
+                    throw new DatabaseException('Unable to create the specified database.');
+                }
+
+                return false;
+                // @codeCoverageIgnoreEnd
+            }
+
+            if (isset($this->db->dataCache['db_names'])) {
+                $this->db->dataCache['db_names'][] = $dbName;
+            }
+
+            return true;
+        } catch (Throwable $e) {
+            if ($this->db->DBDebug) {
+                throw new DatabaseException('Unable to create the specified database.', 0, $e);
+            }
+
+            return false; // @codeCoverageIgnore
+        }
+    }
+
+    /**
      * CREATE TABLE attributes
      */
     protected function _createTableAttributes(array $attributes): string
@@ -129,8 +180,7 @@ class Forge extends BaseForge
      * @param array|string $processedFields Processed column definitions
      *                                      or column names to DROP
      *
-     * @return         false|list<string>|string                            SQL string or false
-     * @phpstan-return ($alterType is 'DROP' ? string : list<string>|false)
+     * @return ($alterType is 'DROP' ? string : false|list<string>)
      */
     protected function _alterTable(string $alterType, string $table, $processedFields)
     {
@@ -161,10 +211,10 @@ class Forge extends BaseForge
 
             $sql = <<<SQL
                 SELECT name
-                FROM SYS.DEFAULT_CONSTRAINTS
-                WHERE PARENT_OBJECT_ID = OBJECT_ID('{$fullTable}')
-                AND PARENT_COLUMN_ID IN (
-                SELECT column_id FROM sys.columns WHERE NAME IN ({$fields}) AND object_id = OBJECT_ID(N'{$fullTable}')
+                FROM sys.default_constraints
+                WHERE parent_object_id = OBJECT_ID('{$fullTable}')
+                AND parent_column_id IN (
+                SELECT column_id FROM sys.columns WHERE name IN ({$fields}) AND object_id = OBJECT_ID(N'{$fullTable}')
                 )
                 SQL;
 
@@ -174,7 +224,7 @@ class Forge extends BaseForge
 
             $sql = 'ALTER TABLE ' . $fullTable . ' DROP ';
 
-            $fields = array_map(static fn ($item) => 'COLUMN [' . trim($item) . ']', (array) $columnNamesToDrop);
+            $fields = array_map(static fn ($item): string => 'COLUMN [' . trim($item) . ']', (array) $columnNamesToDrop);
 
             return $sql . implode(',', $fields);
         }
@@ -203,8 +253,27 @@ class Forge extends BaseForge
             }
 
             if (! empty($field['default'])) {
-                $sqls[] = $sql . ' ALTER COLUMN ADD CONSTRAINT ' . $this->db->escapeIdentifiers($field['name']) . '_def'
-                    . " DEFAULT {$field['default']} FOR " . $this->db->escapeIdentifiers($field['name']);
+                $fullTable = $this->db->escapeIdentifiers($this->db->schema) . '.' . $this->db->escapeIdentifiers($table);
+                $colName   = $field['name']; // bare, for sys.columns lookup
+
+                // find the existing default constraint name for this column
+                $findSql = <<<SQL
+                    SELECT dc.name AS constraint_name
+                    FROM sys.default_constraints dc
+                    JOIN sys.columns c
+                        ON dc.parent_object_id = c.object_id
+                        AND dc.parent_column_id = c.column_id
+                    WHERE dc.parent_object_id = OBJECT_ID(N'{$fullTable}')
+                        AND c.name = N'{$colName}';
+                    SQL;
+
+                $toDrop = $this->db->query($findSql)->getRowArray();
+                if (isset($toDrop['constraint_name']) && $toDrop['constraint_name'] !== '') {
+                    $sqls[] = $sql . ' DROP CONSTRAINT ' . $this->db->escapeIdentifiers($toDrop['constraint_name']);
+                }
+
+                $sqls[] = $sql . ' ADD CONSTRAINT ' . $this->db->escapeIdentifiers($field['name'] . '_def')
+                    . "{$field['default']} FOR " . $this->db->escapeIdentifiers($field['name']);
             }
 
             $nullable = true; // Nullable by default.
@@ -212,7 +281,7 @@ class Forge extends BaseForge
                 $nullable = false;
             }
             $sqls[] = $sql . ' ALTER COLUMN ' . $this->db->escapeIdentifiers($field['name'])
-                . " {$field['type']}{$field['length']} " . ($nullable === true ? '' : 'NOT') . ' NULL';
+                . " {$field['type']}{$field['length']} " . ($nullable ? '' : 'NOT') . ' NULL';
 
             if (! empty($field['comment'])) {
                 $sqls[] = 'EXEC sys.sp_addextendedproperty '
@@ -309,7 +378,7 @@ class Forge extends BaseForge
     protected function _attributeType(array &$attributes)
     {
         // Reset field lengths for data types that don't support it
-        if (isset($attributes['CONSTRAINT']) && stripos($attributes['TYPE'], 'int') !== false) {
+        if (isset($attributes['CONSTRAINT']) && str_contains(strtolower($attributes['TYPE']), 'int')) {
             $attributes['CONSTRAINT'] = null;
         }
 
@@ -324,8 +393,18 @@ class Forge extends BaseForge
                 break;
 
             case 'ENUM':
-                $attributes['TYPE']       = 'TEXT';
-                $attributes['CONSTRAINT'] = null;
+                // in char(n) and varchar(n), the n defines the string length in
+                // bytes (0 to 8,000).
+                // https://learn.microsoft.com/en-us/sql/t-sql/data-types/char-and-varchar-transact-sql?view=sql-server-ver16#remarks
+                $maxLength = max(
+                    array_map(
+                        strlen(...),
+                        $attributes['CONSTRAINT'],
+                    ),
+                );
+
+                $attributes['TYPE']       = 'VARCHAR';
+                $attributes['CONSTRAINT'] = $maxLength;
                 break;
 
             case 'TIMESTAMP':
@@ -334,6 +413,11 @@ class Forge extends BaseForge
 
             case 'BOOLEAN':
                 $attributes['TYPE'] = 'BIT';
+                break;
+
+            case 'BLOB':
+                $attributes['TYPE'] = 'VARBINARY';
+                $attributes['CONSTRAINT'] ??= 'MAX';
                 break;
 
             default:
@@ -346,7 +430,7 @@ class Forge extends BaseForge
      */
     protected function _attributeAutoIncrement(array &$attributes, array &$field)
     {
-        if (! empty($attributes['AUTO_INCREMENT']) && $attributes['AUTO_INCREMENT'] === true && stripos($field['type'], 'INT') !== false) {
+        if (! empty($attributes['AUTO_INCREMENT']) && $attributes['AUTO_INCREMENT'] === true && str_contains(strtolower($field['type']), strtolower('INT'))) {
             $field['auto_increment'] = ' IDENTITY(1,1)';
         }
     }

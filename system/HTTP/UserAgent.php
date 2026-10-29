@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -12,13 +14,14 @@
 namespace CodeIgniter\HTTP;
 
 use Config\UserAgents;
+use Stringable;
 
 /**
  * Abstraction for an HTTP user agent
  *
  * @see \CodeIgniter\HTTP\UserAgentTest
  */
-class UserAgent
+class UserAgent implements Stringable
 {
     /**
      * Current user-agent
@@ -106,8 +109,10 @@ class UserAgent
     {
         $this->config = $config ?? config(UserAgents::class);
 
-        if (isset($_SERVER['HTTP_USER_AGENT'])) {
-            $this->agent = trim($_SERVER['HTTP_USER_AGENT']);
+        $userAgent = service('superglobals')->server('HTTP_USER_AGENT');
+
+        if ($userAgent !== null) {
+            $this->agent = trim($userAgent);
             $this->compileData();
         }
     }
@@ -122,7 +127,7 @@ class UserAgent
         }
 
         // No need to be specific, it's a browser
-        if ($key === null) {
+        if ((string) $key === '') {
             return true;
         }
 
@@ -140,7 +145,7 @@ class UserAgent
         }
 
         // No need to be specific, it's a robot
-        if ($key === null) {
+        if ((string) $key === '') {
             return true;
         }
 
@@ -158,7 +163,7 @@ class UserAgent
         }
 
         // No need to be specific, it's a mobile
-        if ($key === null) {
+        if ((string) $key === '') {
             return true;
         }
 
@@ -172,10 +177,11 @@ class UserAgent
     public function isReferral(): bool
     {
         if (! isset($this->referrer)) {
-            if (empty($_SERVER['HTTP_REFERER'])) {
+            $referer = service('superglobals')->server('HTTP_REFERER');
+            if ($referer === null || $referer === '') {
                 $this->referrer = false;
             } else {
-                $refererHost = @parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
+                $refererHost = @parse_url($referer, PHP_URL_HOST);
                 $ownHost     = parse_url(\base_url(), PHP_URL_HOST);
 
                 $this->referrer = ($refererHost && $refererHost !== $ownHost);
@@ -238,7 +244,9 @@ class UserAgent
      */
     public function getReferrer(): string
     {
-        return empty($_SERVER['HTTP_REFERER']) ? '' : trim($_SERVER['HTTP_REFERER']);
+        $referrer = service('superglobals')->server('HTTP_REFERER');
+
+        return $referrer === null ? '' : trim($referrer);
     }
 
     /**
@@ -275,7 +283,7 @@ class UserAgent
         $this->setPlatform();
 
         foreach (['setRobot', 'setBrowser', 'setMobile'] as $function) {
-            if ($this->{$function}() === true) {
+            if ($this->{$function}()) {
                 break;
             }
         }
@@ -286,7 +294,7 @@ class UserAgent
      */
     protected function setPlatform(): bool
     {
-        if (is_array($this->config->platforms) && $this->config->platforms) {
+        if (is_array($this->config->platforms) && $this->config->platforms !== []) {
             foreach ($this->config->platforms as $key => $val) {
                 if (preg_match('|' . preg_quote($key, '|') . '|i', $this->agent)) {
                     $this->platform = $val;
@@ -306,7 +314,7 @@ class UserAgent
      */
     protected function setBrowser(): bool
     {
-        if (is_array($this->config->browsers) && $this->config->browsers) {
+        if (is_array($this->config->browsers) && $this->config->browsers !== []) {
             foreach ($this->config->browsers as $key => $val) {
                 if (preg_match('|' . $key . '.*?([0-9\.]+)|i', $this->agent, $match)) {
                     $this->isBrowser = true;
@@ -327,7 +335,7 @@ class UserAgent
      */
     protected function setRobot(): bool
     {
-        if (is_array($this->config->robots) && $this->config->robots) {
+        if (is_array($this->config->robots) && $this->config->robots !== []) {
             foreach ($this->config->robots as $key => $val) {
                 if (preg_match('|' . preg_quote($key, '|') . '|i', $this->agent)) {
                     $this->isRobot = true;
@@ -347,7 +355,7 @@ class UserAgent
      */
     protected function setMobile(): bool
     {
-        if (is_array($this->config->mobiles) && $this->config->mobiles) {
+        if (is_array($this->config->mobiles) && $this->config->mobiles !== []) {
             foreach ($this->config->mobiles as $key => $val) {
                 if (false !== (stripos($this->agent, $key))) {
                     $this->isMobile = true;

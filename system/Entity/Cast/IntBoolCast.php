@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -12,8 +14,6 @@
 namespace CodeIgniter\Entity\Cast;
 
 /**
- * Int Bool Cast
- *
  * DB column: int (0/1) <--> Class property: bool
  */
 final class IntBoolCast extends BaseCast

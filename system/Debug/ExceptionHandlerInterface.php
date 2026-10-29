@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -11,6 +13,8 @@
 
 namespace CodeIgniter\Debug;
 
+use CodeIgniter\HTTP\CLIRequest;
+use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Throwable;
@@ -19,12 +23,14 @@ interface ExceptionHandlerInterface
 {
     /**
      * Determines the correct way to display the error.
+     *
+     * @param CLIRequest|IncomingRequest $request
      */
     public function handle(
         Throwable $exception,
         RequestInterface $request,
         ResponseInterface $response,
         int $statusCode,
-        int $exitCode
+        int $exitCode,
     ): void;
 }

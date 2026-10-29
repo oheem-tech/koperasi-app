@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -50,24 +52,23 @@ class SecureHeaders implements FilterInterface
      * We don't have anything to do here.
      *
      * @param list<string>|null $arguments
-     *
-     * @return void
      */
     public function before(RequestInterface $request, $arguments = null)
     {
+        return null;
     }
 
     /**
      * Add security headers.
      *
      * @param list<string>|null $arguments
-     *
-     * @return void
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
         foreach ($this->headers as $header => $value) {
             $response->setHeader($header, $value);
         }
+
+        return $response;
     }
 }
