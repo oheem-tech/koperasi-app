@@ -56,17 +56,24 @@ $paths = new Paths();
 // ── Installer Guard ──────────────────────────────────────────────────────────
 // Jika file .env belum ada dan database belum dikonfigurasi, redirect ke installer
 $rootPath = dirname(FCPATH) . DIRECTORY_SEPARATOR;
-$hasEnv = file_exists($rootPath . '.env')
+$envFile = $rootPath . '.env';
+
+// Auto-fallback: jika file .env belum ada tapi ada file 'env', salin otomatis
+if (!file_exists($envFile) && file_exists($rootPath . 'env')) {
+    @copy($rootPath . 'env', $envFile);
+}
+
+$hasEnv = file_exists($envFile)
        || file_exists(FCPATH . '.env')
        || (isset($paths->appDirectory) && file_exists(rtrim($paths->appDirectory, '\\/ ') . '/../.env'));
 
-// Periksa apakah database sudah dikonfigurasi langsung di Config\Database
+// Periksa apakah database sudah dikonfigurasi langsung di Database.php tanpa me-load class
 $hasDbConfig = false;
-if (file_exists($paths->appDirectory . '/Config/Database.php')) {
-    require_once $paths->appDirectory . '/Config/Database.php';
-    if (class_exists('Config\Database')) {
-        $dbCfg = new Config\Database();
-        $hasDbConfig = !empty($dbCfg->default['database']);
+$dbConfigFile = $paths->appDirectory . '/Config/Database.php';
+if (file_exists($dbConfigFile)) {
+    $dbContent = @file_get_contents($dbConfigFile);
+    if ($dbContent && preg_match("/'database'\s*=>\s*'([^']+)'/", $dbContent, $m) && !empty($m[1])) {
+        $hasDbConfig = true;
     }
 }
 
