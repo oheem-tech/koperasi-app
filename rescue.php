@@ -13,7 +13,13 @@
 @ini_set('memory_limit', '512M');
 
 $repo = 'oheem-tech/koperasi-app';
-$rootDir = __DIR__ . DIRECTORY_SEPARATOR;
+
+// Deteksi apakah rescue.php dijalankan dari public/ atau dari root project
+if (basename(__DIR__) === 'public') {
+    $rootDir = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+} else {
+    $rootDir = __DIR__ . DIRECTORY_SEPARATOR;
+}
 $writableDir = $rootDir . 'writable' . DIRECTORY_SEPARATOR;
 $uploadsDir = $writableDir . 'uploads' . DIRECTORY_SEPARATOR;
 
