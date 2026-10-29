@@ -34,7 +34,8 @@ $success = '';
 
 if ($action === 'delete_self') {
     @unlink(__FILE__);
-    header('Location: ./');
+    $redirectUrl = (basename(__DIR__) === 'public') ? '../' : './';
+    header('Location: ' . $redirectUrl);
     exit;
 }
 

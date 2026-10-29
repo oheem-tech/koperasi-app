@@ -54,10 +54,23 @@ require FCPATH . '../app/Config/Paths.php';
 $paths = new Paths();
 
 // ── Installer Guard ──────────────────────────────────────────────────────────
-// Jika file .env belum ada, redirect ke halaman installer sebelum framework
-// mencoba koneksi database (yang akan menyebabkan crash "Whoops!").
-$rootPath = realpath(FCPATH . '../') . DIRECTORY_SEPARATOR;
-if (!file_exists($rootPath . '.env')) {
+// Jika file .env belum ada dan database belum dikonfigurasi, redirect ke installer
+$rootPath = dirname(FCPATH) . DIRECTORY_SEPARATOR;
+$hasEnv = file_exists($rootPath . '.env')
+       || file_exists(FCPATH . '.env')
+       || (isset($paths->appDirectory) && file_exists(rtrim($paths->appDirectory, '\\/ ') . '/../.env'));
+
+// Periksa apakah database sudah dikonfigurasi langsung di Config\Database
+$hasDbConfig = false;
+if (file_exists($paths->appDirectory . '/Config/Database.php')) {
+    require_once $paths->appDirectory . '/Config/Database.php';
+    if (class_exists('Config\Database')) {
+        $dbCfg = new Config\Database();
+        $hasDbConfig = !empty($dbCfg->default['database']);
+    }
+}
+
+if (!$hasEnv && !$hasDbConfig) {
     $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
     // Normalisasi: ambil path tanpa query string
     $requestPath = strtok($requestUri, '?');

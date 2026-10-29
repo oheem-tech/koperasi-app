@@ -99,7 +99,8 @@ class Install extends Controller
 
             // Deteksi port MySQL lokal aktif (3306 default, otomatis 3307 jika 3307 yang aktif)
             $defaultPort = 3306;
-            $test3307 = @fsockopen('127.0.0.1', 3307, $errno, $errstr, 0.1);
+            if (function_exists('fsockopen')) {
+                $test3307 = @fsockopen('127.0.0.1', 3307, $errno, $errstr, 0.1);
             if ($test3307) {
                 fclose($test3307);
                 $test3306 = @fsockopen('127.0.0.1', 3306, $errno, $errstr, 0.1);
@@ -108,6 +109,7 @@ class Install extends Controller
                 } else {
                     fclose($test3306);
                 }
+            }
             }
 
             echo "<div style='font-family: sans-serif; padding: 20px; max-width: 600px; margin: 40px auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>";
