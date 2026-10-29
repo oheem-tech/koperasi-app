@@ -9,18 +9,14 @@
     <?php if(session()->getFlashdata('success')) : ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?= session()->getFlashdata('success'); ?>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
 
     <?php if(session()->getFlashdata('error')) : ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <?= session()->getFlashdata('error'); ?>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
 
@@ -34,15 +30,15 @@
                     <table class="table table-sm table-borderless mb-3">
                         <tr>
                             <td style="width: 200px;">Versi Aplikasi Saat Ini</td>
-                            <td>: <strong class="badge badge-info p-2" style="font-size: 14px;">v<?= esc($currentVersion); ?></strong></td>
+                            <td>: <span class="badge bg-primary p-2" style="font-size: 14px;">v<?= esc($currentVersion); ?></span></td>
                         </tr>
                         <tr>
                             <td>Versi PHP Server Hosting</td>
                             <td>: 
                                 <?php if ($isPhpSupported) : ?>
-                                    <span class="badge badge-success p-2"><i class="fas fa-check-circle"></i> PHP <?= esc($phpVersion); ?> (Didukung Penuh)</span>
+                                    <span class="badge bg-success p-2"><i class="fas fa-check-circle"></i> PHP <?= esc($phpVersion); ?> (Didukung Penuh)</span>
                                 <?php else : ?>
-                                    <span class="badge badge-warning p-2"><i class="fas fa-exclamation-triangle"></i> PHP <?= esc($phpVersion); ?> (Perlu Diubah di cPanel ke PHP 8.2/8.4)</span>
+                                    <span class="badge bg-warning text-dark p-2"><i class="fas fa-exclamation-triangle"></i> PHP <?= esc($phpVersion); ?> (Perlu Diubah di cPanel ke PHP 8.2/8.4)</span>
                                 <?php endif; ?>
                             </td>
                         </tr>
